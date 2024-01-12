@@ -5,7 +5,7 @@ generic
 
 package Memoire is
 
-   type T_Memoire is limited private;
+   type T_Memoire is private;
 
    -- Enum�rable du type de la variable
    type T_Type is (CHAINE, ENTIER, TAB);

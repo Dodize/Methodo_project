@@ -3,11 +3,15 @@
 
 -- Importer le module de memoire dans .adb
 -- Mettre le tableau memoire en argument
+with Memoire;
 
-   generic
+generic
+    with package P_Memoire is new Memoire(<>);
       Capacite: Integer;   -- Nombre de ligne du code interprete
 
 package Decode is
+    
+    use P_Memoire;
    
    Type T_tab_instruc is limited private ;
    
