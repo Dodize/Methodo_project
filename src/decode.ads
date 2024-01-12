@@ -1,17 +1,21 @@
--- Ce module definit les operations necessaires au decodage des instructions
--- ainsi qu'a leurs executions.
+-- Ce module definit les operations necessaires au decodage du code intermediaire
+-- Il stock les instructions et les executes.
 
--- Importer le module de mémoire
+-- Importer le module de memoire dans .adb
+-- Mettre le tableau mÃ©moire en argument
 
 package Decode is
 
    Type T_tab_instruc is limited private ;
-   Limited private CP integer;
+   --DECLARER CAPACITE EN GENERIQUE POUR L'UTILISER DANS TAB ET LE DECLARER ICI
    Capacite: constant Integer := 70;   -- Cette taille est arbitraire POUR LE MOMENT
+   
+   -- Verifie si le tableau d'instruction est vide
+   function est_null(Tab : in T_tab_instruc) return Boolean;
 
    -- Initialiser le tableau d'instruction
    procedure init_tab_instruc (Tab : out T_tab_instruc) with
-     Post Tab = null;
+     Post => est_null(Tab);
 
    -- Initialise le compteur
    procedure init_CP (CP: out Integer) with
@@ -21,62 +25,67 @@ package Decode is
      Post => CP'Old +1 = CP;
 
    -- Rempli le tableau avec les instructions
-   -- en ignorant les commentaires ou pas de commentaires ?
+   -- Coommentaire : DEVIENT NULL
    -- en mettant sous la forme voulue
    procedure remplir_tab_instruc (Tab : in out T_tab_instruc);
 
-   --Mettre dans .adb en methode interne ???
+   --METTRE dans .adb en methode interne
 	-- Recupere l'instruction dans le tableau.
-	function recup_instru (Tab : in T_tab_instruc, CP : in Integer) return String with
-		Post => Tab(CP).pos1 = res or Tab(CP).pos3 = res;
+	-- function recup_instru (Tab : in T_tab_instruc; CP : in Integer) return String with
+	--	Post => Tab(CP).pos1 = res or Tab(CP).pos3 = res;
 
-   -- Effectue une instruction passée en paramètre en fonction de son type
+   -- Effectue une instruction passÃ©e en paramÃ¨tre en fonction de son type
    -- utilise recup_instru ?
    -- appel instru_goto, instru_op, instru_affectation, instru_if, instru_null
-	procedure effectuer_instru (Tab : in T_tab_instruc, CP : in Integer);
+	procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer);
 
    -- Effectue l'instruction goto en allant au label souhaite
-   procedure instru_goto (CP : out Integer, label : in Integer);
+   procedure instru_goto (CP : out Integer; label : in Integer);
 
    -- Effectue l'instruction operation demande
-   procedure instru_op (x : in Integer, y : in Integer, op : in String, z : out Integer);
+   procedure instru_op (x : in Integer; y : in Integer; op : in String; z : out Integer);
 
    -- Effectue l'instruction operation demande
    -- si "chaine" + "5" dans le doc y aura ""5""
-   procedure instru_op (x : in String, y : in String, op : in String, z : out Integer);
+   procedure instru_op (x : in String; y : in String; op : in String; z : out Integer);
 
    -- Effectue l'instruction affectation TODO A FAIRE EN GENERIQUE SUR VAL ET RAJOUTER LE TABLEAU DE MEMOIRE DEDANS
-   procedure instru_affectation (val : in Integer, cle : in out String);
+   procedure instru_affectation (val : in Integer; cle : in out String);
 
    -- Effectue l'instruction if
    -- Integer pour X car c'est notre clef
-   procedure instru_if (x : in Integer, label : in int, CP : out Integer);
+   procedure instru_if (x : in Integer; label : in Integer; CP : out Integer);
 
    -- Effectue l'instruction null, soit ne fait rien
    procedure instru_null (CP : out Integer) with
-     Post CP'Old +1 = CP;
+     Post => CP'Old +1 = CP;
 
-   -- Pour debugger : Affihe mémoire CP et la mémoire regroupant les valeurs des différentes variables
-   procedure afficher (Tab : in T_tab_instruc, CP : in Integer);
+   -- Pour debugger : Affihe mÃ©moire CP et la mÃ©moire regroupant les valeurs des differentes variables
+   procedure afficher (Tab : in T_tab_instruc; CP : in Integer);
 
+   
+   -- A DEPLACER PLUS AU 
    -- Permet de choisir le mode d'utilisation
    -- 0 pour normal et 1 pour debugge
-   function menu () return Integer with
-     Post res = 0 or res = 1;
+   -- function menu return Integer with
+   --   Post => res = 0 or res = 1;
 
    -- Lance l'interpreteur en lisant et excecutant le code
-   procedure execution ();
+   -- procedure execution;
 
 private
 
-   type T_tab_instruc is array (1..Capacite) of T_op;
-
-   type T_op is
+   -- VIRE AU DESSUS DANS EXECUTION VU QU'ON DECLARE TAB AUSSI D'ABORD
+   -- CP integer;
+   
+      type T_op is
       record
-         pos1: String;
-         pos2 : String; --si fait ça faut un 5eme champs pour cste ou variable
-         pos3 : String; --on met que des int au lieu de string
-         pos4 : String; --x on met l'adresse
+         pos1: String (1..25);
+         pos2 : String (1..25); --si fait Ã§a faut un 5eme champs pour cste ou variable
+         pos3 : String (1..25); --on met que des int au lieu de string
+         pos4 : String (1..25); --x on met l'adresse
       end record;
+   
+   type T_tab_instruc is array (1..Capacite) of T_op;
 
 end Decode;
