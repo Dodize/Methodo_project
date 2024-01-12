@@ -2,13 +2,14 @@
 -- Il stock les instructions et les executes.
 
 -- Importer le module de memoire dans .adb
--- Mettre le tableau mémoire en argument
+-- Mettre le tableau memoire en argument
+
+   generic
+      Capacite: Integer;   -- Nombre de ligne du code interprete
 
 package Decode is
-
+   
    Type T_tab_instruc is limited private ;
-   --DECLARER CAPACITE EN GENERIQUE POUR L'UTILISER DANS TAB ET LE DECLARER ICI
-   Capacite: constant Integer := 70;   -- Cette taille est arbitraire POUR LE MOMENT
    
    -- Verifie si le tableau d'instruction est vide
    function est_null(Tab : in T_tab_instruc) return Boolean;
@@ -37,31 +38,31 @@ package Decode is
    -- Effectue une instruction passée en paramètre en fonction de son type
    -- utilise recup_instru ?
    -- appel instru_goto, instru_op, instru_affectation, instru_if, instru_null
-	procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer);
+	procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire);
 
    -- Effectue l'instruction goto en allant au label souhaite
    procedure instru_goto (CP : out Integer; label : in Integer);
 
    -- Effectue l'instruction operation demande
-   procedure instru_op (x : in Integer; y : in Integer; op : in String; z : out Integer);
+   procedure instru_op (x : in Integer; y : in Integer; op : in String; z : out Integer; mem : in out T_memoire);
 
    -- Effectue l'instruction operation demande
    -- si "chaine" + "5" dans le doc y aura ""5""
-   procedure instru_op (x : in String; y : in String; op : in String; z : out Integer);
+   procedure instru_op (x : in String; y : in String; op : in String; z : out Integer; mem : in out T_memoire);
 
    -- Effectue l'instruction affectation TODO A FAIRE EN GENERIQUE SUR VAL ET RAJOUTER LE TABLEAU DE MEMOIRE DEDANS
-   procedure instru_affectation (val : in Integer; cle : in out String);
+   procedure instru_affectation (val : in Integer; cle : in out String; mem : in out T_memoire);
 
    -- Effectue l'instruction if
    -- Integer pour X car c'est notre clef
-   procedure instru_if (x : in Integer; label : in Integer; CP : out Integer);
+   procedure instru_if (x : in Integer; label : in Integer; CP : out Integer; mem : in T_memoire);
 
    -- Effectue l'instruction null, soit ne fait rien
    procedure instru_null (CP : out Integer) with
      Post => CP'Old +1 = CP;
 
-   -- Pour debugger : Affihe mémoire CP et la mémoire regroupant les valeurs des differentes variables
-   procedure afficher (Tab : in T_tab_instruc; CP : in Integer);
+   -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
+   procedure afficher (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire);
 
    
    -- A DEPLACER PLUS AU 
@@ -81,7 +82,7 @@ private
       type T_op is
       record
          pos1: String (1..25);
-         pos2 : String (1..25); --si fait ça faut un 5eme champs pour cste ou variable
+         pos2 : String (1..25); --si fait ca faut un 5eme champs pour cste ou variable
          pos3 : String (1..25); --on met que des int au lieu de string
          pos4 : String (1..25); --x on met l'adresse
       end record;
