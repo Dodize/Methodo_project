@@ -2,3 +2,9 @@ obj/gpsauto.cgpr
 obj/decode.ads.stderr
 obj/decode.ads.stdout
 obj/projet_janvier-loc.xml
+obj/decode.adb.stderr
+obj/decode.adb.stdout
+obj/memoire.ads.stderr
+obj/memoire.ads.stdout
+obj/test_decode.adb.stderr
+obj/test_decode.adb.stdout
