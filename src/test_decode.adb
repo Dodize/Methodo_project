@@ -2,15 +2,9 @@ with Decode;
 with Memoire;
 procedure test_decode is
     
-    subtype Str50 is String (1..50);
-    
     package MemoireEntier is new Memoire(T_Elt => Integer);
-        
-    package MemoireChaine is new Memoire(T_Elt => Str50);
     
     package Decode2Entier is new Decode(P_Memoire => MemoireEntier, Capacite => 2);
-    
-    package Decode2Chaine is new Decode(P_Memoire => MemoireChaine, Capacite => 2);
     
         
     -- Test concernant l'instruction NULL
@@ -18,7 +12,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : Decode2Entier.T_tab_instruc;
-        MemoirePremierElement, MemoireX : MemoireEntier.T_Memoire;
+        MemoirePremierElement : MemoireEntier.T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -38,8 +33,8 @@ procedure test_decode is
         
         -- vérifications
         pragma Assert (CP = 2);
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 2);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 2);       
         
     end;
     
@@ -48,7 +43,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -67,8 +63,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 5);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 5);       
         
     end;
     
@@ -78,7 +74,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -98,8 +95,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 7);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 7);       
         
     end;
     
@@ -109,7 +106,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -128,108 +126,19 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 8);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 8);       
         
     end;
     
-    
-    -- Test concernant l'instruction OP : addition de deux constantes (string)
-    procedure test_instruction_addition_chaine_const is  
-        use MemoireChaine; use Decode2Chaine;
-        
-        Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireMaChaine : T_Memoire;
-        CP : Integer;
-        
-    begin
-              
-        --initialisation du tableau d'instruction
-        init_tab_instruc(Tab_Instruc); 
-        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "maChaine <- "1" + "2")
-        CP := 1;
-        
-        --initialisation de la mémoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "maChaine : Chaine");
-        Modifier(MemoirePremierElement, "maChaine", "uneChaine");
-        
-        -- test : opération add chaines constantes
-        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
-        
-        -- vérifications
-        MemoireMaChaine := RecupererVariable(MemoirePremierElement, "maChaine");
-        pragma Assert (MemoireMaChaine.all.Data = "12");       
-        
-    end;
-    
-    -- Test concernant l'instruction OP : addition de deux variables (string)
-    procedure test_instruction_addition_chaine_var is  
-        use MemoireChaine; use Decode2Chaine;
-        
-        Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireMaChaine : T_Memoire;
-        CP : Integer;
-        
-    begin
-              
-        --initialisation du tableau d'instruction
-        init_tab_instruc(Tab_Instruc); 
-        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "maChaine <- chaineA + chaineB")
-        CP := 1;
-        
-        --initialisation de la mémoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "maChaine, chaineA, chaineB : Chaine");
-        Modifier(MemoirePremierElement, "maChaine", "uneChaine");
-        Modifier(MemoirePremierElement, "chaineA", "aa");
-        Modifier(MemoirePremierElement, "chaineB", "22");
-        
-        -- test : opération add chaines variables
-        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
-        
-        -- vérifications
-        MemoireMaChaine := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireMaChaine.all.Data = "aa22");       
-        
-    end;
-    
-    
-    -- Test concernant l'instruction OP : addition d'une variable et d'une constante (string)
-    procedure test_instruction_addition_chaine_mix is  
-        use MemoireChaine; use Decode2Chaine;
-        
-        Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireMaChaine : T_Memoire;
-        CP : Integer;
-        
-    begin
-              
-        --initialisation du tableau d'instruction
-        init_tab_instruc(Tab_Instruc); 
-        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "maChaine <- maChaine + " "")
-        CP := 1;
-        
-        --initialisation de la mémoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "maChaine : Chaine");
-        Modifier(MemoirePremierElement, "maChaine", "bonjour");
-        
-        -- test : opération NULL
-        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
-        
-        -- vérifications
-        MemoireMaChaine := RecupererVariable(MemoirePremierElement, "maChaine");
-        pragma Assert (MemoireMaChaine.all.Data = "bonjour ");       
-        
-    end;
-    
+
     -- Test concernant l'instruction OP : soustraction de deux constantes (entieres)
     procedure test_instruction_soustraction_const is  
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -248,8 +157,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = -3);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = -3);       
         
     end;
     
@@ -259,7 +168,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -279,8 +189,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 3);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 3);       
         
     end;
     
@@ -290,7 +200,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -309,8 +220,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 2);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 2);       
         
     end;
     
@@ -319,7 +230,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -338,8 +250,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 6);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 6);       
         
     end;
     
@@ -349,7 +261,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -369,8 +282,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 0);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 0);       
         
     end;
     
@@ -380,7 +293,8 @@ procedure test_decode is
         use MemoireEntier; use Decode2Entier;
         
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement, MemoireX : T_Memoire;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
         CP : Integer;
         
     begin
@@ -399,9 +313,257 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- vérifications
-        MemoireX := RecupererVariable(MemoirePremierElement, "x");
-        pragma Assert (MemoireX.all.Data = 8);       
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 8);       
         
+    end;
+    
+     -- Test concernant l'instruction OP : division de deux constantes (entieres)
+    procedure test_instruction_division_const is  
+        use MemoireEntier; use Decode2Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "x <- 4 / 2")
+        CP := 1;
+        
+        --initialisation de la mémoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        Modifier(MemoirePremierElement, "x", 3);
+        
+        -- test : opération division avec constantes
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- vérifications
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 2);       
+        
+    end;
+    
+    -- Test concernant l'instruction OP : cas d'exception de la division par zero
+    procedure test_instruction_division_parzero is
+        use MemoireEntier; use Decode2Entier;
+    
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        est_leve : Boolean; --indique si l'exception est levée
+    
+    begin
+        est_leve := False;
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc);
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "x <- 4 / 0")
+        CP := 1;
+    
+        --initialisation de la mémoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "x : Entier");
+    
+        begin
+            -- test : opération division par zero (doit lever une erreur)
+            effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+            
+        exception
+            when Constraint_Error => 
+                est_leve := True;
+        end;
+    
+        -- vérifications
+        pragma Assert (est_leve = True);
+    
+    end;
+    
+    
+    -- Test concernant l'instruction OP : division de deux variables (entieres)
+    procedure test_instruction_division_entier_var is  
+        use MemoireEntier; use Decode2Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "x <- x / y")
+        CP := 1;
+        
+        --initialisation de la mémoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        Modifier(MemoirePremierElement, "x", 6);
+        Modifier(MemoirePremierElement, "y", 2);
+        
+        -- test : opération division avec variables
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- vérifications
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 3);       
+        
+    end;
+    
+    
+    -- Test concernant l'instruction OP : division d'une variable et d'une constante (entieres)
+    procedure test_instruction_division_entier_mix is  
+        use MemoireEntier; use Decode2Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne : "x <- y / 3")
+        CP := 1;
+        
+        --initialisation de la mémoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        Modifier(MemoirePremierElement, "y", 6);
+        
+        -- test : opération division variable + constante
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- vérifications
+        X_value := RecupererValeur(MemoirePremierElement, "x");
+        pragma Assert (X_value = 2);       
+        
+    end;
+    
+    
+    -- Test concernant l'instruction GOTO avec un numéro de ligne antérieur
+    procedure test_instruction_goto_ligne_ante is  
+        use MemoireEntier; use Decode2Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (deux lignes : une vide + "GOTO 1")
+        CP := 2;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        
+        -- test : opération division variable + constante
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- vérifications
+        pragma Assert (CP = 1);       
+        
+    end;
+    
+    
+    -- Test concernant l'instruction GOTO avec un numéro de ligne postérieur
+    procedure test_instruction_goto_ligne_post is
+        package Decode5Entier is new Decode(P_Memoire => MemoireEntier, Capacite => 5);
+        use MemoireEntier; use Decode5Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne "GOTO 5")
+        CP := 1;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        
+        -- test : opération division variable + constante
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- vérifications
+        pragma Assert (CP = 5);       
+        
+    end;
+    
+    -- Test concernant l'instruction GOTO avec un numéro de ligne invalide (<1)
+    procedure test_instruction_goto_invalide_inf is
+        use MemoireEntier; use Decode2Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        est_leve : Boolean;
+        
+    begin
+        est_leve := False;    
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne "GOTO 0")
+        CP := 1;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        
+        begin
+            -- test : opération goto invalide
+            effectuer_instru(Tab_Instruc, CP, MemoirePremierElement); 
+            
+        exception
+            when GOTO_OUT_OF_RANGE_EXCEPTION => 
+                est_leve := True;    
+        end;
+        
+        -- vérifications
+        pragma Assert (est_leve = True);
+    
+    end;
+    
+    -- Test concernant l'instruction GOTO avec un numéro de ligne invalide (> Capacite de Tab_instruc)
+    procedure test_instruction_goto_invalide_sup is
+        use MemoireEntier; use Decode2Entier;
+        
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        est_leve : Boolean;
+        
+    begin
+        est_leve := False;    
+        --initialisation du tableau d'instruction
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc);--remplir avec les instructions (une ligne "GOTO 10")
+        CP := 1;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        
+        begin
+            -- test : opération goto invalide
+            effectuer_instru(Tab_Instruc, CP, MemoirePremierElement); 
+            
+        exception
+            when GOTO_OUT_OF_RANGE_EXCEPTION => 
+                est_leve := True;    
+        end;
+        
+        -- vérifications
+        pragma Assert (est_leve = True);
+    
     end;
     
 begin

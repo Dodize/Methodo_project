@@ -13,7 +13,9 @@ package Decode is
     
     use P_Memoire;
    
-   Type T_tab_instruc is limited private ;
+    Type T_tab_instruc is limited private ;
+    
+    GOTO_OUT_OF_RANGE_EXCEPTION : Exception; -- la ligne renvoyée par GOTO est < à 1 ou > au nombre de lignes du code
    
    -- Verifie si le tableau d'instruction est vide
    function est_null(Tab : in T_tab_instruc) return Boolean;
