@@ -16,28 +16,41 @@ package Decode is
     GOTO_OUT_OF_RANGE_EXCEPTION : Exception; -- la ligne renvoyee par GOTO est inf a 1 ou supp au nombre de lignes du code
    
    -- Verifie si le tableau d'instruction est vide
+   -- @param Tab : tableau d'instruction à comparer
    function est_null(Tab : in T_tab_instruc) return Boolean;
 
    -- Initialiser le tableau d'instruction
+   -- @param Tab: tableau d'instruction a initialiser
    procedure init_tab_instruc (Tab : out T_tab_instruc) with
      Post => est_null(Tab);
 
    -- Initialise le compteur
+   -- @param CP : compteur a initialiser
    procedure init_CP (CP: out Integer) with
      Post => CP = 1;
-
+   
+   -- Incrémente le compteur
+   -- @param CP : compteur a incrementer
    procedure increm_CP (CP : in out Integer) with
      Post => CP'Old +1 = CP;
 
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
+   -- @param Tab : tableau a remplir
+   -- @param Fichier : code source a utiliser pour remplir le tableau
    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type);
 
    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
+   -- @param Tab : tableau comptenant les instructions
+   -- @param CP : compteur
+   -- @param mem : liste chainee comptenant les variables et leurs valeurs
 	procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire);
 
    -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
+   -- @param Tab : tableau comptenant les instructions
+   -- @param CP : compteur
+   -- @param mem : liste chainee comptenant les variables et leurs valeurs
    procedure afficher (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire);
 
    
@@ -45,9 +58,9 @@ private
    type T_op is
       record
          pos1: String (1..25);
-         pos2 : String (1..25); --si fait ca faut un 5eme champs pour cste ou variable
-         pos3 : String (1..25); --on met que des int au lieu de string
-         pos4 : String (1..25); --x on met l'adresse
+         pos2 : String (1..25);
+         pos3 : String (1..25);
+         pos4 : String (1..25);
       end record;
    
    type T_tab_instruc is array (1..Capacite) of T_op;
