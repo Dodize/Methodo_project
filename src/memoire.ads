@@ -1,4 +1,4 @@
--- Ce module definit les operations necessaires à la gestion de la mémoire
+-- Ce module definit les operations necessaires a la gestion de la mÃ©moire
 
 generic
    type T_Elt is private;
@@ -23,8 +23,11 @@ package Memoire is
    -- Modifie la donnee d'une variable existante en memoire
    procedure Modifier(Mem : in out T_Memoire ; Cle : in String ; Data : in T_Elt);
 
-   -- Recupere une variable par son nom
-   function RecupererVariable(Mem : in T_Memoire ; Cle : in String) return T_Memoire;
+   -- Recupere la valeur d'une variable par son nom
+   function RecupererValeur(Mem : in T_Memoire ; Cle : in String) return T_Elt;
+
+   -- Recupere le type d'une variable par son nom
+   function RecupererType(Mem : in T_Memoire ; Cle : in String) return T_Type;
 
    private
 
