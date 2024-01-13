@@ -7,23 +7,23 @@ package Memoire is
 
    type T_Memoire is private;
 
-   -- Enum�rable du type de la variable
+   -- Enumerable du type de la variable
    type T_Type is (CHAINE, ENTIER, TAB);
 
-   -- Initialise une case m�moire. La case m�moire est vide
+   -- Initialise une case memoire. La case memoire est vide
    procedure Initialiser(Mem : out T_Memoire) with
      Post => Est_Vide(Mem);
 
-   -- Indique si la m�moire est vide
+   -- Indique si la memoire est vide
    function Est_Vide(Mem : in T_Memoire) return Boolean;
 
-   -- D�clare toutes les variables en m�moire
+   -- Declare toutes les variables en memoire
    procedure DeclarerVariables(Mem : in out T_Memoire ; Code : in String);
 
-   -- Modifie la donn�e d'une variable existante en m�moire
+   -- Modifie la donnee d'une variable existante en memoire
    procedure Modifier(Mem : in out T_Memoire ; Cle : in String ; Data : in T_Elt);
 
-   -- R�cup�re une variable par son nom
+   -- Recupere une variable par son nom
    function RecupererVariable(Mem : in T_Memoire ; Cle : in String) return T_Memoire;
 
    private
