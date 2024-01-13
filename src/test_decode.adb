@@ -564,7 +564,51 @@ procedure test_decode is
         -- vÃ©rifications
         pragma Assert (est_leve = True);
     
-    end;
+   end;
+   
+   -- Test pour verifier qu'à l'initialisation un T_tab_instruc est null
+   procedure test_initialisation_t_tab_instruc is
+      use Decode2Entier;
+      
+      Tab_Instruc : T_tab_instruc;
+      
+   begin
+      -- Initialisation du tableau d'instruction
+      init_tab_instruc(Tab_Instruc);
+      -- Verification de si le tableau est bien vide
+      pragma Assert(est_null(Tab_Instruc));
+   end;
+   
+   -- Test pour verifier qu'à l'initialisation cp vaut 1
+   procedure test_initialisation_cp is
+      use Decode2Entier;
+      
+      cp : Integer;
+      
+   begin
+      -- Initialisation de cp
+      init_CP(cp);      
+      -- Verification de si cp vaut bien 1
+      pragma Assert(cp = 1);
+   end;
+   
+   -- Test pour verifier que cp est incremente de 1 apres utilisation de la procedure increm_CP
+   procedure test_increm_cp is
+      use Decode2Entier;
+      
+      current_cp : Integer;
+      old_cp : Integer;
+      
+   begin
+      -- Initialisation de current_cp
+      init_CP(current_cp);
+      -- Stockage de sa valeur dans old_cp
+      old_cp := current_cp;
+      -- Incrémentation de current_cp
+      increm_CP(current_cp);
+      -- Verification de si current_cp vaut bien old_cp + 1
+      pragma Assert(current_cp = (old_cp + 1));
+   end;
     
 begin
     Null;
