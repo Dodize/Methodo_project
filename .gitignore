@@ -8,3 +8,13 @@ obj/memoire.ads.stderr
 obj/memoire.ads.stdout
 obj/test_decode.adb.stderr
 obj/test_decode.adb.stdout
+obj/decode.ali
+obj/decode.o
+obj/interpreteur.ads.stderr
+obj/interpreteur.ads.stdout
+obj/memoire.adb.stderr
+obj/memoire.adb.stdout
+obj/memoire.ali
+obj/memoire.o
+obj/test_decode.ali
+obj/test_decode.o

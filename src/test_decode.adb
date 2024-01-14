@@ -26,8 +26,6 @@ procedure test_decode is
     end;
     
     
-    
-    
         
     -- Test concernant l'instruction NULL
     procedure test_instruction_NULL is  
@@ -62,8 +60,42 @@ procedure test_decode is
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 2); 
         
+    end;
+    
+    
+    -- Test concernant l'instruction d'affectation
+    procedure test_instruction_affectation is
+        use MemoireEntier; use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        Valeur_X : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "X <- 3");
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        CP := 1;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "X : Entier");
+        Modifier(MemoirePremierElement, "X", 0); --variable initialisée à 0
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- verifications
+        deleteFileInstruct(Fichier_temp);
+        Valeur_X := RecupererValeur(MemoirePremierElement, "X");
+        pragma Assert (Valeur_X = 3);  -- la valeur de X a bien été modifiée
         
     end;
+    
     
     -- Test concernant l'instruction OP : addition de deux constantes (entieres)
     procedure test_instruction_addition_entier_const is  
@@ -648,8 +680,83 @@ procedure test_decode is
         deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve = True);
     
-   end;
+    end;
+    
+    -- Test concernant l'instruction IF avec une condition = true (le goto prend effet)
+    procedure test_instruction_if_true is
+        package Decode5Entier is new Decode(P_Memoire => MemoireEntier, Capacite => 5);
+        use MemoireEntier; use Decode5Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "IF T1 GOTO 5");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "NULL");
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        CP := 1;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "T1 : Entier");
+        Modifier(MemoirePremierElement, "T1", 1); --valeur autre que 0 donc True
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- verifications
+        deleteFileInstruct(Fichier_temp);
+        pragma Assert (CP = 5);    -- conséquence du goto   
+        
+    end;
+    
+    
+    -- Test concernant l'instruction IF avec une condition = false (le goto ne prend pas effet)
+    procedure test_instruction_if_false is
+        package Decode5Entier is new Decode(P_Memoire => MemoireEntier, Capacite => 5);
+        use MemoireEntier; use Decode5Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        MemoirePremierElement : T_Memoire;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "IF T1 GOTO 3");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "NULL");
+        init_tab_instruc(Tab_Instruc); 
+        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        CP := 1;
+        
+        -- initialisation memoire
+        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, "T1 : Entier");
+        Modifier(MemoirePremierElement, "T1", 0); --valeur 0 donc False
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        
+        -- verifications
+        deleteFileInstruct(Fichier_temp);
+        pragma Assert (CP = 2);  -- le CP est incrémenté de 1 car le goto ne prend pas effet   
+        
+    end;
+        
    
+    
    -- Test pour verifier qu'à l'initialisation un T_tab_instruc est null
    procedure test_initialisation_t_tab_instruc is
       use Decode2Entier;

@@ -1,9 +1,73 @@
-procedure Decode is
+package body Decode is
 
 -- Importer le module de memoire dans .adb
 -- Mettre le tableau memoire en argument
 
-begin
+
+    -- Verifie si le tableau d'instruction est vide
+   -- @param Tab : tableau d'instruction à comparer
+    function est_null(Tab : in T_tab_instruc) return Boolean is
+    begin
+        return True;
+    end est_null;
+
+
+   -- Initialiser le tableau d'instruction
+   -- @param Tab: tableau d'instruction a initialiser
+   procedure init_tab_instruc (Tab : out T_tab_instruc) is
+    begin
+        Null;
+    end init_tab_instruc;
+
+
+   -- Initialise le compteur
+   -- @param CP : compteur a initialiser
+   procedure init_CP (CP: out Integer) is
+    begin
+        Null;
+    end init_CP;
+
+
+   -- Incrémente le compteur
+   -- @param CP : compteur a incrementer
+   procedure increm_CP (CP : in out Integer) is
+    begin
+        Null;
+    end increm_CP;
+
+
+   -- Rempli le tableau avec les instructions du fichier
+   -- en mettant sous la forme voulue
+   -- Si la ligne est un coommentaire : devient un null dans le tableau
+   -- @param Tab : tableau a remplir
+   -- @param Fichier : code source a utiliser pour remplir le tableau
+    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type) is
+    begin
+        Null;
+    end remplir_tab_instruc;
+
+
+   -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
+   -- @param Tab : tableau comptenant les instructions
+   -- @param CP : compteur
+   -- @param mem : liste chainee comptenant les variables et leurs valeurs
+    procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire) is
+    begin
+        Null;
+    end effectuer_instru;
+
+
+   -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
+   -- @param Tab : tableau comptenant les instructions
+   -- @param CP : compteur
+   -- @param mem : liste chainee comptenant les variables et leurs valeurs
+    procedure afficher (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire) is
+    begin
+        Null;
+    end afficher;
+
+
+
    -- Methode interne
 	-- Recupere l'instruction dans le tableau.
 	-- function recup_instru (Tab : in T_tab_instruc; CP : in Integer) return String with
@@ -13,24 +77,48 @@ begin
 
 
    -- Effectue l'instruction goto en allant au label souhaite
-   procedure instru_goto (CP : out Integer; label : in Integer);
+    procedure instru_goto (CP : out Integer; label : in Integer) is
+    begin
+        Null;
+    end instru_goto;
+
 
    -- Effectue l'instruction operation demande
-   procedure instru_op (x : in Integer; y : in Integer; op : in String; z : out Integer; mem : in out T_memoire);
+    procedure instru_op (x : in Integer; y : in Integer; op : in String; z : out Integer; mem : in out T_memoire) is
+    begin
+        Null;
+    end instru_op;
+
 
    -- Effectue l'instruction operation demande
    -- si "chaine" + "5" dans le doc y aura ""5""
-   procedure instru_op (x : in String; y : in String; op : in String; z : out Integer; mem : in out T_memoire);
+    procedure instru_op (x : in String; y : in String; op : in String; z : out Integer; mem : in out T_memoire) is
+    begin
+        Null;
+    end instru_op;
+
 
    -- Effectue l'instruction affectation TODO A FAIRE EN GENERIQUE SUR VAL ET RAJOUTER LE TABLEAU DE MEMOIRE DEDANS
-   procedure instru_affectation (val : in Integer; cle : in out String; mem : in out T_memoire);
+    procedure instru_affectation (val : in Integer; cle : in out String; mem : in out T_memoire) is
+    begin
+        Null;
+    end instru_affectation;
+
 
    -- Effectue l'instruction if
    -- Integer pour X car c'est notre clef
-   procedure instru_if (x : in Integer; label : in Integer; CP : out Integer; mem : in T_memoire);
+    procedure instru_if (x : in Integer; label : in Integer; CP : out Integer; mem : in T_memoire) is
+    begin
+        Null;
+    end instru_if;
+
 
    -- Effectue l'instruction null, soit ne fait rien
    procedure instru_null (CP : out Integer) with
-     Post => CP'Old +1 = CP;
-   null;
+            Post => CP'Old +1 = CP is
+    begin
+        Null;
+    end instru_null;
+
+
 end Decode;
