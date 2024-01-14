@@ -17,11 +17,13 @@ procedure test_decode is
     end;
     
     
-    --  -- Procedure permettant de supprimer le fichier temporaire d'instructions pour réaliser les tests
-    --  procedure createFileInstruct(File : in File_Type) is
-    --  begin
-    --  
-    --  end;
+    -- Procedure permettant de supprimer le fichier temporaire d'instructions pour réaliser les tests
+    -- @param : Fichier le fichier à supprimer
+    procedure deleteFileInstruct(Fichier : out File_Type) is
+        File_Name : constant String := "temp_instruct.txt";
+    begin
+        Delete(Fichier);
+    end;
     
     
     
@@ -55,9 +57,11 @@ procedure test_decode is
         Decode2Entier.effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         pragma Assert (CP = 2);
         X_value := RecupererValeur(MemoirePremierElement, "x");
-        pragma Assert (X_value = 2);       
+        pragma Assert (X_value = 2); 
+        
         
     end;
     
@@ -88,6 +92,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 5);       
         
@@ -122,6 +127,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 7);       
         
@@ -155,6 +161,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 8);       
         
@@ -188,6 +195,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = -3);       
         
@@ -223,6 +231,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 3);       
         
@@ -256,6 +265,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 2);       
         
@@ -288,6 +298,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 6);       
         
@@ -322,6 +333,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 0);       
         
@@ -355,6 +367,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 8);       
         
@@ -387,6 +400,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 2);       
         
@@ -424,6 +438,7 @@ procedure test_decode is
         end;
     
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve = True);
     
     end;
@@ -457,6 +472,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 3);       
         
@@ -490,6 +506,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur(MemoirePremierElement, "x");
         pragma Assert (X_value = 2);       
         
@@ -521,6 +538,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         pragma Assert (CP = 1);       
         
     end;
@@ -555,6 +573,7 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         pragma Assert (CP = 5);       
         
     end;
@@ -590,6 +609,7 @@ procedure test_decode is
         end;
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve = True);
     
     end;
@@ -625,6 +645,7 @@ procedure test_decode is
         end;
         
         -- verifications
+        deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve = True);
     
    end;
