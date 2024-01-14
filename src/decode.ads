@@ -53,6 +53,13 @@ package Decode is
    -- @param mem : liste chainee comptenant les variables et leurs valeurs
    procedure afficher (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire);
 
+   -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
+   -- @param Tab : tableau contenant les instructions
+   -- @param CP : la ligne de la partie a recuperer
+   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return String;
+   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return String;
+   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return String;
+   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return String;
    
 private
    type T_op is

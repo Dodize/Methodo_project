@@ -118,7 +118,38 @@ package body Decode is
             Post => CP'Old +1 = CP is
     begin
         Null;
-    end instru_null;
+   end instru_null;
 
+   -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
+   -- @param Tab : tableau contenant les instructions
+   -- @param CP : la ligne de la partie a recuperer
+   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   begin
+      return "";
+   end recuperer_instru_pos1;
+
+   -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
+   -- @param Tab : tableau contenant les instructions
+   -- @param CP : la ligne de la partie a recuperer
+   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   begin
+      return "";
+   end recuperer_instru_pos2;
+
+   -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
+   -- @param Tab : tableau contenant les instructions
+   -- @param CP : la ligne de la partie a recuperer
+   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   begin
+      return "";
+   end recuperer_instru_pos3;
+
+   -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
+   -- @param Tab : tableau contenant les instructions
+   -- @param CP : la ligne de la partie a recuperer
+   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   begin
+      return "";
+   end recuperer_instru_pos4;
 
 end Decode;

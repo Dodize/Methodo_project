@@ -792,7 +792,7 @@ procedure test_decode is
       
    begin
       -- Initialisation de current_cp
-      init_CP(current_cp);
+      current_cp := 1;
       -- Stockage de sa valeur dans old_cp
       old_cp := current_cp;
       -- Incrémentation de current_cp
@@ -800,6 +800,57 @@ procedure test_decode is
       -- Verification de si current_cp vaut bien old_cp + 1
       pragma Assert(current_cp = (old_cp + 1));
    end;
+   
+   -- Test qui permet de verifier que le tableau d'insructions est correctement rempli
+   procedure test_remplir_tab_instruc is
+      package Decode16Entier is new Decode(P_Memoire => MemoireEntier, Capacite => 16);
+      use Decode16Entier;
+      
+      tab : T_tab_instruc;
+      fichier : File_Type;
+      
+   begin
+      -- Creation d'un fichier avec du code intermediaire
+      createFileInstruct(fichier);
+      Put_Line(fichier, "-- Ce code intermediaire calcule la factorielle F");
+      Put_Line(fichier, "-- d'un entier n avec numeros de ligne");
+      Put_Line(fichier, "Programme Facto est");
+      Put_Line(fichier, "n, i, Fact : Entier");
+      Put_Line(fichier, "T1, T2, T3 : Booleen");
+      Put_Line(fichier, "Debut");
+      Put_Line(fichier, "n <- 5");
+      Put_Line(fichier, "i <- 1");
+      Put_Line(fichier, "Fact <- 1");
+      Put_Line(fichier, "T1 <- i < n");
+      Put_Line(fichier, "T2 <- i = n");
+      Put_Line(fichier, "T3 <- T1 OR T2");
+      Put_Line(fichier, "IF T3 GOTO 9");
+      Put_Line(fichier, "GOTO 15");
+      Put_Line(fichier, "Fact <- Fact * i");
+      Put_Line(fichier, "i <- i + 1");
+      Put_Line(fichier, "T1 <- i < n");
+      Put_Line(fichier, "T2 <- i = n");
+      Put_Line(fichier, "T3 <- T1 OR T2");
+      Put_Line(fichier, "GOTO 7");
+      Put_Line(fichier, "NULL");
+      Put_Line(fichier, "Fin");
+      -- Remplissage du tableau d'instructions
+      remplir_tab_instruc(Tab => tab, Fichier => fichier);
+      -- Suppression du fichier
+      deleteFileInstruct(Fichier => fichier);
+      
+      pragma Assert(recuperer_instru_pos1(tab, 1) = "n");
+      pragma Assert(recuperer_instru_pos2(tab, 1) = "5");
+      pragma Assert(recuperer_instru_pos1(tab, 4) = "i");
+      pragma Assert(recuperer_instru_pos2(tab, 4) = "n");
+      pragma Assert(recuperer_instru_pos3(tab, 4) = "<");
+      pragma Assert(recuperer_instru_pos4(tab, 4) = "T1");
+      pragma Assert(recuperer_instru_pos1(tab, 8) = "GOTO");
+      pragma Assert(recuperer_instru_pos2(tab, 8) = "15");
+      pragma Assert(recuperer_instru_pos1(tab, 16) = "NULL");
+   end;
+
+   
     
 begin
     test_instruction_NULL;
