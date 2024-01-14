@@ -802,7 +802,29 @@ procedure test_decode is
    end;
     
 begin
-    Null;
+    test_instruction_NULL;
+    test_instruction_affectation;
+    test_instruction_addition_entier_const;
+    test_instruction_addition_entier_var;
+    test_instruction_addition_entier_mix;
+    test_instruction_soustraction_const;
+    test_instruction_soustraction_var;
+    test_instruction_soustraction_mix;
+    test_instruction_multiplication_const;
+    test_instruction_multiplication_var;
+    test_instruction_multiplication_mix;
+    test_instruction_division_const;
+    test_instruction_division_parzero;
+    test_instruction_division_entier_var;
+    test_instruction_division_entier_mix;
+    test_instruction_goto_ligne_ante;
+    test_instruction_goto_ligne_post;
+    test_instruction_goto_invalide_inf;
+    test_instruction_goto_invalide_sup;
+    test_instruction_if_true;
+    test_instruction_if_false;
+    test_initialisation_t_tab_instruc;
+    test_increm_cp;
     
    
 end test_decode;
