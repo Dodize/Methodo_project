@@ -69,5 +69,7 @@ procedure test_memoire is
    end;
    
 begin
-   null;
+    test_Initialiser;
+    test_DeclarerVariables;
+    test_Recuperer;
 end test_memoire;

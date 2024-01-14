@@ -876,6 +876,6 @@ begin
     test_instruction_if_false;
     test_initialisation_t_tab_instruc;
     test_increm_cp;
-    
+    test_remplir_tab_instruc;
    
 end test_decode;
