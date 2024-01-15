@@ -37,16 +37,16 @@ package body Decode is
       while not End_Of_File (Fichier) loop
          Ligne := To_Unbounded_String(Get_Line(Fichier));
          --SPLITTER LA LIGNE
-         case Ligne is
-            when "GOTO" =>
-               null; -- TODO
-            when "IF" =>
-               null; --TODO
-            when "null" | "--" =>
-               null; -- TODO
-            when others =>
-               null; -- TODO
-         end case;
+         --  case Ligne is
+         --     when "GOTO" =>
+         --        null; -- TODO
+         --     when "IF" =>
+         --        null; --TODO
+         --     when "null" | "--" =>
+         --        null; -- TODO
+         --     when others =>
+         --        null; -- TODO
+         --  end case;
 
 
       end loop;
@@ -131,36 +131,36 @@ package body Decode is
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
    -- @return : le parametre de tab demande
-   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
-      return "";
+      return To_Unbounded_String("");
    end recuperer_instru_pos1;
 
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
    -- @return : le parametre de tab demande
-   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
-      return "";
+      return To_Unbounded_String("");
    end recuperer_instru_pos2;
 
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
    -- @return : le parametre de tab demande
-   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
-      return "";
+      return To_Unbounded_String("");
    end recuperer_instru_pos3;
 
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
    -- @return : le parametre de tab demande
-   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return String is
+   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
-      return "";
+      return To_Unbounded_String("");
    end recuperer_instru_pos4;
 
 end Decode;
