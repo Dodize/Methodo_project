@@ -40,6 +40,9 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "x <- 3");
         init_tab_instruc(Tab_Instruc); 
@@ -47,8 +50,7 @@ procedure test_decode is
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 2);
         
         -- test : operation NULL
@@ -76,15 +78,17 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
-        Put_Line (Fichier_temp, "X <- 3");
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- 3");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "X : Entier");
-        Modifier(MemoirePremierElement, "X", 0); --variable initialisée à 0
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        Modifier(MemoirePremierElement, "x", 0); --variable initialisée à 0
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
@@ -110,14 +114,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 + 3");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 2);
         
         -- test : operation add avec constantes
@@ -144,14 +150,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x + y");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 2);
         Modifier(MemoirePremierElement, "y", 5);
         
@@ -178,15 +186,16 @@ procedure test_decode is
     begin
               
         --initialisation du tableau d'instruction
-        createFileInstruct(Fichier_temp);
+        createFileInstruct(Fichier_temp);Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y + 3");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "y", 5);
         
         -- test : operation add variable + constante
@@ -213,14 +222,16 @@ procedure test_decode is
 
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 - 5");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 4);
         
         -- test : operation soustraction avec constantes
@@ -247,6 +258,9 @@ procedure test_decode is
       
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x - y");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
@@ -254,8 +268,7 @@ procedure test_decode is
         
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 5);
         Modifier(MemoirePremierElement, "y", 2);
         
@@ -283,14 +296,16 @@ procedure test_decode is
      
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y - 3");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "y", 5);
         
         -- test : operation soustraction variable + constante
@@ -316,14 +331,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 * 3");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 4);
         
         -- test : operation multiplication avec constantes
@@ -350,14 +367,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x * y");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 2);
         Modifier(MemoirePremierElement, "y", 0);
         
@@ -385,14 +404,16 @@ procedure test_decode is
                    
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y * 4");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "y", 2);
         
         -- test : operation multiplication variable + constante
@@ -418,14 +439,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 2");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 3);
         
         -- test : operation division avec constantes
@@ -451,14 +474,16 @@ procedure test_decode is
         est_leve := False;
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 0");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
     
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
     
         begin
             -- test : operation division par zero (doit lever une erreur)
@@ -489,14 +514,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x / y");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "x", 6);
         Modifier(MemoirePremierElement, "y", 2);
         
@@ -524,14 +551,16 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y / 3");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         --initialisation de la memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "x, y : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "y", 6);
         
         -- test : operation division variable + constante
@@ -557,6 +586,9 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
         Put_Line (Fichier_temp, "GOTO 1");
         init_tab_instruc(Tab_Instruc); 
@@ -564,7 +596,7 @@ procedure test_decode is
         CP := 2;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
@@ -589,6 +621,8 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 5");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
@@ -599,7 +633,7 @@ procedure test_decode is
         CP := 1;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
@@ -623,13 +657,15 @@ procedure test_decode is
         est_leve := False;    
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 0");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         
         begin
             -- test : operation goto invalide
@@ -659,13 +695,15 @@ procedure test_decode is
         est_leve := False;    
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 10");
         init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         
         begin
             -- test : operation goto invalide
@@ -695,6 +733,9 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "T1 : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "IF T1 GOTO 5");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
@@ -705,8 +746,7 @@ procedure test_decode is
         CP := 1;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "T1 : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "T1", 1); --valeur autre que 0 donc True
         
         -- test : operation division variable + constante
@@ -732,6 +772,9 @@ procedure test_decode is
               
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "T1 : Entier");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "IF T1 GOTO 3");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
@@ -742,8 +785,7 @@ procedure test_decode is
         CP := 1;
         
         -- initialisation memoire
-        Initialiser(MemoirePremierElement);
-        DeclarerVariables(MemoirePremierElement, "T1 : Entier");
+        DeclarerVariables(MemoirePremierElement, Fichier_temp);
         Modifier(MemoirePremierElement, "T1", 0); --valeur 0 donc False
         
         -- test : operation division variable + constante

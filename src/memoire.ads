@@ -1,4 +1,5 @@
 -- Ce module definit les operations necessaires a la gestion de la memoire
+with Ada.Text_IO; use Ada.Text_IO;
 
 generic
    type T_Elt is private;
@@ -12,7 +13,7 @@ package Memoire is
 
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire modifiee
-   -- @param Code : le code où sont déclarées les variables
+   -- @param Code : le code oÃ¹ sont dÃ©clarÃ©es les variables
    procedure DeclarerVariables(Mem : in out T_Memoire ; Code : in File_Type);
 
    -- Modifie la donnee d'une variable existante en memoire
