@@ -30,7 +30,7 @@ package Decode is
    procedure init_CP (CP: out Integer) with
      Post => CP = 1;
    
-   -- Incrémente le compteur
+   -- Incremente le compteur
    -- @param CP : compteur a incrementer
    procedure increm_CP (CP : in out Integer) with
      Post => CP'Old +1 = CP;

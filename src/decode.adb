@@ -16,7 +16,7 @@ package body Decode is
    -- @param Tab: tableau d'instruction a initialiser
    procedure init_tab_instruc (Tab : out T_tab_instruc) is
     begin
-        Null;
+        null;
     end init_tab_instruc;
 
 
@@ -24,15 +24,15 @@ package body Decode is
    -- @param CP : compteur a initialiser
    procedure init_CP (CP: out Integer) is
     begin
-        Null;
+        CP := 1;
     end init_CP;
 
 
-   -- Incrémente le compteur
+   -- Incremente le compteur
    -- @param CP : compteur a incrementer
    procedure increm_CP (CP : in out Integer) is
     begin
-        Null;
+        CP := CP+1;
     end increm_CP;
 
 
