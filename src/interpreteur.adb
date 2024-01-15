@@ -8,8 +8,20 @@ package body Interpreteur is
         return 0;
     end Menu;
 
+    -- Calcule la capacite du tableau d'instructions en fonction du nombre de ligne du fichier du code intermediaire
+    -- @param : in le fichier d'instructions en code intermediaire
+    -- @return : la capacite
     function CalculerCapacite(Fichier : in File_Type) return Integer is
+        est_debut_atteint : Boolean;
     begin
+        est_debut_atteint := False;
+        -- Parcourir le fichier jusqu'à "début"
+        while not est_debut_atteint and then not End_Of_File (F) loop
+            if Get_Line(F) = "Début" || Get_Line(F) = "Debut"
+            Put_Line (Get_Line (F));
+        end loop;
+
+
         return 0; -- TODO
     end CalculerCapacite;
 
