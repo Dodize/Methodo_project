@@ -7,15 +7,6 @@ package body Memoire is
         Null;
     end Initialiser;
 
-
-   -- Indique si la memoire est vide
-   -- @param Mem : la memoire testee
-    function Est_Vide(Mem : in T_Memoire) return Boolean is
-    begin
-        return True;
-    end Est_Vide;
-
-
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire modifiee
    -- @param Code : le code où sont déclarées les variables
