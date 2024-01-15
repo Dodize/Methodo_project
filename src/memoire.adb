@@ -9,8 +9,8 @@ package body Memoire is
 
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire modifiee
-   -- @param Code : le code où sont déclarées les variables
-    procedure DeclarerVariables(Mem : in out T_Memoire ; Code : in String) is
+   -- @param Code : le code ou sont declarees les variables
+    procedure DeclarerVariables(Mem : in out T_Memoire ; Code : in File_Type) is
     begin
         Null;
     end DeclarerVariables;

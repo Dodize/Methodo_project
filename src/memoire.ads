@@ -13,7 +13,7 @@ package Memoire is
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire modifiee
    -- @param Code : le code où sont déclarées les variables
-   procedure DeclarerVariables(Mem : in out T_Memoire ; Code : in String);
+   procedure DeclarerVariables(Mem : in out T_Memoire ; Code : in File_Type);
 
    -- Modifie la donnee d'une variable existante en memoire
    -- @param Mem : la memoire modifiee
