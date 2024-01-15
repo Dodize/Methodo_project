@@ -1,3 +1,5 @@
+
+
 package body Decode is
 
 -- Importer le module de memoire dans .adb
@@ -5,17 +7,17 @@ package body Decode is
    -- Initialise le compteur
    -- @param CP : compteur a initialiser
    procedure init_CP (CP: out Integer) is
-    begin
-        CP := 1;
-    end init_CP;
+   begin
+      CP := 1;
+   end init_CP;
 
 
    -- Incremente le compteur
    -- @param CP : compteur a incrementer
    procedure increm_CP (CP : in out Integer) is
-    begin
-        CP := CP+1;
-    end increm_CP;
+   begin
+      CP := CP+1;
+   end increm_CP;
 
 
    -- Rempli le tableau avec les instructions du fichier
@@ -23,10 +25,33 @@ package body Decode is
    -- Si la ligne est un coommentaire : devient un null dans le tableau
    -- @param Tab : tableau a remplir
    -- @param Fichier : code source a utiliser pour remplir le tableau
-    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type) is
-    begin
-        Null;
-    end remplir_tab_instruc;
+   procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type) is
+      Ligne : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
+      while To_String(Ligne) /= "Debut" loop
+         Ligne := To_Unbounded_String(Get_Line(Fichier));
+      end loop;
+
+      -- Rempli le tableau avec les instructions
+      while not End_Of_File (Fichier) loop
+         Ligne := To_Unbounded_String(Get_Line(Fichier));
+         --SPLITTER LA LIGNE
+         case Ligne is
+            when "GOTO" =>
+               null; -- TODO
+            when "IF" =>
+               null; --TODO
+            when "null" | "--" =>
+               null; -- TODO
+            when others =>
+               null; -- TODO
+         end case;
+
+
+      end loop;
+
+   end remplir_tab_instruc;
 
 
    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)

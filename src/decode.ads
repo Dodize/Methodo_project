@@ -1,6 +1,7 @@
 -- Ce module definit les operations necessaires au decodage du code intermediaire
 -- Il stock les instructions et les executes.
-WITH Ada.Text_IO ;                USE Ada.Text_IO ;
+with Ada.Text_IO ;                use Ada.Text_IO ;
+with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Memoire;
 
 generic
