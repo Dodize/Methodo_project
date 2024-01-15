@@ -16,13 +16,13 @@ package Decode is
     GOTO_OUT_OF_RANGE_EXCEPTION : Exception; -- la ligne renvoyee par GOTO est inf a 1 ou supp au nombre de lignes du code
    
    -- Verifie si le tableau d'instruction est vide
-   -- @param Tab : tableau d'instruction à comparer
+   -- @param Tab : tableau d'instruction Ã  comparer
    function est_null(Tab : in T_tab_instruc) return Boolean;
 
    -- Initialiser le tableau d'instruction
    -- @param Tab: tableau d'instruction a initialiser
    -- @param Fichier : code source a utiliser pour calculer la capacite
-   procedure init_tab_instruc (Tab : out T_tab_instruc; Fichier : in File_Type) with
+   procedure init_tab_instruc (Tab : out T_tab_instruc) with
      Post => est_null(Tab);
 
    -- Initialise le compteur
@@ -30,7 +30,7 @@ package Decode is
    procedure init_CP (CP: out Integer) with
      Post => CP = 1;
    
-   -- Incrémente le compteur
+   -- IncrÃ©mente le compteur
    -- @param CP : compteur a incrementer
    procedure increm_CP (CP : in out Integer) with
      Post => CP'Old +1 = CP;
