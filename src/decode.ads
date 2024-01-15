@@ -21,7 +21,8 @@ package Decode is
 
    -- Initialiser le tableau d'instruction
    -- @param Tab: tableau d'instruction a initialiser
-   procedure init_tab_instruc (Tab : out T_tab_instruc) with
+   -- @param Fichier : code source a utiliser pour calculer la capacite
+   procedure init_tab_instruc (Tab : out T_tab_instruc; Fichier : in File_Type) with
      Post => est_null(Tab);
 
    -- Initialise le compteur
