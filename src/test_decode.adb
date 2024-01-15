@@ -45,7 +45,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "x <- 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -82,7 +81,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -118,7 +116,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 + 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -154,7 +151,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x + y");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -190,7 +186,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y + 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -226,7 +221,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 - 5");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -262,7 +256,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x - y");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -300,7 +293,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y - 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -335,7 +327,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 * 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -371,7 +362,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x * y");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -408,7 +398,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y * 4");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -443,7 +432,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 2");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -478,7 +466,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 0");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
     
@@ -518,7 +505,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x / y");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -555,7 +541,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "x, y : Entier");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y / 3");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -591,7 +576,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
         Put_Line (Fichier_temp, "GOTO 1");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 2;
         
@@ -628,7 +612,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -660,7 +643,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 0");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -698,7 +680,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 10");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -741,7 +722,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -780,7 +760,6 @@ procedure test_decode is
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
-        init_tab_instruc(Tab_Instruc); 
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
         
@@ -797,20 +776,6 @@ procedure test_decode is
         
     end;
         
-   
-    
-   -- Test pour verifier qu'à l'initialisation un T_tab_instruc est null
-   procedure test_initialisation_t_tab_instruc is
-      use Decode2Entier;
-      
-      Tab_Instruc : T_tab_instruc;
-      
-   begin
-      -- Initialisation du tableau d'instruction
-      init_tab_instruc(Tab_Instruc);
-      -- Verification de si le tableau est bien vide
-      pragma Assert(est_null(Tab_Instruc));
-   end;
    
    -- Test pour verifier qu'à l'initialisation cp vaut 1
    procedure test_initialisation_cp is
@@ -916,7 +881,6 @@ begin
     test_instruction_goto_invalide_sup;
     test_instruction_if_true;
     test_instruction_if_false;
-    test_initialisation_t_tab_instruc;
     test_increm_cp;
     test_remplir_tab_instruc;
    
