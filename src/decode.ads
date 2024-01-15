@@ -49,18 +49,18 @@ package Decode is
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
    -- @return : le parametre de tab demande
-   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return String;
-   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return String;
-   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return String;
-   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return String;
+   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
+   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
+   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
+   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
    
 private
    type T_op is
       record
-         pos1: String (1..25);
-         pos2 : String (1..25);
-         pos3 : String (1..25);
-         pos4 : String (1..25);
+         pos1: Ada.Strings.Unbounded.Unbounded_String;
+         pos2 : Ada.Strings.Unbounded.Unbounded_String;
+         pos3 : Ada.Strings.Unbounded.Unbounded_String;
+         pos4 : Ada.Strings.Unbounded.Unbounded_String;
       end record;
    
    type T_tab_instruc is array (1..Capacite) of T_op;
