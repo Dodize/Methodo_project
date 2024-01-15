@@ -37,7 +37,7 @@ package Decode is
    -- @param Tab : tableau comptenant les instructions
    -- @param CP : compteur
    -- @param mem : liste chainee comptenant les variables et leurs valeurs
-	procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire);
+	procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire);
 
    -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
    -- @param Tab : tableau comptenant les instructions

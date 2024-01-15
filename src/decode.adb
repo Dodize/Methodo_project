@@ -54,30 +54,6 @@ package body Decode is
    end remplir_tab_instruc;
 
 
- -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
-   -- @param Tab : tableau comptenant les instructions
-   -- @param CP : compteur
-   -- @param mem : liste chainee contenant les variables et leurs valeurs
-    procedure effectuer_instru (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire) is
-        InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
-    begin
-        -- Recuperer l'instruction
-        InstruPart1 := recuperer_instru_pos1(Tab, CP);
-        InstruPart2 := recuperer_instru_pos2(Tab, CP);
-        InstruPart3 := recuperer_instru_pos3(Tab, CP);
-        InstruPart4 := recuperer_instru_pos4(Tab, CP);
-
-        -- Realiser l'instruction
-        -- en fonction du premier mot de l'instruction, effectuer la bonne opération
-        --  case To_String(InstruPart1) is
-        --      when "Null" => instru_null(CP);
-        --      when "GOTO" => instru_goto(CP, InstruPart2'Val);
-        --      when others => Null;
-        --  end case;
-        --
-    end effectuer_instru;
-
-
    -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
    -- @param Tab : tableau comptenant les instructions
    -- @param CP : compteur
@@ -105,22 +81,22 @@ package body Decode is
 
 
    -- Effectue l'instruction operation demande
-    procedure instru_op (x : in Integer; y : in Integer; op : in String; z : out Integer; mem : in out T_memoire) is
+    procedure instru_op (x : in Integer; y : in Integer; op : in String; z : in Integer; mem : in out T_memoire) is
     begin
         Null;
     end instru_op;
 
 
-   -- Effectue l'instruction operation demande
+   -- Effectue l'instruction operation demande (attention X pas forcement meme type que y et z)
    -- si "chaine" + "5" dans le doc y aura ""5""
-    procedure instru_op (x : in String; y : in String; op : in String; z : out Integer; mem : in out T_memoire) is
-    begin
-        Null;
-    end instru_op;
+    --  procedure instru_op (x : in String; y : in String; op : in String; z : out Integer; mem : in out T_memoire) is
+    --  begin
+    --      Null;
+    --  end instru_op;
 
 
    -- Effectue l'instruction affectation TODO A FAIRE EN GENERIQUE SUR VAL ET RAJOUTER LE TABLEAU DE MEMOIRE DEDANS
-    procedure instru_affectation (val : in Integer; cle : in out String; mem : in out T_memoire) is
+    procedure instru_affectation (cle : in String; val : in Integer; mem : in out T_memoire) is
     begin
         Null;
     end instru_affectation;
@@ -128,15 +104,14 @@ package body Decode is
 
    -- Effectue l'instruction if
    -- Integer pour X car c'est notre clef
-    procedure instru_if (x : in Integer; label : in Integer; CP : out Integer; mem : in T_memoire) is
+    procedure instru_if (VariableBool : in String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
     begin
         Null;
     end instru_if;
 
 
    -- Effectue l'instruction null, soit ne fait rien
-   procedure instru_null (CP : out Integer) with
-            Post => CP'Old +1 = CP is
+   procedure instru_null is
     begin
         Null;
    end instru_null;
@@ -171,7 +146,41 @@ package body Decode is
    function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
       return Tab(CP).pos4;
-   end recuperer_instru_pos4;
+    end recuperer_instru_pos4;
+
+
+     -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
+   -- @param Tab : tableau comptenant les instructions
+   -- @param CP : compteur
+   -- @param mem : liste chainee contenant les variables et leurs valeurs
+    procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
+        InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
+    begin
+        -- Recuperer l'instruction
+        InstruPart1 := recuperer_instru_pos1(Tab, CP);
+        InstruPart2 := recuperer_instru_pos2(Tab, CP);
+        InstruPart3 := recuperer_instru_pos3(Tab, CP);
+        InstruPart4 := recuperer_instru_pos4(Tab, CP);
+
+        -- Realiser l'instruction
+        -- en fonction du premier mot de l'instruction, effectuer la bonne opération
+        if InstruPart1 = "Null" then
+            instru_null;
+        elsif InstruPart1 = "GOTO" then
+            instru_goto(CP, Integer'Value(To_String(InstruPart2)));
+        elsif InstruPart1 = "IF" then
+            instru_if(To_String(InstruPart2), Integer'Value(To_String(InstruPart4)), CP, mem);
+        else
+            -- affectation sinon operation
+            if InstruPart3 = "affect" then
+                instru_affectation(To_String(InstruPart1), Integer'Value(To_String(InstruPart2)), mem);
+            else
+                instru_op(Integer'Value(To_String(InstruPart1)), Integer'Value(To_String(InstruPart2)), To_String(InstruPart3), Integer'Value(To_String(InstruPart4)), mem);
+            end if;
+        end if;
+
+    end effectuer_instru;
+
 
 
 end Decode;
