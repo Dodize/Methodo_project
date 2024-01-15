@@ -1,8 +1,6 @@
 package body Decode is
 
 -- Importer le module de memoire dans .adb
--- Mettre le tableau memoire en argument
-
 
    -- Initialise le compteur
    -- @param CP : compteur a initialiser
@@ -55,10 +53,10 @@ package body Decode is
    -- Methode interne
 	-- Recupere l'instruction dans le tableau.
 	-- function recup_instru (Tab : in T_tab_instruc; CP : in Integer) return String with
- --	Post => Tab(CP).pos1 = res or Tab(CP).pos3 = res;
+     --Post => Tab(CP).pos1 = res or Tab(CP).pos3 = res;
+
 
    --effectuer_instru : appel instru_goto, instru_op, instru_affectation, instru_if, instru_null
-
 
    -- Effectue l'instruction goto en allant au label souhaite
     procedure instru_goto (CP : out Integer; label : in Integer) is
@@ -107,6 +105,7 @@ package body Decode is
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : le parametre de tab demande
    function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return String is
    begin
       return "";
@@ -115,6 +114,7 @@ package body Decode is
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : le parametre de tab demande
    function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return String is
    begin
       return "";
@@ -123,6 +123,7 @@ package body Decode is
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : le parametre de tab demande
    function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return String is
    begin
       return "";
@@ -131,6 +132,7 @@ package body Decode is
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : le parametre de tab demande
    function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return String is
    begin
       return "";

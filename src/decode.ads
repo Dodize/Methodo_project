@@ -47,6 +47,7 @@ package Decode is
    -- Pour debugger : retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : le parametre de tab demande
    function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return String;
    function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return String;
    function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return String;
