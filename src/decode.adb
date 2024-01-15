@@ -4,22 +4,6 @@ package body Decode is
 -- Mettre le tableau memoire en argument
 
 
-    -- Verifie si le tableau d'instruction est vide
-   -- @param Tab : tableau d'instruction à comparer
-    function est_null(Tab : in T_tab_instruc) return Boolean is
-    begin
-        return True;
-    end est_null;
-
-
-   -- Initialiser le tableau d'instruction
-   -- @param Tab: tableau d'instruction a initialiser
-   procedure init_tab_instruc (Tab : out T_tab_instruc) is
-    begin
-        null;
-    end init_tab_instruc;
-
-
    -- Initialise le compteur
    -- @param CP : compteur a initialiser
    procedure init_CP (CP: out Integer) is

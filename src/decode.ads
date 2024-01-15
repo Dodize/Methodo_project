@@ -14,16 +14,6 @@ package Decode is
     Type T_tab_instruc is limited private ;
     
     GOTO_OUT_OF_RANGE_EXCEPTION : Exception; -- la ligne renvoyee par GOTO est inf a 1 ou supp au nombre de lignes du code
-   
-   -- Verifie si le tableau d'instruction est vide
-   -- @param Tab : tableau d'instruction à comparer
-   function est_null(Tab : in T_tab_instruc) return Boolean;
-
-   -- Initialiser le tableau d'instruction
-   -- @param Tab: tableau d'instruction a initialiser
-   -- @param Fichier : code source a utiliser pour calculer la capacite
-   procedure init_tab_instruc (Tab : out T_tab_instruc) with
-     Post => est_null(Tab);
 
    -- Initialise le compteur
    -- @param CP : compteur a initialiser
