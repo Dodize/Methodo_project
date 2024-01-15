@@ -17,7 +17,7 @@ package body Interpreteur is
     begin
 
         -- Parcourir le fichier jusqu'à "début"
-        while not (Get_Line(Fichier) = "Début" or else Get_Line(Fichier) = "Debut") loop
+        while not (Get_Line(Fichier) = "Début") loop
             Null;
         end loop;
 
