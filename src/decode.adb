@@ -40,8 +40,6 @@ package body Decode is
       end if;
    end slice_mot;
 
-
-
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
@@ -60,9 +58,6 @@ package body Decode is
       while not End_Of_File (Fichier) loop
          Ligne := To_Unbounded_String(Get_Line(Fichier));
          --SPLITTER LA LIGNE (avec ligne qu'on raccourci et
-
-
-
       end loop;
 
    end remplir_tab_instruc;
