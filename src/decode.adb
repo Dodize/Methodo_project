@@ -20,6 +20,28 @@ package body Decode is
    end increm_CP;
 
 
+-- Vérifier si delete inclu la supp du delimiteur comme souhaité
+   procedure slice_mot(Ligne : in out Unbounded_String; mot : in out Unbounded_String; delimiteur : in Character) is
+      Index : Natural;
+   begin
+      -- Trouver l'indice du délimiteur
+      Index := Ada.Strings.Unbounded.Index(Ligne, Character'Image(Delimiteur));
+
+      -- Extraire la sous-chaîne jusqu'au délimiteur
+      if Index /= 0 then
+         Mot := Unbounded_Slice(Ligne, 1, Index);
+         -- Supprimer la partie extraite de la ligne
+         Delete(Ligne, 1, Index);
+      else
+         -- Si le délimiteur n'est pas trouvé, copier la ligne entière dans le mot
+         Mot := Ligne;
+         -- Réinitialiser la ligne
+         Delete(Ligne, 1, Length(Ligne));
+      end if;
+   end slice_mot;
+
+
+
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
@@ -27,6 +49,7 @@ package body Decode is
    -- @param Fichier : code source a utiliser pour remplir le tableau
    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type) is
       Ligne : Ada.Strings.Unbounded.Unbounded_String;
+      Mot : Ada.Strings.Unbounded.Unbounded_String;
    begin
       -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
       while To_String(Ligne) /= "Debut" loop
@@ -36,17 +59,8 @@ package body Decode is
       -- Rempli le tableau avec les instructions
       while not End_Of_File (Fichier) loop
          Ligne := To_Unbounded_String(Get_Line(Fichier));
-         --SPLITTER LA LIGNE
-         --  case Ligne is
-         --     when "GOTO" =>
-         --        null; -- TODO
-         --     when "IF" =>
-         --        null; --TODO
-         --     when "null" | "--" =>
-         --        null; -- TODO
-         --     when others =>
-         --        null; -- TODO
-         --  end case;
+         --SPLITTER LA LIGNE (avec ligne qu'on raccourci et
+
 
 
       end loop;
