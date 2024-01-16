@@ -65,13 +65,16 @@ package body Decode is
    end instru_null;
 
 
--- Vérifier si delete inclu la supp du delimiteur comme souhaité
-   procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; delimiteur : in Character) is
+   -- Vérifier si delete inclu la supp du delimiteur comme souhaité
+   -- permet de retirer le premier mot avant délimiteur de la ligne en le plaçant dans mot
+   -- @param Ligne : ligne dont on extrait le mot
+   -- @param Mot : où placer le mot extrait
+   -- @param Delimiteur: caractère signant la fin du mot
+   procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in Character) is
       Index : Natural;
    begin
       -- Trouver l'indice du délimiteur
       Index := Ada.Strings.Unbounded.Index(Ligne, Character'Image(Delimiteur));
-
       -- Extraire la sous-chaîne jusqu'au délimiteur
       if Index /= 0 then
          Mot := Unbounded_Slice(Ligne, 1, Index);
