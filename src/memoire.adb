@@ -30,8 +30,9 @@ package body Memoire is
    procedure DeclarerVariables (Mem : out T_Memoire; Code : in File_Type) is
 
       package Mem_Integer is new Case_Memoire (T_Elt => Integer);
+      package Mem_String is new Case_Memoire (T_Elt => Unbounded_String);
 
-      Current_Mem     : T_Memoire;
+      Current_Mem_Integer     : Mem_Integer.T_Memoire;
       New_Mem_Integer : Mem_Integer.T_Memoire;
       Current_Line    : Unbounded_String;
       Temporary_Line  : Unbounded_String;
@@ -40,13 +41,12 @@ package body Memoire is
       Current_Type    : T_Type;
    begin
       Fini := False;
-      Initialiser (Mem);
-      Current_Mem := Mem;
+      Initialiser(Mem);
+      Current_Mem_Integer := Mem;
       -- Tant qu'on n'a pas atteint la fin du fichier ni la ligne "Debut"
       while not End_Of_File (Code) and not Fini loop
          Current_Line := To_Unbounded_String (Get_Line (Code));
-         Current_Line :=
-           Translate (Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
+         Current_Line := Translate (Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
          -- Si pas commentaire
          if Index (Current_Line, "--") = 0 then
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
@@ -73,7 +73,6 @@ package body Memoire is
                      if Est_Vide (Mem) then
                         Mem := New_Mem_Integer;
                      else
-                        -- Creation de la memoire
                         Current_Mem.Suivant := New_Mem_Integer;
                      end if;
                   end if;
@@ -89,31 +88,30 @@ package body Memoire is
    -- @param Mem : la memoire modifiee
    -- @param Cle : le nom de la variable a modifier
    -- @param Data : la nouvelle valeur de la variable
-   procedure Modifier
-     (Mem : in out T_Memoire; Cle : in Unbounded_String; Data : in T_Elt)
+   procedure Modifier_Entier (Mem : in out T_Memoire; Cle : in Unbounded_String; Data : in Integer)
    is
    begin
       null;
-   end Modifier;
+   end Modifier_Entier;
 
    -- Recupere la valeur d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return la valeur de la variable
-   function RecupererValeur (Mem : in T_Memoire; Cle : in Unbounded_String) return T_Elt
+   function RecupererValeur_Entier (Mem : in T_Memoire; Cle : in Unbounded_String) return Integer
    is
    begin
-      return Mem.all.Data; -- A CHANGER !!
-   end RecupererValeur;
+      return 0; -- A CHANGER !!
+   end RecupererValeur_Entier;
 
    -- Recupere le type d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return le type de la variable
-   function RecupererType (Mem : in T_Memoire; Cle : in Unbounded_String) return T_Type
+   function RecupererType (Mem : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String
    is
    begin
-      return CHAINE;
+      return To_Unbounded_String("CHAINE");
    end RecupererType;
 
 end Memoire;
