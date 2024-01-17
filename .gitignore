@@ -18,3 +18,8 @@ obj/memoire.ali
 obj/memoire.o
 obj/test_decode.ali
 obj/test_decode.o
+temp_instruct.txt
+*.o
+*.ali
+*.bexch
+*.adb.std*
