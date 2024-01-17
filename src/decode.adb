@@ -57,17 +57,17 @@ package body Decode is
     -- @param Label : la valeur que doit prendre CP si le booleen vaut True
     -- @param CP : le compteur de la ligne courante
     -- @param mem : la memoire
-    procedure instru_if (VariableBool : in String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
-        valeur : Integer; -- valeur de "VariableBool"
-    begin
-        -- Recuperer la valeur du booleen
-        valeur := RecupererValeur(mem, VariableBool);
-        if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
-            Null;
-        else -- cas ou la valeur vaut true : on change la valeur de CP
-            CP := Label;
-        end if;
-    end instru_if;
+    --  procedure instru_if (VariableBool : in String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
+    --      valeur : Integer; -- valeur de "VariableBool"
+    --  begin
+    --      -- Recuperer la valeur du booleen
+    --      valeur := RecupererValeur(mem, VariableBool);
+    --      if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
+    --          Null;
+    --      else -- cas ou la valeur vaut true : on change la valeur de CP
+    --          CP := Label;
+    --      end if;
+    --  end instru_if;
 
 
 
@@ -84,15 +84,15 @@ package body Decode is
    -- @param Mot : où placer le mot extrait
    -- @param Delimiteur: caractère signant la fin du mot
    procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in Character) is
-      Index : Natural;
+      Pos : Natural;
    begin
       -- Trouver l'indice du délimiteur
-      Index := Ada.Strings.Unbounded.Index(Ligne, Character'Image(Delimiteur));
+      Pos := Ada.Strings.Unbounded.Index(Ligne, Character'Image(Delimiteur));
       -- Extraire la sous-chaîne jusqu'au délimiteur
-      if Index /= 0 then
-         Mot := Unbounded_Slice(Ligne, 1, Index);
+      if Pos /= 0 then
+         Mot := Unbounded_Slice(Ligne, 1, Pos);
          -- Supprimer la partie extraite de la ligne
-         Delete(Ligne, 1, Index);
+         Delete(Ligne, 1, Pos);
       else
          -- Si le délimiteur n'est pas trouvé, copier la ligne entière dans le mot
          Mot := Ligne;
@@ -104,9 +104,9 @@ package body Decode is
    -- Rempli une ligne du tableau en mettant en forme l'instruction null ou un commentaire
    -- @param Tab : tableau a remplir
    -- @param Index : ligne du tableau a remplir
-   procedure remplir_ligne_null(Tab: out T_tab_instruc; Index : in Integer) is
+   procedure remplir_ligne_null(Tab: out T_tab_instruc; Pos : in Integer) is
    begin
-      Tab(Index).pos1 := To_Unbounded_String("null");
+      Tab(Pos).pos1 := To_Unbounded_String("null");
    end remplir_ligne_null;
 
    -- Rempli une ligne du tableau en mettant en forme l'instruction
@@ -114,13 +114,28 @@ package body Decode is
    -- @param Index : ligne du tableau a remplir
    -- @param Ligne : ligne dont on recupere les informations
    -- @param Mot : premier mot de la ligne
-   procedure remplir_ligne(Tab: out T_tab_instruc; Index : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
+   procedure remplir_ligne(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
    begin
-      Tab(Index).pos1 := Mot;
-      slice_mot(Ligne, Tab(Index).pos2, ' ');
-      slice_mot(Ligne, Tab(Index).pos3, ' ');
-      slice_mot(Ligne, Tab(Index).pos4, ' ');
+      Tab(Pos).pos1 := Mot;
+      slice_mot(Ligne, Tab(Pos).pos2, ' ');
+      slice_mot(Ligne, Tab(Pos).pos3, ' ');
+      slice_mot(Ligne, Tab(Pos).pos4, ' ');
    end remplir_ligne;
+
+   -- Rempli une ligne du tableau en mettant en forme l'instru x y op z
+   -- @param Tab : tableau a remplir
+   -- @param Pos : ligne du tableau a remplir
+   -- @param Ligne : ligne dont on recupere les informations
+   -- @param Mot : premier mot de la ligne
+   procedure remplir_ligne_op(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
+      inutile : Unbounded_String;
+   begin
+      Tab(Pos).pos1 := Mot;
+      slice_mot(Ligne, inutile, ' ');
+      slice_mot(Ligne, Tab(Pos).pos2, ' ');
+      slice_mot(Ligne, Tab(Pos).pos3, ' ');
+      slice_mot(Ligne, Tab(Pos).pos4, ' ');
+   end remplir_ligne_op;
 
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
@@ -128,26 +143,33 @@ package body Decode is
    -- @param Tab : tableau a remplir
    -- @param Fichier : code source a utiliser pour remplir le tableau
    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type) is
-      Ligne : Ada.Strings.Unbounded.Unbounded_String;
-      Mot : Ada.Strings.Unbounded.Unbounded_String;
-      Index : Integer;
+      Ligne : Unbounded_String;
+      Mot : Unbounded_String;
+      Pos : Integer;
    begin
-      Index := 1;
+      Pos := 1;
       -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
-      while To_String(Ligne) /= "Debut" loop
+      Ligne := To_Unbounded_String(Get_Line(Fichier));
+      while (Index(Ligne, "D�but")) = 0 or else (Index(Ligne, ":")) > 0 loop
          Ligne := To_Unbounded_String(Get_Line(Fichier));
       end loop;
 
-      -- Rempli le tableau avec les instructions
-      while not End_Of_File (Fichier) loop
-         Ligne := To_Unbounded_String(Get_Line(Fichier));
+      -- Parcours le code en remplicant le tableau
+      Ligne := To_Unbounded_String(Get_Line(Fichier));
+      while not (Ligne = "Fin") loop
+         Put_Line(To_String(Ligne));
+         Put(Pos);
+         Skip_Line;
          slice_mot(Ligne, Mot, ' ');
          if Mot = "--" or Ligne = "null" then
-            remplir_ligne_null(Tab, Index);
+            remplir_ligne_null(Tab, Pos);
+         elsif Mot /= "GOTO" or Mot /= "--" or Mot /= "null" or Mot /= "If" then
+            remplir_ligne_op(Tab, Pos, Ligne, Mot);
          else
-            remplir_ligne(Tab, Index, Ligne, Mot);
+            remplir_ligne(Tab, Pos, Ligne, Mot);
          end if;
-         Index := Index + 1;
+         Pos := Pos + 1;
+         Ligne := To_Unbounded_String(Get_Line(Fichier));
       end loop;
 
    end remplir_tab_instruc;
@@ -224,7 +246,7 @@ package body Decode is
         elsif InstruPart1 = "GOTO" then
             instru_goto(CP, Integer'Value(To_String(InstruPart2)));
         elsif InstruPart1 = "IF" then
-            instru_if(To_String(InstruPart2), Integer'Value(To_String(InstruPart4)), CP, mem);
+            null; --instru_if(To_String(InstruPart2), Integer'Value(To_String(InstruPart4)), CP, mem);
         else
             -- affectation sinon operation
             if InstruPart3 = "affect" then
