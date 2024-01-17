@@ -1,5 +1,6 @@
 WITH Ada.Text_IO ;
 USE Ada.Text_IO ;
+with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 
 package Interpreteur is
 

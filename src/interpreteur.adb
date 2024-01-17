@@ -17,7 +17,8 @@ package body Interpreteur is
     begin
 
         -- Parcourir le fichier jusqu'à "début"
-        while not (Get_Line(Fichier) = "Début") loop
+        -- on verifie qu'il n'y ait de ":" (sinon il s'agirait d'un nom de variable)
+        while (Index(To_Unbounded_String(Get_Line(Fichier)), "Début")) = 0 and then (Index(To_Unbounded_String(Get_Line(Fichier)), ":")) > 0 loop
             Null;
         end loop;
 

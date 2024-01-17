@@ -21,10 +21,12 @@ package body Decode is
 
    --effectuer_instru : appel instru_goto, instru_op, instru_affectation, instru_if, instru_null
 
-   -- Effectue l'instruction goto en allant au label souhaite
+    -- Effectue l'instruction goto en allant au label souhaite (sous forme de numero de ligne)
+    -- @param CP : le compteur qui doit etre modifie
+    -- @param label : le numero de la ligne a laquelle on souhaite aller
    procedure instru_goto (CP : out Integer; label : in Integer) is
    begin
-      Null;
+      CP := label;
    end instru_goto;
 
 
@@ -50,12 +52,23 @@ package body Decode is
    end instru_affectation;
 
 
-   -- Effectue l'instruction if
-   -- Integer pour X car c'est notre clef
-   procedure instru_if (VariableBool : in String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
-   begin
-      Null;
-   end instru_if;
+    -- Effectue l'instruction if en fonction de la variable VariableBool
+    -- @param VariableBool : le nom de la variable booleenne
+    -- @param Label : la valeur que doit prendre CP si le booleen vaut True
+    -- @param CP : le compteur de la ligne courante
+    -- @param mem : la memoire
+    procedure instru_if (VariableBool : in String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
+        valeur : Integer; -- valeur de "VariableBool"
+    begin
+        -- Recuperer la valeur du booleen
+        valeur := RecupererValeur(mem, VariableBool);
+        if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
+            Null;
+        else -- cas ou la valeur vaut true : on change la valeur de CP
+            CP := Label;
+        end if;
+    end instru_if;
+
 
 
    -- Effectue l'instruction null, soit ne fait rien
@@ -65,25 +78,25 @@ package body Decode is
    end instru_null;
 
 
-   -- Vérifier si delete inclu la supp du delimiteur comme souhaité
-   -- permet de retirer le premier mot avant délimiteur de la ligne en le plaçant dans mot
+   -- VÃ©rifier si delete inclu la supp du delimiteur comme souhaitÃ©
+   -- permet de retirer le premier mot avant dÃ©limiteur de la ligne en le plaÃ§ant dans mot
    -- @param Ligne : ligne dont on extrait le mot
-   -- @param Mot : où placer le mot extrait
-   -- @param Delimiteur: caractère signant la fin du mot
+   -- @param Mot : oÃ¹ placer le mot extrait
+   -- @param Delimiteur: caractÃ¨re signant la fin du mot
    procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in Character) is
       Index : Natural;
    begin
-      -- Trouver l'indice du délimiteur
+      -- Trouver l'indice du dÃ©limiteur
       Index := Ada.Strings.Unbounded.Index(Ligne, Character'Image(Delimiteur));
-      -- Extraire la sous-chaîne jusqu'au délimiteur
+      -- Extraire la sous-chaÃ®ne jusqu'au dÃ©limiteur
       if Index /= 0 then
          Mot := Unbounded_Slice(Ligne, 1, Index);
          -- Supprimer la partie extraite de la ligne
          Delete(Ligne, 1, Index);
       else
-         -- Si le délimiteur n'est pas trouvé, copier la ligne entière dans le mot
+         -- Si le dÃ©limiteur n'est pas trouvÃ©, copier la ligne entiÃ¨re dans le mot
          Mot := Ligne;
-         -- Réinitialiser la ligne
+         -- RÃ©initialiser la ligne
          Delete(Ligne, 1, Length(Ligne));
       end if;
    end slice_mot;
@@ -205,7 +218,7 @@ package body Decode is
         InstruPart4 := recuperer_instru_pos4(Tab, CP);
 
         -- Realiser l'instruction
-        -- en fonction du premier mot de l'instruction, effectuer la bonne opÃ©ration
+        -- en fonction du premier mot de l'instruction, effectuer la bonne opÃƒÂ©ration
         if InstruPart1 = "Null" then
             instru_null;
         elsif InstruPart1 = "GOTO" then
