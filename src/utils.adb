@@ -22,5 +22,13 @@ package body utils is
       end if;
    end slice_mot;
 
+   procedure parcourir_debut(Ligne : out Unbounded_String; Fichier : in File_Type) is
+      -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
+      begin
+      Ligne := To_Unbounded_String(Get_Line(Fichier));
+      while (Index(Ligne, "Début")) = 0 or else (Index(Ligne, ":")) > 0 loop
+         Ligne := To_Unbounded_String(Get_Line(Fichier));
+      end loop;
+   end parcourir_debut;
 
 end utils;

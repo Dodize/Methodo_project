@@ -124,11 +124,7 @@ package body Decode is
       Pos : Integer;
    begin
       Pos := 1;
-      -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
-      Ligne := To_Unbounded_String(Get_Line(Fichier));
-      while (Index(Ligne, "Début")) = 0 or else (Index(Ligne, ":")) > 0 loop
-         Ligne := To_Unbounded_String(Get_Line(Fichier));
-      end loop;
+      parcourir_debut(Ligne, Fichier);
 
       -- Parcours le code en remplicant le tableau
       Ligne := To_Unbounded_String(Get_Line(Fichier));

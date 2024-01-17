@@ -12,5 +12,7 @@ package utils is
    -- @param Delimiteur: caractere signant la fin du mot
    procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in Character);
    
+   procedure parcourir_debut(Ligne : out Unbounded_String; Fichier : in File_Type);
+   
 
 end utils;
