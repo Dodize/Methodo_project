@@ -99,14 +99,14 @@ package body Decode is
     -- @param Operation : le type d'operation a realiser (en chaine)
     -- @param Valeur2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
-   procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire) is
-    begin
-        if RecupererType(Memoire, CleVariableAffectation) = "Entier" then
-            Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
-        else
-            Null; --TODO quand on aura les autres types
-        end if;
-      Null;
+   procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire; CP: in out Integer) is
+   begin
+      if RecupererType(Memoire, CleVariableAffectation) = "Entier" then
+         Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
+      else
+         Null; --TODO quand on aura les autres types
+      end if;
+      increm_CP(CP);
    end instru_op;
 
 
@@ -115,14 +115,14 @@ package body Decode is
     -- @param CleVariable : le nom de la variable a modifier
     -- @param Valeur : la nouvelle valeur de la variable (recuperee en string dans le tableau d'instruction)
     -- @param Mem : la memoire
-   procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire) is
+   procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire; CP : in out Integer) is
    begin
-        if RecupererType(Mem, CleVariable) = "Entier" then
-            Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
-        else
-            Null; --TODO quand on aura les autres types
-        end if;
-
+      if RecupererType(Mem, CleVariable) = "Entier" then
+         Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
+      else
+         Null; --TODO quand on aura les autres types
+      end if;
+      increm_CP(CP);
    end instru_affectation;
 
 
@@ -131,24 +131,23 @@ package body Decode is
      --  @param Label : la valeur que doit prendre CP si le booleen vaut True
      --  @param CP : le compteur de la ligne courante
      --  @param mem : la memoire
-    procedure instru_if (VariableBool : in Unbounded_String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
+    procedure instru_if (VariableBool : in Unbounded_String; Label : in Integer; CP : in out Integer; mem : in T_memoire) is
         valeur : Integer; -- valeur de "VariableBool"
     begin
         -- Recuperer la valeur du booleen
         valeur := RecupererValeur_Entier(mem, VariableBool);
         if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
-            Null;
+            increm_CP(CP);
         else -- cas ou la valeur vaut true : on change la valeur de CP
             CP := Label;
         end if;
-    end instru_if;
-
+   end instru_if;
 
 
    -- Effectue l'instruction null, soit ne fait rien
-   procedure instru_null is
+   procedure instru_null(CP : in out Integer) is
    begin
-      Null;
+      increm_CP(CP);
    end instru_null;
 
    -- Rempli une ligne du tableau en mettant en forme l'instruction null ou un commentaire
@@ -203,18 +202,13 @@ package body Decode is
    begin
       Pos := 1;
       parcourir_debut(Fichier);
-
       -- Parcours le code en remplicant le tableau
       Ligne := To_Unbounded_String(Get_Line(Fichier));
       while not (Ligne = "Fin") loop
-         --  Put_Line(To_String(Ligne));
-         --  Skip_Line;
          slice_mot(Ligne, Mot, " ");
-         --  Put_Line("Mot : ");
-         --  Put_Line(To_String(Mot));
          if Mot = "--" or Ligne = "NULL" then
             remplir_ligne_null(Tab, Pos);
-         elsif Mot /= "GOTO" and Mot /= "--" and Mot /= "NULL" and Mot /= "IF" then
+         elsif Mot /= "GOTO" and Mot /= "--" and Mot /= "NULL" and Mot /= "IF" then -- pour op car traitement special
             remplir_ligne_op(Tab, Pos, Ligne, Mot);
          else
             remplir_ligne(Tab, Pos, Ligne, Mot);
@@ -222,7 +216,6 @@ package body Decode is
          Pos := Pos + 1;
          Ligne := To_Unbounded_String(Get_Line(Fichier));
       end loop;
-
    end remplir_tab_instruc;
 
 
@@ -274,35 +267,36 @@ package body Decode is
     end recuperer_instru_pos4;
 
 
-     -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
+   -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
+   -- Et modifie le CP en consequence
    -- @param Tab : tableau comptenant les instructions
    -- @param CP : compteur
    -- @param mem : liste chainee contenant les variables et leurs valeurs
-    procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
-        InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
-    begin
-        -- Recuperer l'instruction
-        InstruPart1 := recuperer_instru_pos1(Tab, CP);
-        InstruPart2 := recuperer_instru_pos2(Tab, CP);
-        InstruPart3 := recuperer_instru_pos3(Tab, CP);
-        InstruPart4 := recuperer_instru_pos4(Tab, CP);
+   procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
+      InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
+   begin
+      -- Recuperer l'instruction
+      InstruPart1 := recuperer_instru_pos1(Tab, CP);
+      InstruPart2 := recuperer_instru_pos2(Tab, CP);
+      InstruPart3 := recuperer_instru_pos3(Tab, CP);
+      InstruPart4 := recuperer_instru_pos4(Tab, CP);
 
-        -- Realiser l'instruction
-        -- en fonction du premier mot de l'instruction, effectuer la bonne opÃ©ration
-        if InstruPart1 = "NULL" then
-            instru_null;
-        elsif InstruPart1 = "GOTO" then
-            instru_goto(CP, Integer'Value(To_String(InstruPart2)));
-        elsif InstruPart1 = "IF" then
-            instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
-        else
-            -- affectation sinon operation
-            if InstruPart3 = "affect" then
-                instru_affectation(InstruPart1, InstruPart2, mem);
-            else
-                instru_op(InstruPart1, InstruPart2, InstruPart3, InstruPart4, mem);
-            end if;
-        end if;
+      -- Realiser l'instruction
+      -- en fonction du premier mot de l'instruction, effectuer la bonne operation
+      if InstruPart1 = "NULL" then
+         instru_null(CP);
+      elsif InstruPart1 = "GOTO" then
+         instru_goto(CP, Integer'Value(To_String(InstruPart2)));
+      elsif InstruPart1 = "IF" then
+         instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
+      else
+         -- affectation sinon operation
+         if InstruPart3 = "affect" then
+            instru_affectation(InstruPart1, InstruPart2, mem, CP);
+         else
+            instru_op(InstruPart1, InstruPart2, InstruPart3, InstruPart4, mem, CP);
+         end if;
+      end if;
 
     end effectuer_instru;
 

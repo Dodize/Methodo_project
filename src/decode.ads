@@ -18,11 +18,6 @@ package Decode is
    procedure init_CP (CP: out Integer) with
      Post => CP = 1;
    
-   -- Incremente le compteur
-   -- @param CP : compteur a incrementer
-   procedure increm_CP (CP : in out Integer) with
-     Post => CP'Old +1 = CP;
-
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
