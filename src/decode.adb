@@ -101,7 +101,7 @@ package body Decode is
    -- @param Index : ligne du tableau a remplir
    procedure remplir_ligne_null(Tab: out T_tab_instruc; Pos : in Integer) is
    begin
-      Tab(Pos).pos1 := To_Unbounded_String("null");
+      Tab(Pos).pos1 := To_Unbounded_String("NULL");
    end remplir_ligne_null;
 
    -- Rempli une ligne du tableau en mettant en forme l'instruction
@@ -128,8 +128,12 @@ package body Decode is
       Tab(Pos).pos1 := Mot;
       slice_mot(Ligne, inutile, " ");
       slice_mot(Ligne, Tab(Pos).pos2, " ");
-      slice_mot(Ligne, Tab(Pos).pos3, " ");
-      slice_mot(Ligne, Tab(Pos).pos4, " ");
+      if index(Ligne, " ") = 0 then
+         Tab(Pos).pos3 := To_Unbounded_String("affect");
+      else
+        slice_mot(Ligne, Tab(Pos).pos3, " ");
+         slice_mot(Ligne, Tab(Pos).pos4, " ");
+      end if;
    end remplir_ligne_op;
 
    -- Rempli le tableau avec les instructions du fichier
@@ -153,9 +157,9 @@ package body Decode is
          slice_mot(Ligne, Mot, " ");
          --  Put_Line("Mot : ");
          --  Put_Line(To_String(Mot));
-         if Mot = "--" or Ligne = "null" then
+         if Mot = "--" or Ligne = "NULL" then
             remplir_ligne_null(Tab, Pos);
-         elsif Mot /= "GOTO" or Mot /= "--" or Mot /= "null" or Mot /= "If" then
+         elsif Mot /= "GOTO" and Mot /= "--" and Mot /= "NULL" and Mot /= "IF" then
             remplir_ligne_op(Tab, Pos, Ligne, Mot);
          else
             remplir_ligne(Tab, Pos, Ligne, Mot);
