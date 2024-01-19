@@ -1,6 +1,7 @@
 with Decode;
 with Utils;           use Utils;
 with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
+with Memoire; use Memoire;
 
 package body Interpreteur is
 
@@ -41,12 +42,18 @@ package body Interpreteur is
 
    -- Lance l'interpreteur en lisant et excecutant le code
    procedure Executer(Fichier : in File_Type) is
-      package Decode2Entier is new Decode(Capacite => CalculerCapacite(Fichier));
-        use Decode2Entier;
-      tab : T_tab_instruc;
+      package Dec is new Decode(Capacite => CalculerCapacite(Fichier));
+      use Dec;
+      Instructions : T_tab_instruc;
+      Mem : T_Memoire;
+      cp : Integer;
    begin
-      Null;
+      -- Declaration des variables en memoire
+      DeclarerVariables(Mem, Fichier);
+      -- Recuperation des instructions
+      Dec.remplir_tab_instruc(Instructions, Fichier);
+      -- Initialisation du CP
+      Dec.init_CP(cp);
    end Executer;
-
 
 end Interpreteur;

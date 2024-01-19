@@ -9,7 +9,6 @@ package body Memoire is
    procedure DeclarerVariables (Mem : out T_Memoire; Code : in File_Type) is
       Current_Mem_Integer : P_Memoire_Entier.T_Case_Memoire;
       Current_Line        : Unbounded_String;
-      Temporary_Line      : Unbounded_String;
       Splitted_Line       : Unbounded_String;
       Fini                : Boolean;
       Current_Type        : T_Type;
@@ -18,16 +17,11 @@ package body Memoire is
       -- Tant qu'on n'a pas atteint la fin du fichier ni la ligne "Debut"
       while not End_Of_File (Code) and not Fini loop
          Current_Line := To_Unbounded_String (Get_Line (Code));
-         Current_Line :=
-           Translate (Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
+         Current_Line := Translate (Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
          -- Si pas commentaire
          if Index (Current_Line, "--") = 0 then
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
-            if
-              (Index (Temporary_Line, "dÃ©but") > 0 or
-                   Index (Temporary_Line, "debut") > 0) and
-              Index (Temporary_Line, ":") = 0
-            then
+            if (Index (Current_Line, "début") > 0 or Index (Current_Line, "debut") > 0) and Index (Current_Line, ":") = 0 then
                Fini := True;
             else
                -- Split au niveau de ':'
@@ -36,21 +30,24 @@ package body Memoire is
                if Index (Splitted_Line, "entier") > 0 then
                   Current_Type := ENTIER;
                end if;
+               -- Split au niveau de ','
                slice_mot (Current_Line, Splitted_Line, ",");
-               while Length (Current_Line) > 0 loop
+               while Length (Splitted_Line) > 0 loop
+                  -- Initialisation de la memoire en fonction de son type
                   if Current_Type = ENTIER then
                      P_Memoire_Entier.Initialiser (Current_Mem_Integer);
                      Current_Mem_Integer.Cle        := Splitted_Line;
                      Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
-
+                     -- Recuperation de la tete si premier element
                      if Mem.Entiers = null then
                         Mem.Entiers := Current_Mem_Integer;
                      end if;
 
+                     -- Recuperation de l'element suivant
                      Current_Mem_Integer := Current_Mem_Integer.Suivant;
                   end if;
                   -- Split au niveau de ','
-                  slice_mot (Current_Line, Splitted_Line, ",");
+                  slice_mot (Current_Line, Splitted_Line, ',');
                end loop;
             end if;
          end if;
