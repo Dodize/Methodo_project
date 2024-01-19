@@ -31,15 +31,15 @@ package body Decode is
     end instru_goto;
 
 
-    function result_instru_entier(y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) return Integer is
-        Result : Integer;
-    begin
-        --  if op = "+" then
-        --      Result := Integer'Value(To_String(y)) + Integer'Value(To_String(z));
-        --  elsif op = "-" then
-        --
-        return 0;
-    end result_instru_entier;
+    --  function result_instru_entier(y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) return Integer is
+    --      Result : Integer;
+    --  begin
+    --      --  if op = "+" then
+    --      --      Result := Integer'Value(To_String(y)) + Integer'Value(To_String(z));
+    --      --  elsif op = "-" then
+    --      --
+    --      return 0;
+    --  end result_instru_entier;
 
 
 
@@ -112,9 +112,9 @@ package body Decode is
    procedure remplir_ligne(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
    begin
       Tab(Pos).pos1 := Mot;
-      slice_mot(Ligne, Tab(Pos).pos2, ' ');
-      slice_mot(Ligne, Tab(Pos).pos3, ' ');
-      slice_mot(Ligne, Tab(Pos).pos4, ' ');
+      slice_mot(Ligne, Tab(Pos).pos2, " ");
+      slice_mot(Ligne, Tab(Pos).pos3, " ");
+      slice_mot(Ligne, Tab(Pos).pos4, " ");
    end remplir_ligne;
 
    -- Rempli une ligne du tableau en mettant en forme l'instru x y op z
@@ -126,10 +126,10 @@ package body Decode is
       inutile : Unbounded_String;
    begin
       Tab(Pos).pos1 := Mot;
-      slice_mot(Ligne, inutile, ' ');
-      slice_mot(Ligne, Tab(Pos).pos2, ' ');
-      slice_mot(Ligne, Tab(Pos).pos3, ' ');
-      slice_mot(Ligne, Tab(Pos).pos4, ' ');
+      slice_mot(Ligne, inutile, " ");
+      slice_mot(Ligne, Tab(Pos).pos2, " ");
+      slice_mot(Ligne, Tab(Pos).pos3, " ");
+      slice_mot(Ligne, Tab(Pos).pos4, " ");
    end remplir_ligne_op;
 
    -- Rempli le tableau avec les instructions du fichier
@@ -149,9 +149,10 @@ package body Decode is
       Ligne := To_Unbounded_String(Get_Line(Fichier));
       while not (Ligne = "Fin") loop
          --  Put_Line(To_String(Ligne));
-         --  Put(Pos);
          --  Skip_Line;
-         slice_mot(Ligne, Mot, ' ');
+         slice_mot(Ligne, Mot, " ");
+         --  Put_Line("Mot : ");
+         --  Put_Line(To_String(Mot));
          if Mot = "--" or Ligne = "null" then
             remplir_ligne_null(Tab, Pos);
          elsif Mot /= "GOTO" or Mot /= "--" or Mot /= "null" or Mot /= "If" then

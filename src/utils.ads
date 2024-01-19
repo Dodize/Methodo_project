@@ -9,7 +9,7 @@ package utils is
    -- @param Ligne : ligne dont on extrait le mot
    -- @param Mot : a placer le mot extrait
    -- @param Delimiteur: caractere signant la fin du mot
-   procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in Character);
+   procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in String);
    
 
    procedure parcourir_debut(Fichier : in File_Type);

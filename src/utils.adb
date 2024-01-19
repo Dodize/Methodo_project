@@ -1,17 +1,17 @@
 package body utils is
 
-   -- permet de retirer le premier mot avant delimiteur de la ligne en le plaÃ§ant dans mot
+   -- permet de retirer le premier mot avant delimiteur de la ligne en le placant dans mot
    -- @param Ligne : ligne dont on extrait le mot
    -- @param Mot : a placer le mot extrait
    -- @param Delimiteur: caractere signant la fin du mot
-   procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in Character) is
+   procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in String) is
       Pos : Natural;
    begin
       -- Trouver l'indice du delimiteur
-      Pos := Ada.Strings.Unbounded.Index(Ligne, Character'Image(Delimiteur));
-      -- Extraire la sous-chaÃ®ne jusqu'au delimiteur
+      Pos := Index(Ligne, Delimiteur);
+      -- Extraire la sous-chaine jusqu'au delimiteur
       if Pos /= 0 then
-         Mot := Unbounded_Slice(Ligne, 1, Pos);
+         Mot := Unbounded_Slice(Ligne, 1, Pos-1);
          -- Supprimer la partie extraite de la ligne
          Delete(Ligne, 1, Pos);
       else
@@ -27,7 +27,7 @@ package body utils is
       -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
       begin
       Ligne := To_Unbounded_String(Get_Line(Fichier));
-      while (Index(Ligne, "Début")) = 0 or else (Index(Ligne, ":")) > 0 loop
+      while (Index(Ligne, "D�but")) = 0 or else (Index(Ligne, ":")) > 0 loop
          Ligne := To_Unbounded_String(Get_Line(Fichier));
       end loop;
    end parcourir_debut;

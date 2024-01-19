@@ -31,12 +31,12 @@ package body Memoire is
                Fini := True;
             else
                -- Split au niveau de ':'
-               slice_mot (Current_Line, Splitted_Line, ':');
+               slice_mot (Current_Line, Splitted_Line, ":");
                -- Recuperation du type
                if Index (Splitted_Line, "entier") > 0 then
                   Current_Type := ENTIER;
                end if;
-               slice_mot (Current_Line, Splitted_Line, ',');
+               slice_mot (Current_Line, Splitted_Line, ",");
                while Length (Current_Line) > 0 loop
                   if Current_Type = ENTIER then
                      P_Memoire_Entier.Initialiser (Current_Mem_Integer);
@@ -50,7 +50,7 @@ package body Memoire is
                      Current_Mem_Integer := Current_Mem_Integer.Suivant;
                   end if;
                   -- Split au niveau de ','
-                  slice_mot (Current_Line, Splitted_Line, ',');
+                  slice_mot (Current_Line, Splitted_Line, ",");
                end loop;
             end if;
          end if;
