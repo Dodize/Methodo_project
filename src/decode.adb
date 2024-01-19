@@ -1,4 +1,6 @@
 
+with Utils; use Utils;
+
 
 package body Decode is
 
@@ -19,7 +21,6 @@ package body Decode is
       CP := CP+1;
    end increm_CP;
 
-   --effectuer_instru : appel instru_goto, instru_op, instru_affectation, instru_if, instru_null
 
     -- Effectue l'instruction goto en allant au label souhaite (sous forme de numero de ligne)
     -- @param CP : le compteur qui doit etre modifie
@@ -27,47 +28,55 @@ package body Decode is
    procedure instru_goto (CP : out Integer; label : in Integer) is
    begin
       CP := label;
-   end instru_goto;
+    end instru_goto;
+
+
+    procedure add_
 
 
    -- Effectue l'instruction operation demande
-   procedure instru_op (x : in Integer; y : in Integer; op : in String; z : in Integer; mem : in out T_memoire) is
+   procedure instru_op (x : in Unbounded_String; y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) is
    begin
-      Null;
+      if RecupererType(Mem, CleVariable) = "Entier" then
+            Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
+        else
+            Null; --TODO quand on aura les autres types
+        end if;
    end instru_op;
 
 
-   -- Effectue l'instruction operation demande (attention X pas forcement meme type que y et z)
-   -- si "chaine" + "5" dans le doc y aura ""5""
-   --  procedure instru_op (x : in String; y : in String; op : in String; z : out Integer; mem : in out T_memoire) is
-   --  begin
-   --      Null;
-   --  end instru_op;
 
-
-   -- Effectue l'instruction affectation TODO A FAIRE EN GENERIQUE SUR VAL ET RAJOUTER LE TABLEAU DE MEMOIRE DEDANS
-   procedure instru_affectation (cle : in String; val : in Integer; mem : in out T_memoire) is
+    -- Effectue l'instruction affectation
+    -- @param CleVariable : le nom de la variable a modifier
+    -- @param Valeur : la nouvelle valeur de la variable (recuperee en string dans le tableau d'instruction)
+    -- @param Mem : la memoire
+   procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire) is
    begin
-      Null;
+        if RecupererType(Mem, CleVariable) = "Entier" then
+            Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
+        else
+            Null; --TODO quand on aura les autres types
+        end if;
+
    end instru_affectation;
 
 
-    -- Effectue l'instruction if en fonction de la variable VariableBool
-    -- @param VariableBool : le nom de la variable booleenne
-    -- @param Label : la valeur que doit prendre CP si le booleen vaut True
-    -- @param CP : le compteur de la ligne courante
-    -- @param mem : la memoire
-    --  procedure instru_if (VariableBool : in String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
-    --      valeur : Integer; -- valeur de "VariableBool"
-    --  begin
-    --      -- Recuperer la valeur du booleen
-    --      valeur := RecupererValeur(mem, VariableBool);
-    --      if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
-    --          Null;
-    --      else -- cas ou la valeur vaut true : on change la valeur de CP
-    --          CP := Label;
-    --      end if;
-    --  end instru_if;
+     --  Effectue l'instruction if en fonction de la variable VariableBool
+     --  @param VariableBool : le nom de la variable booleenne
+     --  @param Label : la valeur que doit prendre CP si le booleen vaut True
+     --  @param CP : le compteur de la ligne courante
+     --  @param mem : la memoire
+    procedure instru_if (VariableBool : in Unbounded_String; Label : in Integer; CP : out Integer; mem : in T_memoire) is
+        valeur : Integer; -- valeur de "VariableBool"
+    begin
+        -- Recuperer la valeur du booleen
+        valeur := RecupererValeur_Entier(mem, VariableBool);
+        if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
+            Null;
+        else -- cas ou la valeur vaut true : on change la valeur de CP
+            CP := Label;
+        end if;
+    end instru_if;
 
 
 
@@ -158,13 +167,6 @@ package body Decode is
 
 
 
-   -- Methode interne
-	-- Recupere l'instruction dans le tableau.
-	-- function recup_instru (Tab : in T_tab_instruc; CP : in Integer) return String with
-     --Post => Tab(CP).pos1 = res or Tab(CP).pos3 = res;
-
-
-
    -- Retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
@@ -218,13 +220,13 @@ package body Decode is
         elsif InstruPart1 = "GOTO" then
             instru_goto(CP, Integer'Value(To_String(InstruPart2)));
         elsif InstruPart1 = "IF" then
-            null; --instru_if(To_String(InstruPart2), Integer'Value(To_String(InstruPart4)), CP, mem);
+            instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
         else
             -- affectation sinon operation
             if InstruPart3 = "affect" then
-                instru_affectation(To_String(InstruPart1), Integer'Value(To_String(InstruPart2)), mem);
+                instru_affectation(InstruPart1, InstruPart2, mem);
             else
-                instru_op(Integer'Value(To_String(InstruPart1)), Integer'Value(To_String(InstruPart2)), To_String(InstruPart3), Integer'Value(To_String(InstruPart4)), mem);
+                instru_op(InstruPart1, InstruPart2, InstruPart3, InstruPart4, mem);
             end if;
         end if;
 
