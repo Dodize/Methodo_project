@@ -31,26 +31,80 @@ package body Decode is
     end instru_goto;
 
 
-    --  function result_instru_entier(y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) return Integer is
-    --      Result : Integer;
-    --  begin
-    --      --  if op = "+" then
-    --      --      Result := Integer'Value(To_String(y)) + Integer'Value(To_String(z));
-    --      --  elsif op = "-" then
-    --      --
-    --      return 0;
-    --  end result_instru_entier;
+  -- Calcule le resultat d'une operation composee de deux entiers
+    -- @param CleVal1 : le nom de la premiere variable de l'operation
+    -- @param Operation : l'operation a effectuer
+    -- @param CleVal2 : le nom de la deuxieme variable de l'operation
+    -- @param Memoire : la memoire
+    function result_instru_entier(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire) return Integer is
+        Result : Integer;
+        Valeur1 : Integer;
+        Valeur2 : Integer;
+    begin
+        Valeur1 := RecupererValeur_Entier(Memoire, CleVal1);
+        Valeur2 := RecupererValeur_Entier(Memoire, CleVal2);
+        if Operation = "+" then
+            Result := Valeur1 + Valeur2;
+        elsif Operation = "-" then
+            Result := Valeur1 - Valeur2;
+        elsif Operation = "/" then
+            Result := Valeur1 / Valeur2;
+        elsif Operation = "*" then
+            Result := Valeur1 * Valeur2;
+        elsif Operation = "=" then
+            if Valeur1 = Valeur2 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
+        elsif Operation = "<" then
+            if Valeur1 < Valeur2 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
+        elsif Operation = ">" then
+            if Valeur1 > Valeur2 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
+        elsif Operation = "OR" then
+            if Valeur1/=0 or else Valeur2/=0 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
+        elsif Operation = "AND" then
+            if Valeur1/=0 and then Valeur2/=0 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
+        else
+            -- exception
+            Null;
+        end if;
+
+        return Result;
+
+    end result_instru_entier;
 
 
 
-   -- Effectue l'instruction operation demande
-   procedure instru_op (CleVariable : in Unbounded_String; y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) is
-   begin
-      --  if RecupererType(Mem, CleVariable) = "Entier" then
-      --
-      --    else
-      --        Null; --TODO quand on aura les autres types
-      --    end if;
+    -- Effectue l'instruction operation demande
+    -- @param CleVariableAffectation : le nom de la variable affectee
+    -- @param Valeur1 : le nom de la premiere variable de l'operation
+    -- @param Operation : le type d'operation a realiser (en chaine)
+    -- @param Valeur2 : le nom de la deuxieme variable de l'operation
+    -- @param Memoire : la memoire
+   procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire) is
+    begin
+        if RecupererType(Memoire, CleVariableAffectation) = "Entier" then
+            Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
+        else
+            Null; --TODO quand on aura les autres types
+        end if;
       Null;
    end instru_op;
 
@@ -230,7 +284,7 @@ package body Decode is
 
         -- Realiser l'instruction
         -- en fonction du premier mot de l'instruction, effectuer la bonne opÃ©ration
-        if InstruPart1 = "Null" then
+        if InstruPart1 = "NULL" then
             instru_null;
         elsif InstruPart1 = "GOTO" then
             instru_goto(CP, Integer'Value(To_String(InstruPart2)));
