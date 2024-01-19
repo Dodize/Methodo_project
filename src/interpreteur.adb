@@ -42,18 +42,24 @@ package body Interpreteur is
 
    -- Lance l'interpreteur en lisant et excecutant le code
    procedure Executer(Fichier : in File_Type) is
-      package Dec is new Decode(Capacite => CalculerCapacite(Fichier));
-      use Dec;
+      package P_Decode is new Decode(Capacite => CalculerCapacite(Fichier));
+      use P_Decode;
       Instructions : T_tab_instruc;
       Mem : T_Memoire;
       cp : Integer;
+      Capacite_tab : Integer;
    begin
       -- Declaration des variables en memoire
       DeclarerVariables(Mem, Fichier);
       -- Recuperation des instructions
-      Dec.remplir_tab_instruc(Instructions, Fichier);
+      remplir_tab_instruc(Instructions, Fichier);
       -- Initialisation du CP
-      Dec.init_CP(cp);
+      init_CP(cp);
+      -- parcour le tableau tant que l'on n'a pas termine le programme
+      while cp < Capacite_tab loop
+         effectuer_instru(Instructions, cp, Mem);
+      end loop;
+
    end Executer;
 
 end Interpreteur;
