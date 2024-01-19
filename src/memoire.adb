@@ -1,29 +1,5 @@
 package body Memoire is
 
-   -- Vérifier si delete inclu la supp du delimiteur comme souhaité
-   procedure slice_mot
-     (Ligne      : in out Unbounded_String; mot : in out Unbounded_String;
-      delimiteur : in     Character)
-   is
-      Index : Natural;
-   begin
-      -- Trouver l'indice du délimiteur
-      Index :=
-        Ada.Strings.Unbounded.Index (Ligne, Character'Image (delimiteur));
-
-      -- Extraire la sous-chaîne jusqu'au délimiteur
-      if Index /= 0 then
-         mot := Unbounded_Slice (Ligne, 1, Index);
-         -- Supprimer la partie extraite de la ligne
-         Delete (Ligne, 1, Index);
-      else
-      -- Si le délimiteur n'est pas trouvé, copier la ligne entière dans le mot
-         mot := Ligne;
-         -- Réinitialiser la ligne
-         Delete (Ligne, 1, Length (Ligne));
-      end if;
-   end slice_mot;
-
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire
    -- @param Code : le code ou sont declarees les variables
