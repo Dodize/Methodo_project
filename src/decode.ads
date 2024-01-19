@@ -3,17 +3,14 @@
 with Ada.Text_IO ;                use Ada.Text_IO ;
 with Ada.Integer_Text_IO;         use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
-with Memoire;
+with Memoire;                     use Memoire;
 with utils;                       use utils;
 
 generic
-    with package P_Memoire is new Memoire(<>);
       Capacite: Integer;   -- Nombre de ligne du code interprete
 
 package Decode is
-    
-    use P_Memoire;
-   
+       
     Type T_tab_instruc is limited private ;
     
     GOTO_OUT_OF_RANGE_EXCEPTION : Exception; -- la ligne renvoyee par GOTO est inf a 1 ou supp au nombre de lignes du code

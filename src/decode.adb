@@ -129,9 +129,9 @@ package body Decode is
       -- Parcours le code en remplicant le tableau
       Ligne := To_Unbounded_String(Get_Line(Fichier));
       while not (Ligne = "Fin") loop
-         Put_Line(To_String(Ligne));
-         Put(Pos);
-         Skip_Line;
+         --  Put_Line(To_String(Ligne));
+         --  Put(Pos);
+         --  Skip_Line;
          slice_mot(Ligne, Mot, ' ');
          if Mot = "--" or Ligne = "null" then
             remplir_ligne_null(Tab, Pos);
