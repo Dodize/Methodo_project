@@ -21,7 +21,7 @@ package body Memoire is
          -- Si pas commentaire
          if Index (Current_Line, "--") = 0 then
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
-            if (Index (Current_Line, "d�but") > 0 or Index (Current_Line, "debut") > 0) and Index (Current_Line, ":") = 0 then
+            if (Index (Current_Line, "début") > 0 or Index (Current_Line, "debut") > 0) and Index (Current_Line, ":") = 0 then
                Fini := True;
             else
                -- Split au niveau de ':'
@@ -47,7 +47,7 @@ package body Memoire is
                      Current_Mem_Integer := Current_Mem_Integer.Suivant;
                   end if;
                   -- Split au niveau de ','
-                  slice_mot (Current_Line, Splitted_Line, ',');
+                  slice_mot (Current_Line, Splitted_Line, ",");
                end loop;
             end if;
          end if;
@@ -58,7 +58,7 @@ package body Memoire is
    function trouver_case_entier (CaseMem : in P_Memoire_Entier.T_Case_Memoire; Cle : in Unbounded_String) return P_Memoire_Entier.T_Case_Memoire is
       Pos_entier : P_Memoire_Entier.T_Case_Memoire;
    begin
-      -- Recuperer la liste chainée
+      -- Recuperer la liste chainee
       Pos_entier := CaseMem;
       while Pos_entier.Cle /= Cle loop -- on n'est pas oblige de commencer par Pos_entier /= null or else car on sait que la variable existe en memoire
          Pos_entier := Pos_entier.Suivant;
@@ -78,14 +78,14 @@ package body Memoire is
    end Modifier_Entier;
 
 
-    -- Recupere la valeur d'une variable par son nom Ã  partir d'une case memoire (est appelÃ©e par RecupererValeur_Entier)
+    -- Recupere la valeur d'une variable par son nom a partir d'une case memoire (est appelee par RecupererValeur_Entier)
     -- @param CaseMem : la case memoire dans laquelle on verifie si la cle correspond
     -- @param Cle : la cle de la variable dont on cherche la valeur
     -- @return : la valeur associee au nom de la variable
     function RecupererValeur_Entier_FromCase(CaseMem : in P_Memoire_Entier.T_Case_Memoire; Cle : in Unbounded_String) return Integer
     is
     begin
-        -- Vérifier si la cle est la bonne pour chaque case memoire
+        -- Verifier si la cle est la bonne pour chaque case memoire
         if CaseMem.All.Cle = Cle then
             return CaseMem.All.Data;
         else
@@ -95,11 +95,11 @@ package body Memoire is
     end RecupererValeur_Entier_FromCase;
 
 
-   -- Recupere la valeur d'une variable par son nom Ã  partir de l'objet memoire
+   -- Recupere la valeur d'une variable par son nom (a partir de l'objet memoire)
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return la valeur de la variable
-   -- Pre-condition : Mem.Entiers /= Null et la clÃ© existe dans la mÃ©moire (car le programme intermÃ©diaire est bien formÃ©)
+   -- Pre-condition : Mem.Entiers /= Null et la clee existe dans la memoire (car le programme intermediaire est bien formee)
    function RecupererValeur_Entier (Mem : in T_Memoire; Cle : in Unbounded_String) return Integer
     is
     begin
