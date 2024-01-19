@@ -31,11 +31,12 @@ package body Decode is
     end instru_goto;
 
 
-  -- Calcule le resultat d'une operation composee de deux entiers
+    -- Calcule le resultat d'une operation composee de deux entiers
     -- @param CleVal1 : le nom de la premiere variable de l'operation
     -- @param Operation : l'operation a effectuer
     -- @param CleVal2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
+    -- @return : le resultat de l'operation
     function result_instru_entier(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire) return Integer is
         Result : Integer;
         Valeur1 : Integer;
@@ -239,6 +240,7 @@ package body Decode is
    -- Retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : la partie 1 de l'instruction
    function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
       return Tab(CP).pos1;
@@ -247,6 +249,7 @@ package body Decode is
    -- Retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : la partie 2 de l'instruction
    function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
       return Tab(CP).pos2;
@@ -255,6 +258,7 @@ package body Decode is
    -- Retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : la partie 3 de l'instruction
    function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
       return Tab(CP).pos3;
@@ -263,6 +267,7 @@ package body Decode is
    -- Retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
+   -- @return : la partie 4 de l'instruction
    function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
    begin
       return Tab(CP).pos4;

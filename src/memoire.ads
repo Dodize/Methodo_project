@@ -33,12 +33,14 @@ package Memoire is
    -- Recupere la valeur d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
+   -- @return : la valeur de la variable
     function RecupererValeur_Entier(Mem : in T_Memoire ; Cle : in Unbounded_String) return Integer with
             Pre => Mem.Entiers /= Null;
 
    -- Recupere le type d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
+   -- @return : le type de la variable
    function RecupererType(Mem : in T_Memoire ; Cle : in Unbounded_String) return Unbounded_String;
 
 end Memoire;

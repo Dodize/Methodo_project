@@ -54,7 +54,10 @@ package body Memoire is
       end loop;
    end DeclarerVariables;
 
-
+   -- Permet de trouver la case memoire de la variable ayant Cle comme nom
+   -- @param CaseMem : la premiere case memoire
+   -- @param Cle : le nom de la variable
+   -- @return : la case memoire contenant la variable 
    function trouver_case_entier (CaseMem : in P_Memoire_Entier.T_Case_Memoire; Cle : in Unbounded_String) return P_Memoire_Entier.T_Case_Memoire is
       Pos_entier : P_Memoire_Entier.T_Case_Memoire;
    begin
