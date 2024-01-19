@@ -42,7 +42,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp); 
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "x <- 3");
         Put_Line (Fichier_temp, "Fin");
@@ -84,7 +84,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -119,7 +119,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 + 3");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -154,7 +154,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x + y");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -189,7 +189,7 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y + 3");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -224,7 +224,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 - 5");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -259,7 +259,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x - y");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -296,7 +296,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y - 3");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -330,7 +330,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 * 3");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -365,7 +365,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x * y");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -401,7 +401,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y * 4");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -435,7 +435,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 2");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -469,7 +469,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 0");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -508,7 +508,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x / y");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -544,7 +544,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y / 3");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -578,7 +578,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
         Put_Line (Fichier_temp, "GOTO 1");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
@@ -611,7 +611,7 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 5");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
@@ -646,7 +646,7 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 0");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -683,7 +683,7 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 10");
         remplir_tab_instruc(Tab_Instruc, Fichier_temp);
         CP := 1;
@@ -721,7 +721,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "T1 : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "IF T1 GOTO 5");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
@@ -759,7 +759,7 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "T1 : Entier");
-        Put_Line (Fichier_temp, "DÃ©but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "IF T1 GOTO 3");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
@@ -829,7 +829,7 @@ procedure test_decode is
       Put_Line(fichier, "Programme Facto est");
       Put_Line(fichier, "n, i, Fact : Entier");
       Put_Line(fichier, "T1, T2, T3 : Booleen");
-      Put_Line(fichier, "Debut");
+      Put_Line(fichier, "Début");
       Put_Line(fichier, "n <- 5");
       Put_Line(fichier, "i <- 1");
       Put_Line(fichier, "Fact <- 1");
