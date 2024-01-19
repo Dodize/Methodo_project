@@ -31,17 +31,27 @@ package body Decode is
     end instru_goto;
 
 
-    procedure add_
+    function result_instru_entier(y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) return Integer is
+        Result : Integer;
+    begin
+        --  if op = "+" then
+        --      Result := Integer'Value(To_String(y)) + Integer'Value(To_String(z));
+        --  elsif op = "-" then
+        --
+        return 0;
+    end result_instru_entier;
+
 
 
    -- Effectue l'instruction operation demande
-   procedure instru_op (x : in Unbounded_String; y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) is
+   procedure instru_op (CleVariable : in Unbounded_String; y : in Unbounded_String; op : in Unbounded_String; z : in Unbounded_String; mem : in out T_memoire) is
    begin
-      if RecupererType(Mem, CleVariable) = "Entier" then
-            Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
-        else
-            Null; --TODO quand on aura les autres types
-        end if;
+      --  if RecupererType(Mem, CleVariable) = "Entier" then
+      --
+      --    else
+      --        Null; --TODO quand on aura les autres types
+      --    end if;
+      Null;
    end instru_op;
 
 
