@@ -1,5 +1,7 @@
 with Decode;
-with Memoire;
+with Utils;           use Utils;
+with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
+
 package body Interpreteur is
 
    -- Permet de choisir le mode d'utilisation : 0 pour normal et 1 pour debug
@@ -24,10 +26,7 @@ package body Interpreteur is
    begin
 
       -- Parcourir le fichier jusqu'à "début"
-      -- on verifie qu'il n'y ait de ":" (sinon il s'agirait d'un nom de variable)
-      while (Index(To_Unbounded_String(Get_Line(Fichier)), "Début")) = 0 and then (Index(To_Unbounded_String(Get_Line(Fichier)), ":")) > 0 loop
-         Null;
-      end loop;
+      parcourir_debut(Fichier);
 
       -- Calculer le nombre de lignes de la ligne début + 1 / jusqu'à la fin du programme (mot "Fin)
       Capacite := 0;
@@ -42,9 +41,8 @@ package body Interpreteur is
 
    -- Lance l'interpreteur en lisant et excecutant le code
    procedure Executer(Fichier : in File_Type) is
-      package MemoireEntier is new Memoire(T_Elt => Integer);
-      package Decode2Entier is new Decode(P_Memoire => MemoireEntier, Capacite => CalculerCapacite(Fichier));
-      use MemoireEntier; use Decode2Entier;
+      package Decode2Entier is new Decode(Capacite => CalculerCapacite(Fichier));
+        use Decode2Entier;
       tab : T_tab_instruc;
    begin
       Null;

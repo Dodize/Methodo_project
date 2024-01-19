@@ -124,7 +124,7 @@ package body Decode is
       Pos : Integer;
    begin
       Pos := 1;
-      parcourir_debut(Ligne, Fichier);
+      parcourir_debut(Fichier);
 
       -- Parcours le code en remplicant le tableau
       Ligne := To_Unbounded_String(Get_Line(Fichier));
