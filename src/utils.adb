@@ -32,4 +32,18 @@ package body utils is
       end loop;
    end parcourir_debut;
 
+   -- Permet de retirer les espaces d'une chaine
+   -- @pram Chaine : la string d'origine
+   -- @return String
+   function Strip_Space (Chaine : in String) return String is
+   begin
+      if Chaine'Length = 0 then
+         return "";
+      elsif Chaine (Chaine'First) = ' ' then
+         return Strip_Space (Chaine (Chaine'First + 1 .. Chaine'Last));
+      else
+         return Chaine (Chaine'First) & Strip_Space (Chaine (Chaine'First + 1 .. Chaine'Last));
+      end if;
+   end Strip_Space;
+
 end utils;

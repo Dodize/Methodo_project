@@ -14,35 +14,37 @@ package body Memoire is
       Current_Type        : T_Type;
    begin
       Fini                := False;
+      Mem.Entiers         := new P_Memoire_Entier.T_Var;
+      Current_Mem_Integer := Mem.Entiers;
       -- Tant qu'on n'a pas atteint la fin du fichier ni la ligne "Debut"
       while not End_Of_File (Code) and not Fini loop
          Current_Line := To_Unbounded_String (Get_Line (Code));
          Current_Line := Translate (Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
-         -- Si pas commentaire
-         if Index (Current_Line, "--") = 0 then
+         -- Si pas commentaire ou declaration debut programme
+         if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
-            if (Index (Current_Line, "dÃ©but") > 0 or Index (Current_Line, "debut") > 0) and Index (Current_Line, ":") = 0 then
+            if (Index (Current_Line, "début") > 0 or Index (Current_Line, "debut") > 0) then
                Fini := True;
             else
                -- Split au niveau de ':'
-               slice_mot (Current_Line, Splitted_Line, ":");
+               slice_mot(Current_Line, Splitted_Line, ":");
+
                -- Recuperation du type
-               if Index (Splitted_Line, "entier") > 0 then
+               if Index(Current_Line, "entier") > 0 then
                   Current_Type := ENTIER;
                end if;
+
+               Current_Line := Splitted_Line;
+
                -- Split au niveau de ','
                slice_mot (Current_Line, Splitted_Line, ",");
+
                while Length (Splitted_Line) > 0 loop
                   -- Initialisation de la memoire en fonction de son type
                   if Current_Type = ENTIER then
-                     P_Memoire_Entier.Initialiser (Current_Mem_Integer);
-                     Current_Mem_Integer.Cle        := Splitted_Line;
+                     Current_Mem_Integer.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
                      Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
-                     -- Recuperation de la tete si premier element
-                     if Mem.Entiers = null then
-                        Mem.Entiers := Current_Mem_Integer;
-                     end if;
-
+                     Current_Mem_Integer.Suivant := new P_Memoire_Entier.T_Var;
                      -- Recuperation de l'element suivant
                      Current_Mem_Integer := Current_Mem_Integer.Suivant;
                   end if;
