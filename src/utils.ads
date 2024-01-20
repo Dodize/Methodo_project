@@ -12,6 +12,11 @@ package utils is
    procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in String);
    
 
+   -- Ouvre le fichier en lecture pour pouvoir ensuite le parcourir
+   -- @param NomFichier : le nom du fichier que l'on souhaite ouvrir en lecture
+   -- @param FichierOuvert : l'object fichier apres ouverture
+   procedure Ouvrir_Fichier_Lecture(NomFichier : in String; FichierOuvert : out File_Type);
+    
    procedure parcourir_debut(Fichier : in File_Type);
    
    -- Permet de retirer les espaces d'une chaine

@@ -15,19 +15,29 @@ package body utils is
          -- Supprimer la partie extraite de la ligne
          Delete(Ligne, 1, Pos);
       else
-         -- Si le delimiteur n'est pas trouve, copier la ligne entiÃ¨re dans le mot
+         -- Si le delimiteur n'est pas trouve, copier la ligne entiere dans le mot
          Mot := Ligne;
          -- Reinitialiser la ligne
          Delete(Ligne, 1, Length(Ligne));
       end if;
-   end slice_mot;
+    end slice_mot;
+
+   -- Ouvre le fichier en lecture pour pouvoir ensuite le parcourir
+   -- @param NomFichier : le nom du fichier que l'on souhaite ouvrir en lecture
+   -- @param FichierOuvert : l'object fichier apres ouverture
+    procedure Ouvrir_Fichier_Lecture(NomFichier : in String; FichierOuvert : out File_Type) is
+    begin
+        Open(FichierOuvert, In_File, NomFichier);
+    end Ouvrir_Fichier_Lecture;
+
+
 
     procedure parcourir_debut(Fichier : in File_Type) is
         Ligne : Unbounded_String;
       -- Parcours jusqu'a debut pour remplir uniquement les lignes de codes en ignorant la decla de variable
       begin
       Ligne := To_Unbounded_String(Get_Line(Fichier));
-      while (Index(Ligne, "D�but")) = 0 or else (Index(Ligne, ":")) > 0 loop
+      while (Index(Ligne, "Début")) = 0 or else (Index(Ligne, ":")) > 0 loop
          Ligne := To_Unbounded_String(Get_Line(Fichier));
       end loop;
    end parcourir_debut;

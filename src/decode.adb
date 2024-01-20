@@ -194,12 +194,14 @@ package body Decode is
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
    -- @param Tab : tableau a remplir
-   -- @param Fichier : code source a utiliser pour remplir le tableau
-   procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type) is
+   -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
+   procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
       Ligne : Unbounded_String;
       Mot : Unbounded_String;
       Pos : Integer;
+      Fichier : File_Type;
    begin
+      Ouvrir_Fichier_Lecture(NomFichier, Fichier);
       Pos := 1;
       parcourir_debut(Fichier);
       -- Parcours le code en remplicant le tableau
@@ -215,7 +217,8 @@ package body Decode is
          end if;
          Pos := Pos + 1;
          Ligne := To_Unbounded_String(Get_Line(Fichier));
-      end loop;
+        end loop;
+        Close(Fichier);
    end remplir_tab_instruc;
 
 

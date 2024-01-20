@@ -2,25 +2,28 @@ with Decode;
 with Memoire;     use Memoire;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
+with Utils; use Utils;
 
 procedure test_decode is
     
+    File_Name : constant String := "temp_instruct.txt";
+    
     package Decode2Entier is new Decode(Capacite => 2);
     
-    -- Procedure permettant de créer un fichier temporaire d'instructions pour réaliser les tests
-    -- @param : Fichier le fichier créé
+    -- Procedure permettant de crÃ©er un fichier temporaire d'instructions pour rÃ©aliser les tests
+    -- @param : Fichier le fichier crÃ©Ã©
     procedure createFileInstruct(Fichier : out File_Type) is
-        File_Name : constant String := "temp_instruct.txt";
     begin
         Create (Fichier, Out_File, File_Name);
     end;
         
     
-    -- Procedure permettant de supprimer le fichier temporaire d'instructions pour réaliser les tests
-    -- @param : Fichier le fichier à supprimer
-    procedure deleteFileInstruct(Fichier : out File_Type) is
+    -- Procedure permettant de supprimer le fichier temporaire d'instructions pour rÃ©aliser les tests
+    -- @param : Fichier le fichier Ã  supprimer
+    procedure deleteFileInstruct(NomFichier : in String) is
+        Fichier : File_Type;
     begin
-        Close(Fichier);
+        Ouvrir_Fichier_Lecture(NomFichier, Fichier);
         Delete(Fichier);
     end;
     
@@ -30,9 +33,8 @@ procedure test_decode is
     procedure test_instruction_NULL is  
         use Decode2Entier;
         Fichier_temp : File_Type; -- le fichier d'instruction
-        File_Name : constant String := "temp_instruct.txt";
         Tab_Instruc : T_tab_instruc;
-        MemoirePremierElement : T_Memoire;
+        Memoire : T_Memoire;
         X_value : Integer;
         CP : Integer;
         
@@ -42,28 +44,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp); 
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "x <- 3");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
-        Open (Fichier_temp, In_File, File_Name);
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
 
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
-        Put("Test");      
-        Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 2);
-        Put("Test");
+        DeclarerVariables(Memoire, File_Name);    
+        Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
         -- test : operation NULL
-        Put("Test");
-        Decode2Entier.effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
+        Decode2Entier.effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         pragma Assert (CP = 2);
-        X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
         pragma Assert (X_value = 2); 
         
     end;
@@ -84,22 +81,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
-        Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 0); --variable initialisée à 0
+        DeclarerVariables(MemoirePremierElement, File_Name);
+        Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 0); --variable initialisÃ©e Ã  0
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         Valeur_X := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("X"));
-        pragma Assert (Valeur_X = 3);  -- la valeur de X a bien été modifiée
+        pragma Assert (Valeur_X = 3);  -- la valeur de X a bien ete modifiee
+        pragma Assert (CP = 2); -- CP a bien ete augmente
         
     end;
     
@@ -119,23 +117,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 + 3");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 2);
         
         -- test : operation add avec constantes
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 5);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -154,13 +152,14 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x + y");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 2);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 5);
         
@@ -168,10 +167,9 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 7);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -189,23 +187,23 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y + 3");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 5);
         
         -- test : operation add variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 8);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
 
@@ -224,23 +222,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 - 5");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 4);
         
         -- test : operation soustraction avec constantes
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = -3);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -259,14 +257,15 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x - y");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 5);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 2);
         
@@ -274,10 +273,9 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 3);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -296,23 +294,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y - 3");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 5);
         
         -- test : operation soustraction variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 2);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     -- Test concernant l'instruction OP : multiplication de deux constantes (entieres)
@@ -330,23 +328,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 2 * 3");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 4);
         
         -- test : operation multiplication avec constantes
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 6);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -365,13 +363,14 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x * y");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 2);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 0);
         
@@ -379,10 +378,9 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 0);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -401,23 +399,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y * 4");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 2);
         
         -- test : operation multiplication variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 8);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
      -- Test concernant l'instruction OP : division de deux constantes (entieres)
@@ -435,23 +433,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 2");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 3);
         
         -- test : operation division avec constantes
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 2);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     -- Test concernant l'instruction OP : cas d'exception de la division par zero
@@ -469,13 +467,14 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 4 / 0");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
     
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
     
         begin
             -- test : operation division par zero (doit lever une erreur)
@@ -487,9 +486,8 @@ procedure test_decode is
         end;
     
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve);
-    
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -508,13 +506,14 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- x / y");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("x"), 6);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 2);
         
@@ -522,10 +521,9 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 3);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -544,23 +542,23 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y / 3");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         --initialisation de la memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("y"), 6);
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         X_value := RecupererValeur_Entier(MemoirePremierElement, To_Unbounded_String("x"));
         pragma Assert (X_value = 2);       
-        
+        pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
     
@@ -578,20 +576,20 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- 3");
         Put_Line (Fichier_temp, "GOTO 1");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 2;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         pragma Assert (CP = 1);       
         
     end;
@@ -611,23 +609,23 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 5");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         pragma Assert (CP = 5);       
         
     end;
@@ -646,13 +644,14 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 0");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         
         begin
             -- test : operation goto invalide
@@ -664,7 +663,6 @@ procedure test_decode is
         end;
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve);
     
     end;
@@ -683,13 +681,14 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "GOTO 10");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         
         begin
             -- test : operation goto invalide
@@ -701,7 +700,6 @@ procedure test_decode is
         end;
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
         pragma Assert (est_leve);
     
     end;
@@ -721,25 +719,25 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "T1 : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "IF T1 GOTO 5");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("T1"), 1); --valeur autre que 0 donc True
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
-        pragma Assert (CP = 5);    -- conséquence du goto   
+        pragma Assert (CP = 5);    -- consÃ©quence du goto   
         
     end;
     
@@ -759,30 +757,30 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "T1 : Entier");
-        Put_Line (Fichier_temp, "D�but");
+        Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "IF T1 GOTO 3");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
         Put_Line (Fichier_temp, "NULL");
-        remplir_tab_instruc(Tab_Instruc, Fichier_temp);
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
         CP := 1;
         
         -- initialisation memoire
-        DeclarerVariables(MemoirePremierElement, Fichier_temp);
+        DeclarerVariables(MemoirePremierElement, File_Name);
         Modifier_Entier(MemoirePremierElement, To_Unbounded_String("T1"), 0); --valeur 0 donc False
         
         -- test : operation division variable + constante
         effectuer_instru(Tab_Instruc, CP, MemoirePremierElement);
         
         -- verifications
-        deleteFileInstruct(Fichier_temp);
-        pragma Assert (CP = 2);  -- le CP est incrémenté de 1 car le goto ne prend pas effet   
+        pragma Assert (CP = 2);  -- le CP est incrÃ©mentÃ© de 1 car le goto ne prend pas effet   
         
     end;
         
    
-   -- Test pour verifier qu'à l'initialisation cp vaut 1
+   -- Test pour verifier qu'Ã  l'initialisation cp vaut 1
    procedure test_initialisation_cp is
       use Decode2Entier;
       
@@ -793,24 +791,6 @@ procedure test_decode is
       init_CP(cp);      
       -- Verification de si cp vaut bien 1
       pragma Assert(cp = 1);
-   end;
-   
-   -- Test pour verifier que cp est incremente de 1 apres utilisation de la procedure increm_CP
-   procedure test_increm_cp is
-      use Decode2Entier;
-      
-      current_cp : Integer;
-      old_cp : Integer;
-      
-   begin
-      -- Initialisation de current_cp
-      current_cp := 1;
-      -- Stockage de sa valeur dans old_cp
-      old_cp := current_cp;
-      -- Incrémentation de current_cp
-      increm_CP(current_cp);
-      -- Verification de si current_cp vaut bien old_cp + 1
-      pragma Assert(current_cp = (old_cp + 1));
    end;
    
    -- Test qui permet de verifier que le tableau d'insructions est correctement rempli
@@ -829,7 +809,7 @@ procedure test_decode is
       Put_Line(fichier, "Programme Facto est");
       Put_Line(fichier, "n, i, Fact : Entier");
       Put_Line(fichier, "T1, T2, T3 : Booleen");
-      Put_Line(fichier, "D�but");
+      Put_Line(fichier, "Début");
       Put_Line(fichier, "n <- 5");
       Put_Line(fichier, "i <- 1");
       Put_Line(fichier, "Fact <- 1");
@@ -846,10 +826,9 @@ procedure test_decode is
       Put_Line(fichier, "GOTO 7");
       Put_Line(fichier, "NULL");
       Put_Line(fichier, "Fin");
+      Close(fichier);
       -- Remplissage du tableau d'instructions
-      remplir_tab_instruc(Tab => tab, Fichier => fichier);
-      -- Suppression du fichier
-      deleteFileInstruct(Fichier => fichier);
+      remplir_tab_instruc(tab, File_Name);
       
       pragma Assert(recuperer_instru_pos1(tab, 1) = "n");
       pragma Assert(recuperer_instru_pos2(tab, 1) = "5");
@@ -866,7 +845,7 @@ procedure test_decode is
     
 begin
     test_instruction_NULL;
-    --  test_instruction_affectation;
+    test_instruction_affectation;
     --  test_instruction_addition_entier_const;
     --  test_instruction_addition_entier_var;
     --  test_instruction_addition_entier_mix;
@@ -886,7 +865,6 @@ begin
     --  test_instruction_goto_invalide_sup;
     --  test_instruction_if_true;
     --  test_instruction_if_false;
-    --  test_increm_cp;
     --  test_remplir_tab_instruc;
    
 end test_decode;

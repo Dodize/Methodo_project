@@ -22,8 +22,8 @@ package Decode is
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
    -- @param Tab : tableau a remplir
-   -- @param Fichier : code source a utiliser pour remplir le tableau
-   procedure remplir_tab_instruc (Tab : in out T_tab_instruc; Fichier : in File_Type);
+   -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
+   procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String);
 
    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
    -- @param Tab : tableau comptenant les instructions

@@ -5,14 +5,16 @@ package body Memoire is
 
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire
-   -- @param Code : le code ou sont declarees les variables
-   procedure DeclarerVariables (Mem : out T_Memoire; Code : in File_Type) is
+   -- @param NomFichierCode : le nom du fichier du code ou sont declarees les variables
+   procedure DeclarerVariables (Mem : out T_Memoire; NomFichierCode : in String) is
       Current_Mem_Integer : P_Memoire_Entier.T_Case_Memoire;
       Current_Line        : Unbounded_String;
       Splitted_Line       : Unbounded_String;
       Fini                : Boolean;
       Current_Type        : T_Type;
+      Code                : File_Type;
    begin
+      Ouvrir_Fichier_Lecture(NomFichierCode, Code);
       Fini                := False;
       Mem.Entiers         := new P_Memoire_Entier.T_Var;
       Current_Mem_Integer := Mem.Entiers;
@@ -23,7 +25,7 @@ package body Memoire is
          -- Si pas commentaire ou declaration debut programme
          if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
-            if (Index (Current_Line, "début") > 0 or Index (Current_Line, "debut") > 0) then
+            if (Index (Current_Line, "dÃ©but") > 0 or Index (Current_Line, "debut") > 0) then
                Fini := True;
             else
                -- Split au niveau de ':'
@@ -53,13 +55,14 @@ package body Memoire is
                end loop;
             end if;
          end if;
-      end loop;
+        end loop;
+        Close(Code); -- fermeture du fichier contenant le code
    end DeclarerVariables;
 
    -- Permet de trouver la case memoire de la variable ayant Cle comme nom
    -- @param CaseMem : la premiere case memoire
    -- @param Cle : le nom de la variable
-   -- @return : la case memoire contenant la variable 
+   -- @return : la case memoire contenant la variable
    function trouver_case_entier (CaseMem : in P_Memoire_Entier.T_Case_Memoire; Cle : in Unbounded_String) return P_Memoire_Entier.T_Case_Memoire is
       Pos_entier : P_Memoire_Entier.T_Case_Memoire;
    begin
@@ -123,7 +126,7 @@ package body Memoire is
    begin
       Pos_entier := Mem.Entiers;
       -- Recherche si la cle est un entier
-      while (Pos_entier /= null) or else (Cle /= Pos_entier.Cle) loop
+      while (Pos_entier /= null) and then (Cle /= Pos_entier.Cle) loop
          Pos_entier := Pos_entier.Suivant;
       end loop;
       if Pos_entier /= null then
