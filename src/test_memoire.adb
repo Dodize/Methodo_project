@@ -1,21 +1,22 @@
 with Memoire; use Memoire;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
 
 procedure test_memoire is
+    File_Name : constant String := "temp_instruct.txt";
    
    -- Procedure permettant de creer un fichier temporaire d'instructions pour realiser les tests
    -- @param : Fichier le fichier cree
    procedure createFileInstruct(Fichier : out File_Type) is
       File_Name : constant String := "temp_instruct.txt";
-   begin
+    begin
       Create (Fichier, Out_File, File_Name);
    end;
    
    -- Procedure permettant de supprimer le fichier temporaire d'instructions pour realiser les tests
-   -- @param : Fichier le fichier a  supprimer
+   -- @param : Fichier le fichier aÂ  supprimer
    procedure deleteFileInstruct(Fichier : out File_Type) is
-      File_Name : constant String := "temp_instruct.txt";
    begin
       Delete(Fichier);
    end;
@@ -32,11 +33,11 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x : Entier");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);
-      Open(Fichier_temp, In_File, File_Name);
-      DeclarerVariables(Memoire, Fichier_temp);
-      Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
+      Open(Fichier_temp, In_File, File_Name); 
+      DeclarerVariables(Memoire, Fichier_temp);   
+      Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);   
       -- verifications
       X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
       pragma Assert (X_value = 2);
@@ -46,7 +47,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x, y, z : Entier");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);
       Open(Fichier_temp, In_File, File_Name);
       DeclarerVariables(Memoire, Fichier_temp);
@@ -57,70 +58,78 @@ procedure test_memoire is
       deleteFileInstruct(Fichier_temp);
    end;
    
+    
    -- Test concernant la recuperation de valeur et type.
    procedure test_Recuperer is  
       --use MemoireEntier;
       Fichier_temp : File_Type; -- le fichier d'instruction
-      --MemoirePremierElement : MemoireEntier.T_Memoire;
+      Memoire : T_Memoire;
       X_value : Integer;
       Y_value : Integer;
-      X_type : T_Type;
-      Y_type : T_Type;
+      X_type : Unbounded_String;
+      Y_type : Unbounded_String;
    begin
-      --initialisation de la memoire avec une seule variable
-      --createFileInstruct(Fichier_temp);
-      --Put_Line (Fichier_temp, "Programme_test est");
-      --Put_Line (Fichier_temp, "x : Entier");
-      --Put_Line (Fichier_temp, "Début");
-      --DeclarerVariables(MemoirePremierElement, Fichier_temp);
-      -- verifications
-      --X_value := RecupererValeur(MemoirePremierElement, "x");
-      --pragma Assert (X_value = 2);  
-      --X_type := RecupererType(MemoirePremierElement, "x");
-      --pragma Assert (X_type = ENTIER);
-      --deleteFileInstruct(Fichier_temp);
+        --initialisation de la memoire avec une seule variable
+      createFileInstruct(Fichier_temp);
+      Put_Line (Fichier_temp, "Programme_test est");
+      Put_Line (Fichier_temp, "x : Entier");
+      Put_Line (Fichier_temp, "DÃ©but");
+      Close(Fichier_temp);
+      Open(Fichier_temp, In_File, File_Name); 
+      DeclarerVariables(Memoire, Fichier_temp);
+      Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
+      --verifications
+      X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+      pragma Assert (X_value = 2);
+      X_type := RecupererType(Memoire, To_Unbounded_String("x"));
+      pragma Assert (X_type = "Entier");
+      deleteFileInstruct(Fichier_temp);
       
       --initialisation de la memoire avec plusieurs variables
-      --createFileInstruct(Fichier_temp);
-      --Put_Line (Fichier_temp, "Programme_test est");
+      createFileInstruct(Fichier_temp);
+      Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x, y, z : Entier");
-      --Put_Line (Fichier_temp, "Début");
-      --DeclarerVariables(MemoirePremierElement, Fichier_temp);
-      --Modifier(MemoirePremierElement, "y", 2);
-      -- verifications
-      --Y_value := RecupererValeur(MemoirePremierElement, "y");
-      --pragma Assert (Y_value = 2);  
-      --Y_type := RecupererType(MemoirePremierElement, "y");
-      --pragma Assert (Y_type = ENTIER);
-      --deleteFileInstruct(Fichier_temp);
+      Put_Line (Fichier_temp, "DÃ©but");
+      Close(Fichier_temp);
+      Open(Fichier_temp, In_File, File_Name);
+      DeclarerVariables(Memoire, Fichier_temp);
+      Modifier_Entier(Memoire, To_Unbounded_String("y"), 2);
+      --verifications
+      Y_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("y"));
+      pragma Assert (Y_value = 2);
+      Y_type := RecupererType(Memoire, To_Unbounded_String("y"));
+      pragma Assert (Y_type = "Entier");
+      deleteFileInstruct(Fichier_temp);
    end;
    
    -- Test concernant la modification de variable.
    procedure test_ModifierVariables is  
       --use MemoireEntier;
       Fichier_temp : File_Type; -- le fichier d'instruction
-      --MemoirePremierElement : MemoireEntier.T_Memoire;
-      --X_value : Integer;
+      Memoire : T_Memoire;
+      X_value : Integer;
    begin
       --initialisation de la memoire avec une variable
-      --createFileInstruct(Fichier_temp);
-      --Put_Line (Fichier_temp, "Programme_test est");
-      --Put_Line (Fichier_temp, "x : Entier");
-      --Put_Line (Fichier_temp, "Début");
-      --DeclarerVariables(MemoirePremierElement, Fichier_temp);
-      --Modifier(MemoirePremierElement, "x", 2);
-      -- verifications
-      --X_value := RecupererValeur(MemoirePremierElement, "x");
-      --pragma Assert (X_value = 2);  
-      --Modifier(MemoirePremierElement, "x", 5);
-      -- verifications
-      --X_value := RecupererValeur(MemoirePremierElement, "x");
-      --pragma Assert (X_value = 5);  
+      createFileInstruct(Fichier_temp);
+      Put_Line (Fichier_temp, "Programme_test est");
+      Put_Line (Fichier_temp, "x : Entier");
+      Put_Line (Fichier_temp, "DÃ©but");
+      Close(Fichier_temp);
+      Open(Fichier_temp, In_File, File_Name);
+      DeclarerVariables(Memoire, Fichier_temp);
+      Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
+      --verifications
+      X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+      pragma Assert (X_value = 2);
+      Modifier_Entier(Memoire, To_Unbounded_String("x"), 5);
+      --verifications
+      X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+      pragma Assert (X_value = 5);
       deleteFileInstruct(Fichier_temp);
    end;
    
 begin
    test_DeclarerVariables;
-   --test_Recuperer;
-   --test_ModifierVariables;
+   test_Recuperer;
+   test_ModifierVariables;
 end test_memoire;
