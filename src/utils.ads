@@ -24,4 +24,13 @@ package utils is
    -- @return String
    function Strip_Space (Chaine : in String) return String;
    
+   -- Procedure permettant de creer un fichier temporaire d'instructions pour realiser les tests
+   -- @param : Fichier le fichier cree
+    procedure createFileInstruct(Fichier : out File_Type);
+    
+    -- Procedure permettant de supprimer le fichier temporaire d'instructions pour realiser les tests
+    -- @param : Fichier le fichier a  supprimer
+    procedure deleteFileInstruct(NomFichier : in String);
+        
+        
 end utils;

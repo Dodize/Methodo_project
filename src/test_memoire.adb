@@ -6,22 +6,6 @@ with Utils; use Utils;
 procedure test_memoire is
     File_Name : constant String := "temp_instruct.txt";
    
-   -- Procedure permettant de creer un fichier temporaire d'instructions pour realiser les tests
-   -- @param : Fichier le fichier cree
-   procedure createFileInstruct(Fichier : out File_Type) is
-      File_Name : constant String := "temp_instruct.txt";
-    begin
-      Create (Fichier, Out_File, File_Name);
-   end;
-   
-   -- Procedure permettant de supprimer le fichier temporaire d'instructions pour realiser les tests
-   -- @param : Fichier le fichier a  supprimer
-    procedure deleteFileInstruct(NomFichier : in String) is
-        Fichier : File_Type;
-    begin
-        Ouvrir_Fichier_Lecture(NomFichier, Fichier);
-        Delete(Fichier);
-   end;
    
    -- Test concernant la declaration de variable.
    procedure test_DeclarerVariables is

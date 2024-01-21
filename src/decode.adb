@@ -25,9 +25,16 @@ package body Decode is
     -- Effectue l'instruction goto en allant au label souhaite (sous forme de numero de ligne)
     -- @param CP : le compteur qui doit etre modifie
     -- @param label : le numero de la ligne a laquelle on souhaite aller
-   procedure instru_goto (CP : out Integer; label : in Integer) is
-   begin
-      CP := label;
+    -- @exception GOTO_OUT_OF_RANGE_EXCEPTION : si le label ne correspond pas a une ligne valide
+    -- (la ligne est < 1 ou > au nombre d'instructions)
+   procedure instru_goto (CP : out Integer; label : in Integer; Tab : in T_tab_instruc) is
+    begin
+        if (label < 1) or else (label > Tab'Length) then
+            raise GOTO_OUT_OF_RANGE_EXCEPTION;
+        else
+            CP := label;
+        end if;
+
     end instru_goto;
 
 
@@ -289,7 +296,7 @@ package body Decode is
       if InstruPart1 = "NULL" then
          instru_null(CP);
       elsif InstruPart1 = "GOTO" then
-         instru_goto(CP, Integer'Value(To_String(InstruPart2)));
+         instru_goto(CP, Integer'Value(To_String(InstruPart2)), Tab);
       elsif InstruPart1 = "IF" then
          instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
       else

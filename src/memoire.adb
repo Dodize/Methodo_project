@@ -68,7 +68,8 @@ package body Memoire is
    begin
       -- Recuperer la liste chainee
       Pos_entier := CaseMem;
-      while Pos_entier.Cle /= Cle loop -- on n'est pas oblige de commencer par Pos_entier /= null or else car on sait que la variable existe en memoire
+      -- a chaque iteration on transforme la cle en minuscule pour que ce ne soit pas case sensitive
+      while Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) /= Pos_entier.Cle loop -- on n'est pas oblige de commencer par Pos_entier /= null or else car on sait que la variable existe en memoire
          Pos_entier := Pos_entier.Suivant;
       end loop;
       return Pos_entier;
@@ -94,7 +95,7 @@ package body Memoire is
     is
     begin
         -- Verifier si la cle est la bonne pour chaque case memoire
-        if CaseMem.All.Cle = Cle then
+        if Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) = CaseMem.Cle then
             return CaseMem.All.Data;
         else
             return RecupererValeur_Entier_FromCase(CaseMem.Suivant, Cle); -- on sait que la cle existe donc si elle n'a pas encore ete trouvee
@@ -108,11 +109,17 @@ package body Memoire is
    -- @param Cle : le nom de la variable recherchee
    -- @return la valeur de la variable
    -- Pre-condition : Mem.Entiers /= Null et la clee existe dans la memoire (car le programme intermediaire est bien formee)
-   function RecupererValeur_Entier (Mem : in T_Memoire; Cle : in Unbounded_String) return Integer
+   function RecupererValeur_Entier (Memoire : in T_Memoire; Cle : in Unbounded_String) return Integer
     is
     begin
-        -- Recuperer la premiere case memoire
-        return RecupererValeur_Entier_FromCase(Mem.Entiers, Cle);
+        -- on verifie s'il s'agit d'une variable (type=entier) ou d'une constante (type=null)
+        if RecupererType(Memoire, Cle) = "Entier" then
+            -- Recuperer la valeur en memoire
+            return RecupererValeur_Entier_FromCase(Memoire.Entiers, Cle);
+        else
+           return Integer'Value(To_String(Cle));
+        end if;
+
    end RecupererValeur_Entier;
 
 
@@ -126,14 +133,14 @@ package body Memoire is
    begin
       Pos_entier := Mem.Entiers;
       -- Recherche si la cle est un entier
-      while (Pos_entier /= null) and then (Cle /= Pos_entier.Cle) loop
+      while (Pos_entier /= null) and then (Pos_entier.Cle /= Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map)) loop
          Pos_entier := Pos_entier.Suivant;
       end loop;
       if Pos_entier /= null then
          return To_Unbounded_String("Entier");
       end if;
       Pos_string := Mem.Chaines;
-      while (Pos_string /= null) or else (Cle /= Pos_string.Cle) loop
+      while (Pos_string /= null) and then (Pos_string.Cle /= Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map)) loop
          Pos_string := Pos_string.Suivant;
       end loop;
       if Pos_string /= null then
