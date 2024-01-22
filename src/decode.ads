@@ -18,6 +18,11 @@ package Decode is
    procedure init_CP (CP: out Integer) with
      Post => CP = 1;
    
+   -- Retourne le nombre d'instructions du tableau d'instructions (le nombre de ligne)
+   -- @param Tab : le tableau d'instructions
+   -- @return : le nombre d'instructions
+   function get_nombre_instruc(Tab : in T_tab_instruc) return Integer;
+    
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau

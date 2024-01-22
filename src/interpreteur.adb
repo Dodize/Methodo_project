@@ -23,9 +23,11 @@ package body Interpreteur is
    -- (entre les mots "Début" ou "Debut" et "Fin")
    -- @param : in le fichier d'instructions en code intermediaire
    -- @return : la capacite
-   function CalculerCapacite(Fichier : in File_Type) return Integer is
+   function CalculerCapacite(NomFichier : in String) return Integer is
       Capacite : Integer;
+      Fichier : File_Type;
    begin
+      Ouvrir_Fichier_Lecture(NomFichier, Fichier);
 
       -- Parcourir le fichier jusqu'à "début"
       parcourir_debut(Fichier);
@@ -35,15 +37,15 @@ package body Interpreteur is
       while not (Get_Line(Fichier) = "Fin") loop
          Capacite := Capacite + 1;
       end loop;
-
+      Close(Fichier);
       return Capacite;
 
    end CalculerCapacite;
 
 
    -- Lance l'interpreteur en lisant et excecutant le code
-   procedure Executer(Fichier : in File_Type) is
-      package P_Decode is new Decode(Capacite => CalculerCapacite(Fichier));
+   procedure Executer(NomFichier : in String) is
+      package P_Decode is new Decode(Capacite => CalculerCapacite(NomFichier));
       use P_Decode;
       Instructions : T_tab_instruc;
       Mem : T_Memoire;
@@ -51,13 +53,14 @@ package body Interpreteur is
       Capacite_tab : Integer;
    begin
       -- Declaration des variables en memoire
-      DeclarerVariables(Mem, Fichier);
+      DeclarerVariables(Mem, NomFichier);
       -- Recuperation des instructions
-      remplir_tab_instruc(Instructions, Fichier);
+      remplir_tab_instruc(Instructions, NomFichier);
+      Capacite_tab := get_nombre_instruc(Instructions);
       -- Initialisation du CP
       init_CP(cp);
       -- parcour le tableau tant que l'on n'a pas termine le programme
-      while cp < Capacite_tab loop
+      while (cp < Capacite_tab) loop
          effectuer_instru(Instructions, cp, Mem);
       end loop;
 

@@ -13,6 +13,14 @@ package body Decode is
       CP := 1;
    end init_CP;
 
+   -- Retourne le nombre d'instructions du tableau d'instructions (le nombre de ligne)
+   -- @param Tab : le tableau d'instructions
+   -- @return : le nombre d'instructions
+    function get_nombre_instruc(Tab : in T_tab_instruc) return Integer is
+    begin
+        return Tab'Length;
+    end get_nombre_instruc;
+
 
    -- Incremente le compteur
    -- @param CP : compteur a incrementer

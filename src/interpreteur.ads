@@ -8,6 +8,6 @@ package Interpreteur is
      Post => Menu'Result = 0 or Menu'Result = 1;
 
    -- Lance l'interpreteur en lisant et excecutant le code
-   procedure Executer(Fichier : in File_Type);
+   procedure Executer(NomFichier : in String);
 
 end Interpreteur;
