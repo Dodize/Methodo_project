@@ -1,6 +1,6 @@
 with Ada.Strings.Maps.Constants; use Ada.Strings.Maps;
+with Ada.Text_IO;                use Ada.Text_IO;
 with Utils;                      use Utils;
-with Ada.Text_IO ;               use Ada.Text_IO ;
 
 package body Memoire is
 
@@ -23,52 +23,50 @@ package body Memoire is
       Current_Mem_Integer := Mem.Entiers;
       Current_Mem_Chaine  := Mem.Chaines;
       -- Tant qu'on n'a pas atteint la fin du fichier ni la ligne "Debut"
-        while not Fini loop
-
-            Current_Line := To_Unbounded_String(Get_Line(Code));
-            
+      while not End_Of_File (Code) and not Fini loop
+         Current_Line := To_Unbounded_String (Get_Line (Code));
+         Current_Line := Translate (Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
+         -- Si pas commentaire ou declaration debut programme
+         if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
-            if Index(Current_Line, "Début") > 0 and Index(Current_Line, ":") = 0 then
-                Fini := True;
+            if (Index (Current_Line, "début") > 0 or Index (Current_Line, "debut") > 0) then
+               Fini := True;
+            else
+               -- Split au niveau de ':'
+               slice_mot(Current_Line, Splitted_Line, ":");
+
+               -- Recuperation du type
+               if Index(Current_Line, "entier") > 0 then
+                  Current_Type := ENTIER;
+               elsif Index(Current_Line, "chaine") > 0 then
+                  Current_Type := CHAINE;
+               end if;
+
+               Current_Line := Splitted_Line;
+
+               -- Split au niveau de ','
+               slice_mot (Current_Line, Splitted_Line, ",");
+
+               while Length (Splitted_Line) > 0 loop
+                  -- Initialisation de la memoire en fonction de son type
+                  if Current_Type = ENTIER then
+                     Current_Mem_Integer.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
+                     Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
+                     Current_Mem_Integer.Suivant := new P_Memoire_Entier.T_Var;
+                     -- Recuperation de l'element suivant
+                     Current_Mem_Integer := Current_Mem_Integer.Suivant;
+                  elsif Current_Type = CHAINE then
+                     Current_Mem_Chaine.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
+                     Current_Mem_Chaine.TypeOfData := P_Memoire_String.CHAINE;
+                     Current_Mem_Chaine.Suivant := new P_Memoire_String.T_Var;
+                     -- Recuperation de l'element suivant
+                     Current_Mem_Chaine := Current_Mem_Chaine.Suivant;
+                  end if;
+                  -- Split au niveau de ','
+                  slice_mot (Current_Line, Splitted_Line, ",");
+               end loop;
             end if;
-
-            Current_Line := Translate(Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);      
-            
-            -- Si pas commentaire ou declaration debut programme     
-            if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
-                -- Split au niveau de ':'
-                slice_mot(Current_Line, Splitted_Line, ":");
-                -- Recuperation du type
-                if Index(Current_Line, "entier") > 0 then
-                    Current_Type := ENTIER;
-                elsif Index(Current_Line, "chaine") > 0 then
-                    Current_Type := CHAINE;
-                end if;
-
-                Current_Line := Splitted_Line;
-
-                -- Split au niveau de ','
-                slice_mot (Current_Line, Splitted_Line, ",");
-
-                while Length (Splitted_Line) > 0 loop
-                    -- Initialisation de la memoire en fonction de son type
-                    if Current_Type = ENTIER then
-                        Current_Mem_Integer.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
-                        Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
-                        Current_Mem_Integer.Suivant := new P_Memoire_Entier.T_Var;
-                        -- Recuperation de l'element suivant
-                        Current_Mem_Integer := Current_Mem_Integer.Suivant;
-                    elsif Current_Type = CHAINE then
-                        Current_Mem_Chaine.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
-                        Current_Mem_Chaine.TypeOfData := P_Memoire_String.CHAINE;
-                        Current_Mem_Chaine.Suivant := new P_Memoire_String.T_Var;
-                        -- Recuperation de l'element suivant
-                        Current_Mem_Chaine := Current_Mem_Chaine.Suivant;
-                    end if;
-                    -- Split au niveau de ','
-                    slice_mot (Current_Line, Splitted_Line, ",");
-                end loop;
-            end if;
+         end if;
         end loop;
         Close(Code); -- fermeture du fichier contenant le code
    end DeclarerVariables;
@@ -200,30 +198,52 @@ package body Memoire is
       end if;
    end RecupererValeur_Chaine;
 
+    -- fonction disant si le type est une chaine de caractère
+    -- surchargé
+    function donner_Type(Mem : in T_Memoire; Cle : in Unbounded_String; search_type : in out P_Memoire_String.T_Case_Memoire) return Unbounded_String is
+    begin
+        search_type := Mem.Chaines;
+        while (search_type /= null) and then (search_type.Cle /= Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map)) loop
+            search_type := search_type.Suivant;
+        end loop;
+        if search_type /= null then
+            return To_Unbounded_String("Chaine");
+        end if;
+        return To_Unbounded_String("null");
+    end donner_Type;  
+    
+    -- fonction disant si le type est un entier
+    -- surchargé
+    function donner_Type(Mem : in T_Memoire; Cle : in Unbounded_String; search_type : in out P_Memoire_Entier.T_Case_Memoire) return Unbounded_String is
+    begin
+        search_type := Mem.Entiers;
+        while (search_type /= null) and then (search_type.Cle /= Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map)) loop
+            search_type := search_type.Suivant;
+        end loop;
+        if search_type /= null then
+            return To_Unbounded_String("Entier");
+        end if;
+        return To_Unbounded_String("null");
+    end donner_Type;
+    
    -- Recupere le type d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return le type de la variable
-   function RecupererType (Mem : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String is
-      Pos_entier : P_Memoire_Entier.T_Case_Memoire;
-      Pos_string : P_Memoire_String.T_Case_Memoire;
-   begin
-      Pos_entier := Mem.Entiers;
-      -- Recherche si la cle est un entier
-      while (Pos_entier /= null) and then (Pos_entier.Cle /= Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map)) loop
-         Pos_entier := Pos_entier.Suivant;
-      end loop;
-      if Pos_entier /= null then
-         return To_Unbounded_String("Entier");
-      end if;
-      Pos_string := Mem.Chaines;
-      while (Pos_string /= null) and then (Pos_string.Cle /= Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map)) loop
-         Pos_string := Pos_string.Suivant;
-      end loop;
-      if Pos_string /= null then
-         return To_Unbounded_String("Chaine");
-      end if;
-      return To_Unbounded_String("null");
-   end RecupererType;
+    function RecupererType (Mem : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String is
+        Pos_entier : P_Memoire_Entier.T_Case_Memoire;
+        Pos_string : P_Memoire_String.T_Case_Memoire;
+    begin
+        -- Recherche si la cle est un entier
+        if donner_Type(Mem, Cle, Pos_entier) /= To_Unbounded_String("null") then
+            return To_Unbounded_String("Entier");
+        end if;
+        Pos_string := Mem.Chaines;
+        --recherche si la cle est une chaine de caractère
+        if donner_Type(Mem, Cle, Pos_string) /= To_Unbounded_String("null") then
+            return To_Unbounded_String("Chaine");
+        end if;
+        return To_Unbounded_String("null");
+    end RecupererType;
 
 end Memoire;
