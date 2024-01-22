@@ -29,7 +29,36 @@ package body Decode is
    procedure increm_CP (CP : in out Integer) is
    begin
       CP := CP+1;
-   end increm_CP;
+    end increm_CP;
+
+
+    procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String) is
+        type_var : Unbounded_String;
+    begin
+        type_var := RecupererType(mem, cle);
+        if type_var = "Entier" then
+            Put(RecupererValeur_entier(mem, cle));
+        elsif type_var = "Chaine" then
+            --Put(RecupererValeur_chaine(mem, cle));
+            null;
+        end if;
+    end ecrire;
+
+    procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
+        type_var : Unbounded_String;
+        val_entier : Integer;
+        val_string : String (1..100); --on définit un max arbitrairement
+    begin
+        type_var := RecupererType(mem, cle);
+        if type_var = "Entier" then
+            Get(val_entier);
+            Modifier_Entier(mem, cle, val_entier);
+        elsif type_var = "Chaine" then
+            Get(val_string);
+            --Modifier_Chaine(mem, cle, To_String(val_string));
+        end if;
+    end lire;
+
 
 
     -- Effectue l'instruction goto en allant au label souhaite (sous forme de numero de ligne)
@@ -335,32 +364,5 @@ package body Decode is
         end if;
 
     end effectuer_instru;
-
-    procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String) is
-        type_var : Unbounded_String;
-    begin
-        type_var := RecupererType(mem, cle);
-        if type_var = "Entier" then
-            Put(RecupererValeur_entier(mem, cle));
-        elsif type_var = "Chaine" then
-            --Put(RecupererValeur_chaine(mem, cle));
-            null;
-        end if;
-    end ecrire;
-
-    procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
-        type_var : Unbounded_String;
-        val_entier : Integer;
-        val_string : String (1..100); --on définit un max arbitrairement
-    begin
-        type_var := RecupererType(mem, cle);
-        if type_var = "Entier" then
-            Get(val_entier);
-            Modifier_Entier(mem, cle, val_entier);
-        elsif type_var = "Chaine" then
-            Get(val_string);
-            --Modifier_Chaine(mem, cle, To_String(val_string));
-        end if;
-    end lire;
 
 end Decode;
