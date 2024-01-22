@@ -1,6 +1,7 @@
 -- Ce module definit les operations necessaires au decodage du code intermediaire
 -- Il stock les instructions et les executes.
 with Ada.Text_IO ;                use Ada.Text_IO ;
+with Ada.Integer_Text_IO ;        use Ada.Integer_Text_IO ;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Memoire;                     use Memoire;
 
@@ -50,6 +51,16 @@ package Decode is
    function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
    function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
    function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String;
+   
+   -- affiche sur la console la variable dont le nom est en parametre
+   -- @param mem : liste chainee comptenant les variables et leurs valeurs
+   -- @param cle : nom de la variable recherchee
+   procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String); 
+   
+   -- equivalent de get et stock la valeur dans la variable de nom cle
+   -- @param mem : liste chainee comptenant les variables et leurs valeurs
+   -- @param cle : nom de la variable recherchee
+   procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String); 
    
 private
    type T_op is
