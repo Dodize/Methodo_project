@@ -783,9 +783,7 @@ procedure test_decode is
    -- Test pour verifier qu'Ã  l'initialisation cp vaut 1
    procedure test_initialisation_cp is
       use Decode2Entier;
-      
       cp : Integer;
-      
    begin
       -- Initialisation de cp
       init_CP(cp);      
@@ -865,6 +863,7 @@ begin
     test_instruction_goto_invalide_sup;
     test_instruction_if_true;
     test_instruction_if_false;
+    test_initialisation_cp;
     test_remplir_tab_instruc;
     deleteFileInstruct(File_Name);
    
