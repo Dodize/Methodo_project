@@ -18,7 +18,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x : Entier");
-      Put_Line (Fichier_temp, "Debut");
+      Put_Line (Fichier_temp, "Début");
       Close(Fichier_temp);
       DeclarerVariables(Memoire, File_Name);
       Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
@@ -30,7 +30,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x, y, z : Entier");
-      Put_Line (Fichier_temp, "Debut");
+      Put_Line (Fichier_temp, "Début");
       Close(Fichier_temp);
       DeclarerVariables(Memoire, File_Name);
       Modifier_Entier(Memoire, To_Unbounded_String("y"), 2);
@@ -129,7 +129,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x : Entier");
-      Put_Line (Fichier_temp, "Debut");
+      Put_Line (Fichier_temp, "Début");
       Close(Fichier_temp);  
       DeclarerVariables(Memoire, File_Name);
       Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
