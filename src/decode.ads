@@ -11,6 +11,7 @@ package Decode is
     Type T_tab_instruc is limited private ;
     
     GOTO_OUT_OF_RANGE_EXCEPTION : Exception; -- la ligne renvoyee par GOTO est inf a 1 ou supp au nombre de lignes du code
+    OP_NON_RECONNUE_EXCEPTION : Exception; -- exception levee si l'operation stockee n'est pas reconnue (comportement inattendu)
 
    -- Initialise le compteur
    -- @param CP : compteur a initialiser

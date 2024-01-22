@@ -100,8 +100,7 @@ package body Decode is
                 Result := 0;
             end if;
         else
-            -- exception
-            Null;
+            raise OP_NON_RECONNUE_EXCEPTION;
         end if;
 
         return Result;
