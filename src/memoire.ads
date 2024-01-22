@@ -1,5 +1,4 @@
 -- Ce module definit les operations necessaires a la gestion de la memoire
-with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Case_Memoire;
 

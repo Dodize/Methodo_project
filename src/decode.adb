@@ -33,32 +33,30 @@ package body Decode is
 
 
     procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String) is
-        type_var : Unbounded_String;
+      type_var : Unbounded_String;
     begin
-        type_var := RecupererType(mem, cle);
-        if type_var = "Entier" then
-            Put(RecupererValeur_entier(mem, cle));
-        elsif type_var = "Chaine" then
-            --Put(RecupererValeur_chaine(mem, cle));
-            null;
-        end if;
+       type_var := RecupererType(mem, cle);
+       if type_var = "Entier" then
+          Put(RecupererValeur_entier(mem, cle));
+       elsif type_var = "Chaine" then
+          Put(To_String(RecupererValeur_chaine(mem, cle)));
+       end if;
     end ecrire;
 
     procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
-        type_var : Unbounded_String;
-        val_entier : Integer;
-        val_string : String (1..100); --on définit un max arbitrairement
+       type_var : Unbounded_String;
+       val_entier : Integer;
+       val_string : String (1..100); --on définit un max arbitrairement
     begin
-        type_var := RecupererType(mem, cle);
-        if type_var = "Entier" then
-            Get(val_entier);
-            Modifier_Entier(mem, cle, val_entier);
-        elsif type_var = "Chaine" then
-            Get(val_string);
-            --Modifier_Chaine(mem, cle, To_String(val_string));
-        end if;
+       type_var := RecupererType(mem, cle);
+       if type_var = "Entier" then
+          Get(val_entier);
+          Modifier_Entier(mem, cle, val_entier);
+       elsif type_var = "Chaine" then
+          Get(val_string);
+          Modifier_Chaine(mem, cle, To_Unbounded_String(val_string));
+       end if;
     end lire;
-
 
 
     -- Effectue l'instruction goto en allant au label souhaite (sous forme de numero de ligne)
@@ -136,7 +134,43 @@ package body Decode is
 
     end result_instru_entier;
 
-
+    -- Calcule le resultat d'une operation composee de deux chaines de caracteres
+    -- @param CleVal1 : le nom de la premiere variable de l'operation
+    -- @param Operation : l'operation a effectuer
+    -- @param CleVal2 : le nom de la deuxieme variable de l'operation
+    -- @param Memoire : la memoire
+    -- @return : le resultat de l'operation
+    procedure result_instru_chaine(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire; New_Chaine : out Unbounded_String ; New_Bool : out Integer) is
+        Valeur1 : Unbounded_String;
+        Valeur2 : Unbounded_String;
+    begin
+        Valeur1 := RecupererValeur_Chaine(Memoire, CleVal1);
+        Valeur2 := RecupererValeur_Chaine(Memoire, CleVal2);
+        if Operation = "+" then
+            New_Chaine := Valeur1 & Valeur2;
+        elsif Operation = "=" then
+            if Valeur1 = Valeur2 then
+                New_Bool := 1;
+            else
+                New_Bool := 0;
+            end if;
+        elsif Operation = "<" then
+            if Valeur1 < Valeur2 then
+                New_Bool := 1;
+            else
+                New_Bool := 0;
+            end if;
+        elsif Operation = ">" then
+            if Valeur1 > Valeur2 then
+                New_Bool := 1;
+            else
+                New_Bool := 0;
+            end if;
+        else
+            -- exception
+            Null;
+        end if;
+    end result_instru_chaine;
 
     -- Effectue l'instruction operation demande
     -- @param CleVariableAffectation : le nom de la variable affectee
@@ -144,31 +178,48 @@ package body Decode is
     -- @param Operation : le type d'operation a realiser (en chaine)
     -- @param Valeur2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
-   procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire; CP: in out Integer) is
-   begin
-      if RecupererType(Memoire, CleVariableAffectation) = "Entier" then
-         Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
-      else
-         Null; --TODO quand on aura les autres types
-      end if;
-      increm_CP(CP);
-   end instru_op;
+    procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire; CP: in out Integer) is
+        Type_Var : Unbounded_String;
+        New_Bool : Integer;
+        New_Chaine : Unbounded_String;
+    begin
 
+        New_Bool := -1;
+        Type_Var := RecupererType(Memoire, CleVariableAffectatione);
+
+        if Type_Var = "Entier" then
+            Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
+        elsif Type_Var = "Chaine" then
+            result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
+            if New_Bool /= -1 then
+                Modifier_Chaine(Memoire, CleVariableAffectation, New_Bool);
+            else
+                Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
+            end if;
+        else
+            Null; --TODO quand on aura les autres types
+        end if;
+        increm_CP(CP);
+    end instru_op;
 
 
     -- Effectue l'instruction affectation
     -- @param CleVariable : le nom de la variable a modifier
     -- @param Valeur : la nouvelle valeur de la variable (recuperee en string dans le tableau d'instruction)
     -- @param Mem : la memoire
-   procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire; CP : in out Integer) is
-   begin
-      if RecupererType(Mem, CleVariable) = "Entier" then
-         Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
-      else
-         Null; --TODO quand on aura les autres types
-      end if;
-      increm_CP(CP);
-   end instru_affectation;
+    procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire; CP : in out Integer) is
+        Type_Var : Unbounded_String;
+    begin
+        Type_Var := RecupererType(Mem, CleVariable);
+        if Type_Var = "Entier" then
+            Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
+        elsif Type_Var = "Chaine" then
+            Modifier_Chaine(Mem, CleVariable, Valeur);
+        else
+            null;
+        end if;
+        increm_CP(CP);
+    end instru_affectation;
 
 
      --  Effectue l'instruction if en fonction de la variable VariableBool
