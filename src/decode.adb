@@ -114,6 +114,18 @@ package body Decode is
             else
                 Result := 0;
             end if;
+        elsif Operation = "<=" then
+            if Valeur1 <= Valeur2 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
+        elsif Operation = ">=" then
+            if Valeur1 >= Valeur2 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
         elsif Operation = "OR" then
             if Valeur1/=0 or else Valeur2/=0 then
                 Result := 1;
@@ -185,17 +197,17 @@ package body Decode is
     begin
 
         New_Bool := -1;
-        Type_Var := RecupererType(Memoire, CleVariableAffectatione);
+        Type_Var := RecupererType(Memoire, CleVariableAffectation);
 
         if Type_Var = "Entier" then
             Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
         elsif Type_Var = "Chaine" then
             result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
-            if New_Bool /= -1 then
-                Modifier_Chaine(Memoire, CleVariableAffectation, New_Bool);
-            else
-                Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
-            end if;
+            --  if New_Bool /= -1 then
+            --      Modifier_Chaine(Memoire, CleVariableAffectation, New_Bool);
+            --  else
+            --      Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
+            --  end if;
         else
             Null; --TODO quand on aura les autres types
         end if;

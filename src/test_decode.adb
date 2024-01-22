@@ -554,6 +554,694 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
+    -- Test concernant l'instruction OP : test de l'egalite avec deux variables (resultat = true)
+    procedure test_instruction_egalite_booleen_var_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y = z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 6);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 6);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'instruction OP : test de strictement inferieur (resultat=true)
+    procedure test_instruction_str_inf_booleen_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y < z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 4);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 6);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de strictement inferieur (resultat=false)
+    procedure test_instruction_str_inf_booleen_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y < z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 4);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 4);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+     -- Test concernant l'instruction OP : test de inferieur ou egal (resultat=true)
+    procedure test_instruction_infeq_booleen_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        A_Value, B_Value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "a, b, x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "a <- x <= y");
+        Put_Line (Fichier_temp, "b <- y <= z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);        
+        Modifier_Entier(Memoire, To_Unbounded_String("x"), 3);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 4);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 4);
+        
+        -- test : operation division variable + constante
+        CP := 1;
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        CP := 2;
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        A_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("a"));
+        B_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("b"));
+        pragma Assert (A_Value = 1); -- valeur a true
+        pragma Assert (B_Value = 1); -- valeur a true
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de inferieur ou egal (resultat=false)
+    procedure test_instruction_infeq_booleen_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y <= z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 6);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 4);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+       -- Test concernant l'instruction OP : test de strictement superieur (resultat=true)
+    procedure test_instruction_str_sup_booleen_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y > z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 5);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 3);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de strictement superieur (resultat=false)
+    procedure test_instruction_str_sup_booleen_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y > z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 2);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 4);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de superieur ou egal (resultat=true)
+    procedure test_instruction_supeq_booleen_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        A_Value, B_Value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "a, b, x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "a <- x >= y");
+        Put_Line (Fichier_temp, "b <- y >= z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);        
+        Modifier_Entier(Memoire, To_Unbounded_String("x"), 4);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 4);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 3);
+        
+        -- test : operation division variable + constante
+        CP := 1;
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        CP := 2;
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        A_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("a"));
+        B_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("b"));
+        pragma Assert (A_Value = 1); -- valeur a true
+        pragma Assert (B_Value = 1); -- valeur a true
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de superieur ou egal (resultat=false)
+    procedure test_instruction_streq_booleen_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y >= z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 3);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 4);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de AND (resultat=true)
+    procedure test_instruction_and_booleen_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y AND z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 1); --y valant true
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 1); -- z valant true
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de AND (resultat=false avec F and T)
+    procedure test_instruction_and_booleen_false1 is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y AND z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 1); --y valant true
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 0); -- z valant false
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de AND (resultat=false avec F and F)
+    procedure test_instruction_and_booleen_false2 is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y AND z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 0); --y valant false
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 0); -- z valant false
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de OR (resultat=true avec V F)
+    procedure test_instruction_or_booleen_true1 is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y OR z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 1); --y valant true
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 0); -- z valant false
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de OR (resultat=true avec V or V)
+    procedure test_instruction_or_booleen_true2 is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y OR z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 1); --y valant true
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 1); -- z valant true
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de OR (resultat=false avec F and F)
+    procedure test_instruction_or_booleen_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y OR z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 0); --y valant false
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 0); -- z valant false
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de l'exception levee si l'operation n'est pas reconnue
+    procedure test_instruction_op_exception is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        CP : Integer;
+        est_leve : Boolean;
+    begin
+        est_leve := False;
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y FISSION z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+          
+        begin
+            -- test : operation qui n'existe pas
+            effectuer_instru(Tab_Instruc, CP, Memoire);
+            
+        exception
+            when OP_NON_RECONNUE_EXCEPTION => 
+                est_leve := True;
+        end;
+                
+        -- verifications
+        pragma Assert (est_leve); -- exception levee
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de l'egalite avec deux variables (resultat = false)
+    procedure test_instruction_egalite_booleen_var_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+              
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y = z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 6);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 2);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de l'egalite entre une constante et une variable (resultat = true)
+    procedure test_instruction_egalite_booleen_const_true is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y = 6");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 6);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    
+    -- Test concernant l'instruction OP : test de l'egalite entre une constante et une variable (resultat = false)
+    procedure test_instruction_egalite_booleen_const_false is  
+        use Decode2Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y = 2");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 6);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = 0); -- valeur a false       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
     
     -- Test concernant l'instruction GOTO avec un numero de ligne anterieur
     procedure test_instruction_goto_ligne_ante is  
@@ -891,6 +1579,25 @@ begin
     test_instruction_division_parzero;
     test_instruction_division_entier_var;
     test_instruction_division_entier_mix;
+    test_instruction_egalite_booleen_var_true;
+    test_instruction_egalite_booleen_var_false;
+    test_instruction_egalite_booleen_const_true;
+    test_instruction_egalite_booleen_const_false;
+    test_instruction_str_inf_booleen_true;
+    test_instruction_str_inf_booleen_false;
+    test_instruction_infeq_booleen_true;
+    test_instruction_infeq_booleen_false;
+    test_instruction_str_sup_booleen_true;
+    test_instruction_str_sup_booleen_false;
+    test_instruction_supeq_booleen_true;
+    test_instruction_streq_booleen_false;
+    test_instruction_and_booleen_true;
+    test_instruction_and_booleen_false1;
+    test_instruction_and_booleen_false2;
+    test_instruction_or_booleen_true1;
+    test_instruction_or_booleen_true2;
+    test_instruction_or_booleen_false;
+    test_instruction_op_exception;
     test_instruction_goto_ligne_ante;
     test_instruction_goto_ligne_post;
     test_instruction_goto_invalide_inf;
