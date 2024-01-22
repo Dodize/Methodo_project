@@ -8,8 +8,7 @@ procedure test_decode is
     
     File_Name : constant String := "temp_instruct.txt";
     
-    package Decode2Entier is new Decode(Capacite => 2);
-      
+    package Decode2Entier is new Decode(Capacite => 2);      
         
     -- Test concernant l'instruction NULL
     procedure test_instruction_NULL is  
@@ -839,7 +838,42 @@ procedure test_decode is
       pragma Assert(recuperer_instru_pos1(tab, 15) = "NULL");
    end;
 
-   
+    
+    -- Test concernant l'instruction IF avec une condition = false (le goto ne prend pas effet)
+    procedure test_remplir_lire_ecrire is
+        package Decode12Entier is new Decode(Capacite => 12);
+        use Decode12Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        File_Name : constant String := "temp_instruct.txt";
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- 4 / 2");
+        Put_Line (Fichier_temp, "NULL");
+        Put_Line (Fichier_temp, "-- Commentaire de texte");
+        Put_Line (Fichier_temp, "IF true GOTO 6");
+        Put_Line (Fichier_temp, "Lire(x)");
+        Put_Line (Fichier_temp, "GOTO 7");
+        Put_Line (Fichier_temp, "Ecrire(x)");
+        Put_Line (Fichier_temp, "x <- 2");
+        Put_Line (Fichier_temp, "-- fini");
+        Put_Line (Fichier_temp, "Fin");
+        Close (Fichier_temp);
+
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+
+        -- verifications
+        pragma Assert (recuperer_instru_pos1(Tab_Instruc, 5) = "Lire");
+        pragma Assert (recuperer_instru_pos2(Tab_Instruc, 5) = "x");
+        pragma Assert (recuperer_instru_pos1(Tab_Instruc, 7) = "Ecrire");
+        pragma Assert (recuperer_instru_pos2(Tab_Instruc, 7) = "x");
+    end;
+    
     
 begin
     test_instruction_NULL;
@@ -865,6 +899,7 @@ begin
     test_instruction_if_false;
     test_initialisation_cp;
     test_remplir_tab_instruc;
+    test_remplir_lire_ecrire;
     deleteFileInstruct(File_Name);
    
 end test_decode;
