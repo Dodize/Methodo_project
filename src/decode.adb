@@ -305,59 +305,63 @@ package body Decode is
    -- @param Tab : tableau comptenant les instructions
    -- @param CP : compteur
    -- @param mem : liste chainee contenant les variables et leurs valeurs
-   procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
-      InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
-   begin
-      -- Recuperer l'instruction
-      InstruPart1 := recuperer_instru_pos1(Tab, CP);
-      InstruPart2 := recuperer_instru_pos2(Tab, CP);
-      InstruPart3 := recuperer_instru_pos3(Tab, CP);
-      InstruPart4 := recuperer_instru_pos4(Tab, CP);
+    procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
+        InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
+    begin
+        -- Recuperer l'instruction
+        InstruPart1 := recuperer_instru_pos1(Tab, CP);
+        InstruPart2 := recuperer_instru_pos2(Tab, CP);
+        InstruPart3 := recuperer_instru_pos3(Tab, CP);
+        InstruPart4 := recuperer_instru_pos4(Tab, CP);
 
-      -- Realiser l'instruction
-      -- en fonction du premier mot de l'instruction, effectuer la bonne operation
-      if InstruPart1 = "NULL" then
-         instru_null(CP);
-      elsif InstruPart1 = "GOTO" then
-         instru_goto(CP, Integer'Value(To_String(InstruPart2)), Tab);
-      elsif InstruPart1 = "IF" then
-         instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
-      else
-         -- affectation sinon operation
-         if InstruPart3 = "affect" then
-            instru_affectation(InstruPart1, InstruPart2, mem, CP);
-         else
-            instru_op(InstruPart1, InstruPart2, InstruPart3, InstruPart4, mem, CP);
-         end if;
-      end if;
+        -- Realiser l'instruction
+        -- en fonction du premier mot de l'instruction, effectuer la bonne operation
+        if InstruPart1 = "NULL" then
+            instru_null(CP);
+        elsif InstruPart1 = "GOTO" then
+            instru_goto(CP, Integer'Value(To_String(InstruPart2)), Tab);
+        elsif InstruPart1 = "IF" then
+            instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
+        elsif InstruPart1 = "Lire" then
+            Lire(mem, InstruPart2);
+        elsif InstruPart1 = "Ecrire" then
+            Ecrire(mem, InstruPart2);
+        else
+            -- affectation sinon operation
+            if InstruPart3 = "affect" then
+                instru_affectation(InstruPart1, InstruPart2, mem, CP);
+            else
+                instru_op(InstruPart1, InstruPart2, InstruPart3, InstruPart4, mem, CP);
+            end if;
+        end if;
 
     end effectuer_instru;
 
-   procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String) is
-      type_var : Unbounded_String;
-   begin
-      type_var := RecupererType(mem, cle);
-      if type_var = "Entier" then
-         Put(RecupererValeur_entier(mem, cle));
-      elsif type_var = "Chaine" then
-         --Put(RecupererValeur_chaine(mem, cle));
-         null;
-      end if;
-   end ecrire;
+    procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String) is
+        type_var : Unbounded_String;
+    begin
+        type_var := RecupererType(mem, cle);
+        if type_var = "Entier" then
+            Put(RecupererValeur_entier(mem, cle));
+        elsif type_var = "Chaine" then
+            --Put(RecupererValeur_chaine(mem, cle));
+            null;
+        end if;
+    end ecrire;
 
-   procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
-      type_var : Unbounded_String;
-      val_entier : Integer;
-      val_string : String (1..100); --on définit un max arbitrairement
-   begin
-      type_var := RecupererType(mem, cle);
-      if type_var = "Entier" then
-         Get(val_entier);
-         Modifier_Entier(mem, cle, val_entier);
-      elsif type_var = "Chaine" then
-         Get(val_string);
-         --Modifier_Chaine(mem, cle, To_String(val_string));
-      end if;
-   end lire;
+    procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
+        type_var : Unbounded_String;
+        val_entier : Integer;
+        val_string : String (1..100); --on définit un max arbitrairement
+    begin
+        type_var := RecupererType(mem, cle);
+        if type_var = "Entier" then
+            Get(val_entier);
+            Modifier_Entier(mem, cle, val_entier);
+        elsif type_var = "Chaine" then
+            Get(val_string);
+            --Modifier_Chaine(mem, cle, To_String(val_string));
+        end if;
+    end lire;
 
 end Decode;
