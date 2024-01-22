@@ -1,5 +1,7 @@
 
 with Utils; use Utils;
+with Ada.Text_IO ;                use Ada.Text_IO ;
+with Ada.Integer_Text_IO ;        use Ada.Integer_Text_IO ;
 
 
 package body Decode is
@@ -203,38 +205,51 @@ package body Decode is
         slice_mot(Ligne, Tab(Pos).pos3, " ");
          slice_mot(Ligne, Tab(Pos).pos4, " ");
       end if;
-   end remplir_ligne_op;
+    end remplir_ligne_op;
+
+   -- Rempli une ligne du tableau en lire/ecrire dans la premiere case et la variable dans la deuxième
+   -- @param Tab : tableau a remplir
+   -- @param Pos : ligne du tableau a remplir
+   -- @param Ligne : ligne dont on recupere les informations
+   -- @param Mot : premier mot de la ligne
+    procedure remplir_ligne_lire_ecrire(Tab: out T_tab_instruc; Pos : in Integer; Mot : in out Unbounded_String) is
+    begin
+        slice_mot(Mot, Tab(Pos).pos1, "(");
+        slice_mot(Mot, Tab(Pos).pos2, ")");
+    end remplir_ligne_lire_ecrire;
 
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
    -- @param Tab : tableau a remplir
    -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
-   procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
-      Ligne : Unbounded_String;
-      Mot : Unbounded_String;
-      Pos : Integer;
-      Fichier : File_Type;
-   begin
-      Ouvrir_Fichier_Lecture(NomFichier, Fichier);
-      Pos := 1;
-      parcourir_debut(Fichier);
-      -- Parcours le code en remplicant le tableau
-      Ligne := To_Unbounded_String(Get_Line(Fichier));
-      while not (Ligne = "Fin") loop
-         slice_mot(Ligne, Mot, " ");
-         if Mot = "--" or Ligne = "NULL" then
-            remplir_ligne_null(Tab, Pos);
-         elsif Mot /= "GOTO" and Mot /= "--" and Mot /= "NULL" and Mot /= "IF" then -- pour op car traitement special
-            remplir_ligne_op(Tab, Pos, Ligne, Mot);
-         else
-            remplir_ligne(Tab, Pos, Ligne, Mot);
-         end if;
-         Pos := Pos + 1;
-         Ligne := To_Unbounded_String(Get_Line(Fichier));
+    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
+        Ligne : Unbounded_String;
+        Mot : Unbounded_String;
+        Pos : Integer;
+        Fichier : File_Type;
+    begin
+        Ouvrir_Fichier_Lecture(NomFichier, Fichier);
+        Pos := 1;
+        parcourir_debut(Fichier);
+        -- Parcours le code en remplicant le tableau
+        Ligne := To_Unbounded_String(Get_Line(Fichier));
+        while not (Ligne = "Fin") loop
+            slice_mot(Ligne, Mot, " ");
+            if Mot = "--" or Mot = "NULL" then
+                remplir_ligne_null(Tab, Pos);
+            elsif Mot /= "GOTO" and Mot /= "IF" and not (Length(Mot)>=4 and then To_String(Mot)(1..4) = "Lire") and not (Length(Mot)>=6 and then To_String(Mot)(1..6) = "Ecrire") then -- pour op car traitement special
+                remplir_ligne_op(Tab, Pos, Ligne, Mot);
+            elsif Mot = "GOTO" or Mot = "IF" then
+                remplir_ligne(Tab, Pos, Ligne, Mot);
+            else -- dans le cas de lire ou ecrire car mise en forme speciale
+                remplir_ligne_lire_ecrire(Tab, Pos, Mot);
+            end if;
+            Pos := Pos + 1;
+            Ligne := To_Unbounded_String(Get_Line(Fichier));
         end loop;
         Close(Fichier);
-   end remplir_tab_instruc;
+    end remplir_tab_instruc;
 
 
    -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
@@ -333,7 +348,7 @@ package body Decode is
    procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
       type_var : Unbounded_String;
       val_entier : Integer;
-      val_string : String (1..100); --on d�finit un max arbitrairement
+      val_string : String (1..100); --on définit un max arbitrairement
    begin
       type_var := RecupererType(mem, cle);
       if type_var = "Entier" then
