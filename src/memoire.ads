@@ -30,12 +30,25 @@ package Memoire is
    -- @param Data : la nouvelle valeur de la variable
    procedure Modifier_Entier(Mem : in out T_Memoire ; Cle : in Unbounded_String ; Data : in Integer);
 
+   -- Modifie la donnee d'une variable existante en memoire
+   -- @param Mem : la memoire modifiee
+   -- @param Cle : le nom de la variable a modifier
+   -- @param Data : la nouvelle valeur de la variable
+   procedure Modifier_Chaine(Mem : in out T_Memoire ; Cle : in Unbounded_String ; Data : in Unbounded_String);
+
    -- Recupere la valeur d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return : la valeur de la variable
-    function RecupererValeur_Entier(Memoire : in T_Memoire ; Cle : in Unbounded_String) return Integer with
-            Pre => Memoire.Entiers /= Null;
+   function RecupererValeur_Entier(Memoire : in T_Memoire ; Cle : in Unbounded_String) return Integer with
+     Pre => Memoire.Entiers /= Null;
+
+   -- Recupere la valeur d'une variable par son nom
+   -- @param Mem : la memoire dans laquelle est stockee la variable
+   -- @param Cle : le nom de la variable recherchee
+   -- @return : la valeur de la variable
+   function RecupererValeur_Chaine(Memoire : in T_Memoire ; Cle : in Unbounded_String) return Unbounded_String with
+     Pre => Memoire.Entiers /= Null;
 
    -- Recupere le type d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
