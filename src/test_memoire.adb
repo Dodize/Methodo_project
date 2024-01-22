@@ -54,7 +54,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x : Entier");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);
       DeclarerVariables(Memoire, File_Name);
       Modifier_Entier(Memoire, To_Unbounded_String("x"), 2);
@@ -68,7 +68,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x, y, z : Entier");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);
       DeclarerVariables(Memoire, File_Name);
       Modifier_Entier(Memoire, To_Unbounded_String("y"), 2);
@@ -93,7 +93,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x : Chaine");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);
       DeclarerVariables(Memoire, File_Name);
       Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("chaine"));
@@ -107,7 +107,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x, y, z : Chaine");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);
       DeclarerVariables(Memoire, File_Name);
       Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("nouvelle valeur"));
@@ -153,7 +153,7 @@ procedure test_memoire is
       createFileInstruct(Fichier_temp);
       Put_Line (Fichier_temp, "Programme_test est");
       Put_Line (Fichier_temp, "x : Chaine");
-      Put_Line (Fichier_temp, "Début");
+      Put_Line (Fichier_temp, "DÃ©but");
       Close(Fichier_temp);  
       DeclarerVariables(Memoire, File_Name);
       Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello"));
@@ -164,7 +164,26 @@ procedure test_memoire is
       --verifications
       X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
       pragma Assert (X_value = "new string");
-   end;
+    end;
+    
+    -- Test concernant la modification de variable string.
+    procedure test_RecupererType is  
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Memoire : T_Memoire;
+    begin
+        --initialisation de la memoire avec une variable
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme_test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "DÃ©but");
+        Close(Fichier_temp);  
+        DeclarerVariables(Memoire, File_Name);
+        --verifications
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("x")) = To_Unbounded_String("Chaine"));
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("y")) = To_Unbounded_String("Entier"));
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("z")) = To_Unbounded_String("Entier"));
+    end;
    
 begin
     test_DeclarerVariables;
@@ -172,5 +191,6 @@ begin
     test_Recuperer_Chaine;
     test_ModifierVariables_Entier;
     test_ModifierVariables_Chaine;
+    test_RecupererType;
     deleteFileInstruct(File_Name);
 end test_memoire;
