@@ -309,6 +309,24 @@ package body Decode is
         slice_mot(Mot, Tab(Pos).pos2, ")");
     end remplir_ligne_lire_ecrire;
 
+    -- function intermédiaire pour simplifier la lecture
+    -- renvoie si le mot correspond à une opération
+    -- cad que ce n'est pas GOTO, pas IF, pas Lire et pas Ecrire (null et commentaire ayant été traité plus tot)
+    function est_op(Mot : in Unbounded_String) return boolean is
+    begin
+        return (Mot /= "GOTO" and Mot /= "IF" and not (Length(Mot)>=4 and then To_String(Mot)(1..4) = "Lire") and not (Length(Mot)>=6 and then To_String(Mot)(1..6) = "Ecrire"));
+    end;
+
+    -- procédure permettant de retirer des espaces avant le premier mot de la ligne
+    -- pour supprimer l'indentation du code intermédiaire
+    procedure enlever_indentation (Ligne : in out Unbounded_String) is
+        inutile : Unbounded_String;
+    begin
+        while Index(Ligne, " ") = 1 loop
+            slice_mot(Ligne, inutile, " ");
+        end loop;
+    end;
+
    -- Rempli le tableau avec les instructions du fichier
    -- en mettant sous la forme voulue
    -- Si la ligne est un coommentaire : devient un null dans le tableau
@@ -326,10 +344,11 @@ package body Decode is
         -- Parcours le code en remplicant le tableau
         Ligne := To_Unbounded_String(Get_Line(Fichier));
         while not (Ligne = "Fin") loop
+            enlever_indentation(Ligne);
             slice_mot(Ligne, Mot, " ");
             if Mot = "--" or Mot = "NULL" then
                 remplir_ligne_null(Tab, Pos);
-            elsif Mot /= "GOTO" and Mot /= "IF" and not (Length(Mot)>=4 and then To_String(Mot)(1..4) = "Lire") and not (Length(Mot)>=6 and then To_String(Mot)(1..6) = "Ecrire") then -- pour op car traitement special
+            elsif est_op(Mot) then -- pour op car traitement special
                 remplir_ligne_op(Tab, Pos, Ligne, Mot);
             elsif Mot = "GOTO" or Mot = "IF" then
                 remplir_ligne(Tab, Pos, Ligne, Mot);
@@ -351,7 +370,6 @@ package body Decode is
     begin
         Null;
     end afficher;
-
 
 
    -- Retourne une partie d'une instruction a la ligne du CP
