@@ -71,7 +71,6 @@ package body Decode is
         else
             CP := label;
         end if;
-
     end instru_goto;
 
 
@@ -197,17 +196,17 @@ package body Decode is
     begin
 
         New_Bool := -1;
-        Type_Var := RecupererType(Memoire, CleVariableAffectation);
+        Type_Var := RecupererType(Memoire, Valeur1);
 
         if Type_Var = "Entier" then
             Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
         elsif Type_Var = "Chaine" then
             result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
-            --  if New_Bool /= -1 then
-            --      Modifier_Chaine(Memoire, CleVariableAffectation, New_Bool);
-            --  else
-            --      Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
-            --  end if;
+            if New_Bool /= -1 then
+                Modifier_Entier(Memoire, CleVariableAffectation, New_Bool);
+            else
+                Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
+            end if;
         else
             Null; --TODO quand on aura les autres types
         end if;

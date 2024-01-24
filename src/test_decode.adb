@@ -8,11 +8,11 @@ procedure test_decode is
     
     File_Name : constant String := "temp_instruct.txt";
     
-    package Decode2Entier is new Decode(Capacite => 2);      
-        
+    package Decode2 is new Decode(Capacite => 2);    
+    
     -- Test concernant l'instruction NULL
     procedure test_instruction_NULL is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -37,7 +37,7 @@ procedure test_decode is
         DeclarerVariables(Memoire, File_Name);    
         Modifier_Entier(Memoire, To_Unbounded_String("X"), 2);
         -- test : operation NULL
-        Decode2Entier.effectuer_instru(Tab_Instruc, CP, Memoire);
+        Decode2.effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
         pragma Assert (CP = 2);
@@ -49,7 +49,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction d'affectation
     procedure test_instruction_affectation is
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -86,7 +86,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : addition de deux constantes (entieres)
     procedure test_instruction_addition_entier_const is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -122,7 +122,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : addition de deux variables (entieres)
     procedure test_instruction_addition_entier_var is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -158,7 +158,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : addition d'une variable et d'une constante (entieres)
     procedure test_instruction_addition_entier_mix is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -193,7 +193,7 @@ procedure test_decode is
 
     -- Test concernant l'instruction OP : soustraction de deux constantes (entieres)
     procedure test_instruction_soustraction_const is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -229,7 +229,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : soustraction de deux variables (entieres)
     procedure test_instruction_soustraction_var is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -267,7 +267,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : soustraction d'une variable et d'une constante (entieres)
     procedure test_instruction_soustraction_mix is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -302,7 +302,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : multiplication de deux constantes (entieres)
     procedure test_instruction_multiplication_const is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -338,7 +338,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : multiplication de deux variables (entieres)
     procedure test_instruction_multiplication_var is  
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -375,7 +375,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : multiplication d'une variable et d'une constante (entieres)
     procedure test_instruction_multiplication_mix is  
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -410,7 +410,7 @@ procedure test_decode is
     
      -- Test concernant l'instruction OP : division de deux constantes (entieres)
     procedure test_instruction_division_const is  
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -445,7 +445,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : cas d'exception de la division par zero
     procedure test_instruction_division_parzero is
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -484,7 +484,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : division de deux variables (entieres)
     procedure test_instruction_division_entier_var is  
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -521,7 +521,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : division d'une variable et d'une constante (entieres)
     procedure test_instruction_division_entier_mix is  
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -556,7 +556,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de l'egalite avec deux variables (resultat = true)
     procedure test_instruction_egalite_booleen_var_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -592,7 +592,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de strictement inferieur (resultat=true)
     procedure test_instruction_str_inf_booleen_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -628,7 +628,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de strictement inferieur (resultat=false)
     procedure test_instruction_str_inf_booleen_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -664,7 +664,7 @@ procedure test_decode is
     
      -- Test concernant l'instruction OP : test de inferieur ou egal (resultat=true)
     procedure test_instruction_infeq_booleen_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -705,7 +705,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de inferieur ou egal (resultat=false)
     procedure test_instruction_infeq_booleen_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -741,7 +741,7 @@ procedure test_decode is
     
        -- Test concernant l'instruction OP : test de strictement superieur (resultat=true)
     procedure test_instruction_str_sup_booleen_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -777,7 +777,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de strictement superieur (resultat=false)
     procedure test_instruction_str_sup_booleen_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -813,7 +813,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de superieur ou egal (resultat=true)
     procedure test_instruction_supeq_booleen_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -854,7 +854,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de superieur ou egal (resultat=false)
     procedure test_instruction_streq_booleen_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -890,7 +890,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de AND (resultat=true)
     procedure test_instruction_and_booleen_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -925,7 +925,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de AND (resultat=false avec F and T)
     procedure test_instruction_and_booleen_false1 is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -960,7 +960,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de AND (resultat=false avec F and F)
     procedure test_instruction_and_booleen_false2 is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -995,7 +995,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de OR (resultat=true avec V F)
     procedure test_instruction_or_booleen_true1 is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1030,7 +1030,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de OR (resultat=true avec V or V)
     procedure test_instruction_or_booleen_true2 is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1065,7 +1065,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de OR (resultat=false avec F and F)
     procedure test_instruction_or_booleen_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1100,7 +1100,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de l'exception levee si l'operation n'est pas reconnue
     procedure test_instruction_op_exception is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1138,7 +1138,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de l'egalite avec deux variables (resultat = false)
     procedure test_instruction_egalite_booleen_var_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1175,7 +1175,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de l'egalite entre une constante et une variable (resultat = true)
     procedure test_instruction_egalite_booleen_const_true is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1210,7 +1210,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction OP : test de l'egalite entre une constante et une variable (resultat = false)
     procedure test_instruction_egalite_booleen_const_false is  
-        use Decode2Entier;
+        use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1245,7 +1245,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction GOTO avec un numero de ligne anterieur
     procedure test_instruction_goto_ligne_ante is  
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1315,7 +1315,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction GOTO avec un numero de ligne invalide (<1)
     procedure test_instruction_goto_invalide_inf is
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1353,7 +1353,7 @@ procedure test_decode is
     
     -- Test concernant l'instruction GOTO avec un numero de ligne invalide (> Capacite de Tab_instruc)
     procedure test_instruction_goto_invalide_sup is
-         use Decode2Entier;
+         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
@@ -1469,7 +1469,7 @@ procedure test_decode is
    
    -- Test pour verifier qu'Ã  l'initialisation cp vaut 1
    procedure test_initialisation_cp is
-      use Decode2Entier;
+      use Decode2;
       cp : Integer;
    begin
       -- Initialisation de cp
@@ -1593,6 +1593,40 @@ procedure test_decode is
         
     end;
     
+    -- Test concernant l'affectation sur des chaines de caracteres
+    procedure test_affectation_chaines is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Integer;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- 2 - 5");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("x"), 4);
+        
+        -- test : operation soustraction avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = -3);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
     
 begin
     test_instruction_NULL;
