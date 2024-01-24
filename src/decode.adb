@@ -406,17 +406,20 @@ package body Decode is
         instruct : Unbounded_String;
     begin
         instruct := recuperer_instru_pos1(Tab, CP);
+        Put_Line("");
+        Put("Prochaine ligne : ");
         if instruct = "GOTO" then
             Put(To_String(recuperer_instru_pos2(Tab, CP)));
         elsif instruct = "IF" then
             if RecupererValeur_Entier(Mem, recuperer_instru_pos2(Tab, CP)) = 1 then
-                put(To_String(recuperer_instru_pos2(Tab, CP)));
+                Put(To_String(recuperer_instru_pos4(Tab, CP)));
             else
                 put(CP+1);
             end if;
         else --instruct = "NULL" or instruct = "Lire" or instruct = "Ecrire" or on est dans affectation ou op
             Put(CP+1);
         end if;
+        Put_Line("");
     end afficher_label;
 
 
