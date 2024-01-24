@@ -1739,14 +1739,15 @@ procedure test_decode is
         
         --initialisation de la memoire
         DeclarerVariables(Memoire, File_Name);
-        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("""hello """));
-        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("""world !"""));
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello "));
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("world !"));
         
         -- test : operation soustraction avec variables
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
         X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        Put_Line(To_String(X_value));
         pragma Assert (X_value = "hello world !");       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
@@ -1799,7 +1800,7 @@ begin
     test_remplir_lire_ecrire;
     test_suppr_indentation;
     test_affectation_chaine;
-    -- test_instruction_addition_chaines;
+    test_instruction_addition_chaines;
     deleteFileInstruct(File_Name);
    
 end test_decode;
