@@ -1562,6 +1562,37 @@ procedure test_decode is
         pragma Assert (recuperer_instru_pos2(Tab_Instruc, 7) = "x");
     end;
     
+           
+    -- Test concernant la suppression de l'indentation
+    procedure test_suppr_indentation is  
+        package Decode10Entier is new Decode(Capacite => 10);
+        use Decode10Entier;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;        
+    begin
+              
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp); 
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "X : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "   NULL");
+        Put_Line (Fichier_temp, "X <- 3");
+        Put_Line (Fichier_temp, "    -- Commentaire de texte");
+        Put_Line (Fichier_temp, "IF true GOTO 6");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        
+        -- verifications
+        
+        pragma Assert (recuperer_instru_pos1(Tab_Instruc, 1) = "NULL");
+        pragma Assert (recuperer_instru_pos1(Tab_Instruc, 2) = "X");
+        pragma Assert (recuperer_instru_pos1(Tab_Instruc, 3) = "NULL");
+        pragma Assert (recuperer_instru_pos1(Tab_Instruc, 4) = "IF");
+        
+    end;
+    
     
 begin
     test_instruction_NULL;
@@ -1607,6 +1638,7 @@ begin
     test_initialisation_cp;
     test_remplir_tab_instruc;
     test_remplir_lire_ecrire;
+    test_suppr_indentation;
     deleteFileInstruct(File_Name);
    
 end test_decode;
