@@ -53,6 +53,10 @@ package Memoire is
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return : le type de la variable
-   function RecupererType(Mem : in T_Memoire ; Cle : in Unbounded_String) return Unbounded_String;
+    function RecupererType(Mem : in T_Memoire ; Cle : in Unbounded_String) return Unbounded_String;
+
+    -- affiche les variables avec leur valeur et leur position
+    -- @param Mem : la memoire dans laquelle est stockee les variables
+    procedure afficher_variables(Mem : in T_Memoire);
 
 end Memoire;
