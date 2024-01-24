@@ -63,7 +63,7 @@ package body Interpreteur is
         -- Demande le menu
         mode := menu;
         -- parcour le tableau tant que l'on n'a pas termine le programme
-        while (cp < Capacite_tab) loop
+        while (cp <= Capacite_tab) loop
             if mode = 1 then
                 afficher(Instructions, cp, mem);
             end if;
