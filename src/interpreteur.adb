@@ -1,6 +1,7 @@
 with Decode;
 with Utils;           use Utils;
 with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
+with Ada.Text_IO ;                use Ada.Text_IO ;
 with Memoire; use Memoire;
 
 package body Interpreteur is
@@ -42,28 +43,32 @@ package body Interpreteur is
 
    end CalculerCapacite;
 
-
-   -- Lance l'interpreteur en lisant et excecutant le code
-   procedure Executer(NomFichier : in String) is
-      package P_Decode is new Decode(Capacite => CalculerCapacite(NomFichier));
-      use P_Decode;
-      Instructions : T_tab_instruc;
-      Mem : T_Memoire;
-      cp : Integer;
-      Capacite_tab : Integer;
-   begin
-      -- Declaration des variables en memoire
-      DeclarerVariables(Mem, NomFichier);
-      -- Recuperation des instructions
-      remplir_tab_instruc(Instructions, NomFichier);
-      Capacite_tab := get_nombre_instruc(Instructions);
-      -- Initialisation du CP
-      init_CP(cp);
-      -- parcour le tableau tant que l'on n'a pas termine le programme
-      while (cp < Capacite_tab) loop
-         effectuer_instru(Instructions, cp, Mem);
-      end loop;
-
+    -- Lance l'interpreteur en lisant et excecutant le code
+    procedure Executer(NomFichier : in String) is
+        package P_Decode is new Decode(Capacite => CalculerCapacite(NomFichier));
+        use P_Decode;
+        Instructions : T_tab_instruc;
+        Mem : T_Memoire;
+        cp : Integer;
+        Capacite_tab : Integer;
+        mode : Integer;
+        begin
+            -- Declaration des variables en memoire
+            DeclarerVariables(Mem, NomFichier);
+            -- Recuperation des instructions
+            remplir_tab_instruc(Instructions, NomFichier);
+            Capacite_tab := get_nombre_instruc(Instructions);
+            -- Initialisation du CP
+            init_CP(cp);
+            -- Demande le menu
+            mode := menu;
+            -- parcour le tableau tant que l'on n'a pas termine le programme
+            while (cp < Capacite_tab) loop
+                if mode = 1 then
+                    afficher(Instructions, cp, mem);
+                end if;
+                effectuer_instru(Instructions, cp, Mem);
+            end loop;
    end Executer;
 
 end Interpreteur;
