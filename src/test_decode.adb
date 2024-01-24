@@ -1710,7 +1710,6 @@ procedure test_decode is
         
         -- verifications
         X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
-        Put_Line(To_String(X_value));
         pragma Assert (X_value = """debut""");       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
