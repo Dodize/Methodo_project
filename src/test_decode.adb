@@ -561,7 +561,7 @@ procedure test_decode is
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estEgal_value : Integer;
         CP : Integer;
         
     begin
@@ -569,9 +569,10 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estEgal : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- y = z");
+        Put_Line (Fichier_temp, "estEgal <- y = z");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -586,8 +587,80 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 1); -- valeur a true       
+        estEgal_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estEgal"));
+        pragma Assert (estEgal_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'instruction OP : test de la non egalite avec deux constantes (resultat = true)
+    procedure test_instruction_nonegalite_cons_true is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        estDiff_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estDiff : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "estDiff <- y /= z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 5);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 6);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        estDiff_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estDiff"));
+        pragma Assert (estDiff_value = 1); -- valeur a true       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'instruction OP : test de la non egalite avec deux constantes (resultat = false)
+    procedure test_instruction_nonegalite_cons_false is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        estDiff_value : Integer;
+        CP : Integer;
+        
+    begin
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estDiff : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "estDiff <- y /= z");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 6);
+        Modifier_Entier(Memoire, To_Unbounded_String("z"), 6);
+        
+        -- test : operation division variable + constante
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        estDiff_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estDiff"));
+        pragma Assert (estDiff_value = 0); -- valeur a true       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -597,16 +670,17 @@ procedure test_decode is
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estInf_Value : Integer;
         CP : Integer;
         
     begin
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estInf : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- y < z");
+        Put_Line (Fichier_temp, "estInf <- y < z");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -621,8 +695,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 1); -- valeur a true       
+        estInf_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estInf"));
+        pragma Assert (estInf_Value = 1); -- valeur a true       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -633,7 +707,7 @@ procedure test_decode is
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estInf_Value : Integer;
         CP : Integer;
         
     begin
@@ -657,8 +731,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 0); -- valeur a false       
+        estInf_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (estInf_Value = 0); -- valeur a false       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -676,7 +750,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "a, b, x, y, z : Entier");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "a, b : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "a <- x <= y");
         Put_Line (Fichier_temp, "b <- y <= z");
@@ -710,7 +785,7 @@ procedure test_decode is
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estInf_Value : Integer;
         CP : Integer;
         
     begin
@@ -718,8 +793,9 @@ procedure test_decode is
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "estInf : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- y <= z");
+        Put_Line (Fichier_temp, "estInf <- y <= z");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -734,8 +810,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 0); -- valeur a false       
+        estInf_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estInf"));
+        pragma Assert (estInf_Value = 0); -- valeur a false       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -746,16 +822,17 @@ procedure test_decode is
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estSup_Value : Integer;
         CP : Integer;
         
     begin
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estSup : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- y > z");
+        Put_Line (Fichier_temp, "estSup <- y > z");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -770,8 +847,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 1); -- valeur a true       
+        estSup_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estSup"));
+        pragma Assert (estSup_Value = 1); -- valeur a true       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -782,16 +859,17 @@ procedure test_decode is
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estSup_Value : Integer;
         CP : Integer;
         
     begin
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estSup : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- y > z");
+        Put_Line (Fichier_temp, "estSup <- y > z");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -806,8 +884,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 0); -- valeur a false       
+        estSup_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estSup"));
+        pragma Assert (estSup_Value = 0); -- valeur a false       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -825,7 +903,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "a, b, x, y, z : Entier");
+        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "a, b : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "a <- x >= y");
         Put_Line (Fichier_temp, "b <- y >= z");
@@ -854,21 +933,22 @@ procedure test_decode is
     
     
     -- Test concernant l'instruction OP : test de superieur ou egal (resultat=false)
-    procedure test_instruction_streq_booleen_false is  
+    procedure test_instruction_supeq_booleen_false is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        estSup_Value : Integer;
         CP : Integer;
         
     begin
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "estSup : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- y >= z");
+        Put_Line (Fichier_temp, "estSup <- y >= z");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -883,8 +963,8 @@ procedure test_decode is
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = 0); -- valeur a false       
+        estSup_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("estSup"));
+        pragma Assert (estSup_Value = 0); -- valeur a false       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -901,7 +981,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "x : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y AND z");
         Put_Line (Fichier_temp, "Fin");
@@ -936,7 +1017,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "x : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y AND z");
         Put_Line (Fichier_temp, "Fin");
@@ -971,7 +1053,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "x : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y AND z");
         Put_Line (Fichier_temp, "Fin");
@@ -1006,7 +1089,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "x : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y OR z");
         Put_Line (Fichier_temp, "Fin");
@@ -1041,7 +1125,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "x : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y OR z");
         Put_Line (Fichier_temp, "Fin");
@@ -1076,7 +1161,8 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y, z : Entier");
+        Put_Line (Fichier_temp, "y, z : Entier");
+        Put_Line (Fichier_temp, "x : Booléen");
         Put_Line (Fichier_temp, "Début");
         Put_Line (Fichier_temp, "x <- y OR z");
         Put_Line (Fichier_temp, "Fin");
@@ -1593,8 +1679,7 @@ procedure test_decode is
         pragma Assert (recuperer_instru_pos1(Tab_Instruc, 4) = "IF");
         
     end;
-    
-    -- Test concernant l'affectation sur des chaines de caracteres
+       -- Test concernant l'affectation sur des chaines de caracteres
     procedure test_affectation_chaine is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
@@ -1687,6 +1772,8 @@ begin
     test_instruction_egalite_booleen_var_false;
     test_instruction_egalite_booleen_const_true;
     test_instruction_egalite_booleen_const_false;
+    test_instruction_nonegalite_cons_true;
+    test_instruction_nonegalite_cons_false;
     test_instruction_str_inf_booleen_true;
     test_instruction_str_inf_booleen_false;
     test_instruction_infeq_booleen_true;
@@ -1694,7 +1781,7 @@ begin
     test_instruction_str_sup_booleen_true;
     test_instruction_str_sup_booleen_false;
     test_instruction_supeq_booleen_true;
-    test_instruction_streq_booleen_false;
+    test_instruction_supeq_booleen_false;
     test_instruction_and_booleen_true;
     test_instruction_and_booleen_false1;
     test_instruction_and_booleen_false2;

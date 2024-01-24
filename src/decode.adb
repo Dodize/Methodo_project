@@ -101,6 +101,12 @@ package body Decode is
             else
                 Result := 0;
             end if;
+        elsif Operation = "/=" then
+            if Valeur1 /= Valeur2 then
+                Result := 1;
+            else
+                Result := 0;
+            end if;
         elsif Operation = "<" then
             if Valeur1 < Valeur2 then
                 Result := 1;
@@ -161,6 +167,12 @@ package body Decode is
             New_Chaine := Valeur1 & Valeur2;
         elsif Operation = "=" then
             if Valeur1 = Valeur2 then
+                New_Bool := 1;
+            else
+                New_Bool := 0;
+            end if;
+        elsif Operation = "/=" then
+            if Valeur1 /= Valeur2 then
                 New_Bool := 1;
             else
                 New_Bool := 0;
