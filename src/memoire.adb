@@ -250,4 +250,44 @@ package body Memoire is
         return To_Unbounded_String("null");
     end RecupererType;
 
+    -- affiche le contenue de la liste de chaine de caractère
+    procedure afficher_liste_chaine(Mem : in P_Memoire_String.T_Case_Memoire; adresse : in out Integer) is
+    begin
+        if Mem.Suivant = null then
+            null;
+        else
+            Put("        Adresse en mémoire : "); Put(adresse, 1); Put_Line("");
+            Put("        Nom de la variable : "); Put(To_String(Mem.Cle)); Put_Line("");
+            Put("        Valeur de la variable : "); Put_Line(To_String(Mem.Data)); Put_Line("");
+            adresse := adresse +1;
+            afficher_liste_chaine(Mem.Suivant, adresse);
+        end if;
+    end afficher_liste_chaine;
+
+    -- affiche le contenue de la liste d'entier
+    procedure afficher_liste_entier(Mem : in P_Memoire_Entier.T_Case_Memoire; adresse : in out Integer) is
+    begin
+        if Mem.Suivant = null then
+            null;
+        else
+            Put("        Adresse en mémoire : "); Put(adresse, 1); Put_Line("");
+            Put("        Nom de la variable : "); Put(To_String(Mem.Cle)); Put_Line("");
+            Put("        Valeur de la variable : "); Put(Mem.Data, 1); Put_Line(""); Put_Line("");
+            adresse := adresse +1;
+            afficher_liste_entier(Mem.Suivant, adresse);
+        end if;
+    end afficher_liste_entier;
+
+    -- affiche les variables avec leur valeur et leur position
+    -- @param Mem : la memoire dans laquelle est stockee les variables
+    procedure afficher_variables(Mem : in T_Memoire) is
+        adresse : Integer;
+    begin
+        adresse := 1;
+        Put_Line("    Affichage de la liste d'entier ou boolean : ");
+        afficher_liste_entier(Mem.Entiers, adresse);
+        Put_Line("    Affichage de la liste de caractère ou chaine : ");
+        --afficher_liste_chaine(Mem, adresse, Liste_string);
+    end afficher_variables;
+
 end Memoire;
