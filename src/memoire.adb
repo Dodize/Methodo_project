@@ -1,6 +1,8 @@
 with Ada.Strings.Maps.Constants; use Ada.Strings.Maps;
 with Ada.Text_IO;                use Ada.Text_IO;
 with Utils;                      use Utils;
+with Ada.Integer_Text_IO;
+use  Ada.Integer_Text_IO;
 
 package body Memoire is
 
@@ -26,23 +28,21 @@ package body Memoire is
         while not Fini loop
 
             Current_Line := To_Unbounded_String(Get_Line(Code));
-            
+
             -- Verifier qu'on n'a pas atteint la ligne "Debut"
             if Index(Current_Line, "Début") > 0 and Index(Current_Line, ":") = 0 then
-                Put_Line(To_String(Current_Line));
                 Fini := True;
             else
 
-                Current_Line := Translate(Current_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);      
-            
-                -- Si pas commentaire ou declaration debut programme     
+                -- Si pas commentaire ou declaration debut programme
                 if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
                     -- Split au niveau de ':'
                     slice_mot(Current_Line, Splitted_Line, ":");
                     -- Recuperation du type
-                    if Index(Current_Line, "entier") > 0 then
+                    -- les booleens sont traites comme des entiers
+                    if (Index(Current_Line, "Entier") > 0 or Index(Current_Line, "Booléen") > 0) then
                         Current_Type := ENTIER;
-                    elsif Index(Current_Line, "chaine") > 0 then
+                    elsif (Index(Current_Line, "Chaine") > 0 or Index(Current_Line, "Caractère") > 0) then
                         Current_Type := CHAINE;
                     end if;
 
@@ -50,8 +50,8 @@ package body Memoire is
 
                     -- Split au niveau de ','
                     slice_mot (Current_Line, Splitted_Line, ",");
-
                     while Length (Splitted_Line) > 0 loop
+                        Splitted_Line := Translate(Splitted_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
                         -- Initialisation de la memoire en fonction de son type
                         if Current_Type = ENTIER then
                             Current_Mem_Integer.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
@@ -70,7 +70,7 @@ package body Memoire is
                         slice_mot (Current_Line, Splitted_Line, ",");
                     end loop;
                 end if;
-            end if;            
+            end if;
         end loop;
         Close(Code); -- fermeture du fichier contenant le code
    end DeclarerVariables;
@@ -90,7 +90,7 @@ package body Memoire is
       end loop;
       return Pos_entier;
    end trouver_case_entier;
-   
+
    -- Permet de trouver la case memoire de la variable ayant Cle comme nom
    -- @param CaseMem : la premiere case memoire
    -- @param Cle : le nom de la variable
@@ -113,11 +113,11 @@ package body Memoire is
    -- @param Data : la nouvelle valeur de la variable
    procedure Modifier_Entier (Mem : in out T_Memoire; Cle : in Unbounded_String; Data : in Integer) is
       Pos_entier : P_Memoire_Entier.T_Case_Memoire;
-   begin
+    begin
       Pos_entier := trouver_case_entier(Mem.Entiers, Cle);
       Pos_entier.Data := Data;
    end Modifier_Entier;
-   
+
    -- Modifie la donnee d'une variable existante en memoire
    -- @param Mem : la memoire modifiee
    -- @param Cle : le nom de la variable a modifier
@@ -144,7 +144,7 @@ package body Memoire is
             -- alors elle est dans la case suivante (pas la peine de tester si Suivant /= Null)
         end if;
    end RecupererValeur_Entier_FromCase;
-   
+
     -- Recupere la valeur d'une variable par son nom a partir d'une case memoire (est appelee par RecupererValeur_Chaine)
     -- @param CaseMem : la case memoire dans laquelle on verifie si la cle correspond
     -- @param Cle : la cle de la variable dont on cherche la valeur
@@ -181,7 +181,7 @@ package body Memoire is
          return -1;
       end if;
    end RecupererValeur_Entier;
-   
+
    -- Recupere la valeur d'une variable par son nom (a partir de l'objet memoire)
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
@@ -214,8 +214,8 @@ package body Memoire is
             return To_Unbounded_String("Chaine");
         end if;
         return To_Unbounded_String("null");
-    end donner_Type;  
-    
+    end donner_Type;
+
     -- fonction disant si le type est un entier
     -- surchargé
     function donner_Type(Mem : in T_Memoire; Cle : in Unbounded_String; search_type : in out P_Memoire_Entier.T_Case_Memoire) return Unbounded_String is
@@ -229,7 +229,7 @@ package body Memoire is
         end if;
         return To_Unbounded_String("null");
     end donner_Type;
-    
+
    -- Recupere le type d'une variable par son nom
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee

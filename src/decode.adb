@@ -193,14 +193,15 @@ package body Decode is
         Type_Var : Unbounded_String;
         New_Bool : Integer;
         New_Chaine : Unbounded_String;
+        FirstOfValeur1 : Character; -- le premier caractere de valeur1
     begin
 
         New_Bool := -1;
         Type_Var := RecupererType(Memoire, Valeur1);
-
-        if Type_Var = "Entier" then
+        FirstOfValeur1 := To_String(Valeur1)(To_String(Valeur1)'First);
+        if Type_Var = "Entier" or else FirstOfValeur1 /= '"' then
             Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
-        elsif Type_Var = "Chaine" then
+        elsif Type_Var = "Chaine" or else FirstOfValeur1 = '"' then
             result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
             if New_Bool /= -1 then
                 Modifier_Entier(Memoire, CleVariableAffectation, New_Bool);
@@ -212,6 +213,7 @@ package body Decode is
         end if;
         increm_CP(CP);
     end instru_op;
+
 
 
     -- Effectue l'instruction affectation
