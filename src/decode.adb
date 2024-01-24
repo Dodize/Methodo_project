@@ -161,6 +161,7 @@ package body Decode is
         Valeur1 : Unbounded_String;
         Valeur2 : Unbounded_String;
     begin
+        New_Bool := -1;
         Valeur1 := RecupererValeur_Chaine(Memoire, CleVal1);
         Valeur2 := RecupererValeur_Chaine(Memoire, CleVal2);
         if Operation = "+" then
@@ -211,9 +212,10 @@ package body Decode is
         New_Bool := -1;
         Type_Var := RecupererType(Memoire, Valeur1);
         FirstOfValeur1 := To_String(Valeur1)(To_String(Valeur1)'First);
-        if Type_Var = "Entier" or else FirstOfValeur1 /= '"' then
+        -- si Type_var vaut null => alors il s'agit d'une constante et on regarde le premier caractère pour connaitre son type
+        if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' or FirstOfValeur1 /= ''')) then
             Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
-        elsif Type_Var = "Chaine" or else FirstOfValeur1 = '"' then
+        elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''')) then
             result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
             if New_Bool /= -1 then
                 Modifier_Entier(Memoire, CleVariableAffectation, New_Bool);
