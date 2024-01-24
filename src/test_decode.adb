@@ -1595,12 +1595,12 @@ procedure test_decode is
     end;
     
     -- Test concernant l'affectation sur des chaines de caracteres
-    procedure test_affectation_chaines is  
+    procedure test_affectation_chaine is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
         Memoire : T_Memoire;
-        X_value : Integer;
+        X_value : Unbounded_String;
         CP : Integer;
         
     begin
@@ -1608,9 +1608,9 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "x : Chaine");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- 2 - 5");
+        Put_Line (Fichier_temp, "x <- ""debut""");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -1618,14 +1618,52 @@ procedure test_decode is
         
         --initialisation de la memoire
         DeclarerVariables(Memoire, File_Name);
-        Modifier_Entier(Memoire, To_Unbounded_String("x"), 4);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("""chaine"""));
         
         -- test : operation soustraction avec constantes
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
-        X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = -3);       
+        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        Put_Line(To_String(X_value));
+        pragma Assert (X_value = """debut""");       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'addition de chaines de caracteres
+    procedure test_instruction_addition_chaines is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Unbounded_String;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- x + y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("""hello """));
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("""world !"""));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = "hello world !");       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -1674,6 +1712,8 @@ begin
     test_remplir_tab_instruc;
     test_remplir_lire_ecrire;
     test_suppr_indentation;
+    test_affectation_chaine;
+    -- test_instruction_addition_chaines;
     deleteFileInstruct(File_Name);
    
 end test_decode;
