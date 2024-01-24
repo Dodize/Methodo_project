@@ -6,18 +6,18 @@ with Memoire; use Memoire;
 
 package body Interpreteur is
 
-   -- Permet de choisir le mode d'utilisation : 0 pour normal et 1 pour debug
-   -- @return : 0 pour mode d'execution normal, 1 pour le mode debug
-   function Menu return Integer is
-      type_menu : Integer;
-   begin
-      Put_Line("Veuillez choisir le mode choisi : 0 pour normal et 1 pour debug");
-      Get(type_menu);
-      while type_menu /= 0 or type_menu /= 1 loop
-         Put_Line("Veuillez choisir le mode choisi : 0 pour normal et 1 pour debug");
-         Get(type_menu);
-      end loop;
-      return type_menu;
+    -- Permet de choisir le mode d'utilisation : 0 pour normal et 1 pour debug
+    -- @return : 0 pour mode d'execution normal, 1 pour le mode debug
+    function Menu return Integer is
+        type_menu : Integer;
+    begin
+        Put_Line("Veuillez choisir le mode choisi : 0 pour normal et 1 pour debug");
+        Get(type_menu);
+        while type_menu /= 0 and type_menu /= 1 loop
+            Put_Line("Veuillez choisir le mode choisi : 0 pour normal et 1 pour debug");
+            Get(type_menu);
+        end loop;
+        return type_menu;
    end Menu;
 
    -- Calcule la capacite du tableau d'instructions en fonction du nombre de ligne effective du fichier du code intermediaire
@@ -51,24 +51,24 @@ package body Interpreteur is
         Mem : T_Memoire;
         cp : Integer;
         Capacite_tab : Integer;
-        --mode : Integer;
-        begin
-            -- Declaration des variables en memoire
-            DeclarerVariables(Mem, NomFichier);
-            -- Recuperation des instructions
-            remplir_tab_instruc(Instructions, NomFichier);
-            Capacite_tab := get_nombre_instruc(Instructions);
-            -- Initialisation du CP
-            init_CP(cp);
-            -- Demande le menu
-           -- mode := menu;
-            -- parcour le tableau tant que l'on n'a pas termine le programme
-            while (cp < Capacite_tab) loop
-                --if mode = 1 then
-                --    afficher(Instructions, cp, mem);
-               -- end if;
-                effectuer_instru(Instructions, cp, Mem);
-            end loop;
-   end Executer;
+        mode : Integer;
+    begin
+        -- Declaration des variables en memoire
+        DeclarerVariables(Mem, NomFichier);
+        -- Recuperation des instructions
+        remplir_tab_instruc(Instructions, NomFichier);
+        Capacite_tab := get_nombre_instruc(Instructions);
+        -- Initialisation du CP
+        init_CP(cp);
+        -- Demande le menu
+        mode := menu;
+        -- parcour le tableau tant que l'on n'a pas termine le programme
+        while (cp < Capacite_tab) loop
+            if mode = 1 then
+                afficher(Instructions, cp, mem);
+            end if;
+            effectuer_instru(Instructions, cp, Mem);
+        end loop;
+    end Executer;
 
 end Interpreteur;
