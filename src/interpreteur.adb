@@ -13,7 +13,7 @@ package body Interpreteur is
    begin
       Put_Line("Veuillez choisir le mode choisi : 0 pour normal et 1 pour debug");
       Get(type_menu);
-      while menu /= 0 or menu /= 1 loop
+      while type_menu /= 0 or type_menu /= 1 loop
          Put_Line("Veuillez choisir le mode choisi : 0 pour normal et 1 pour debug");
          Get(type_menu);
       end loop;
@@ -51,7 +51,7 @@ package body Interpreteur is
         Mem : T_Memoire;
         cp : Integer;
         Capacite_tab : Integer;
-        mode : Integer;
+        --mode : Integer;
         begin
             -- Declaration des variables en memoire
             DeclarerVariables(Mem, NomFichier);
@@ -61,12 +61,12 @@ package body Interpreteur is
             -- Initialisation du CP
             init_CP(cp);
             -- Demande le menu
-            mode := menu;
+           -- mode := menu;
             -- parcour le tableau tant que l'on n'a pas termine le programme
             while (cp < Capacite_tab) loop
-                if mode = 1 then
-                    afficher(Instructions, cp, mem);
-                end if;
+                --if mode = 1 then
+                --    afficher(Instructions, cp, mem);
+               -- end if;
                 effectuer_instru(Instructions, cp, Mem);
             end loop;
    end Executer;
