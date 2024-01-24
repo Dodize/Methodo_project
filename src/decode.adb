@@ -361,16 +361,6 @@ package body Decode is
     end remplir_tab_instruc;
 
 
-   -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
-   -- @param Tab : tableau comptenant les instructions
-   -- @param CP : compteur
-   -- @param mem : liste chainee comptenant les variables et leurs valeurs
-    procedure afficher (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire) is
-    begin
-        Null;
-    end afficher;
-
-
    -- Retourne une partie d'une instruction a la ligne du CP
    -- @param Tab : tableau contenant les instructions
    -- @param CP : la ligne de la partie a recuperer
@@ -406,6 +396,40 @@ package body Decode is
    begin
       return Tab(CP).pos4;
     end recuperer_instru_pos4;
+
+
+    --affiche le numéro de ligne où l'on ira à la prochaine instruction
+    -- @param Tab : tableau comptenant les instructions
+    -- @param CP : compteur
+    -- @param mem : liste chainee comptenant les variables et leurs valeurs
+    procedure afficher_label(Tab : in T_tab_instruc; CP : in Integer; Mem: in T_Memoire) is
+        instruct : Unbounded_String;
+    begin
+        instruct := recuperer_instru_pos1(Tab, CP);
+        if instruct = "GOTO" then
+            Put(To_String(recuperer_instru_pos2(Tab, CP)));
+        elsif instruct = "IF" then
+            if RecupererValeur_Entier(Mem, recuperer_instru_pos2(Tab, CP)) = 1 then
+                put(To_String(recuperer_instru_pos2(Tab, CP)));
+            else
+                put(CP+1);
+            end if;
+        else --instruct = "NULL" or instruct = "Lire" or instruct = "Ecrire" or on est dans affectation ou op
+            Put(CP+1);
+        end if;
+    end afficher_label;
+
+
+    -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
+    -- @param Tab : tableau comptenant les instructions
+    -- @param CP : compteur
+    -- @param mem : liste chainee comptenant les variables et leurs valeurs
+    procedure afficher (Tab : in T_tab_instruc; CP : in Integer; mem : in out T_memoire) is
+    begin
+        afficher_label(Tab, CP, Mem);
+        Put_Line("Variable en mémoire : ");
+        --afficher_variable(mem); --dans mémoire
+    end afficher;
 
 
    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
