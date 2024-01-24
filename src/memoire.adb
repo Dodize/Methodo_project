@@ -287,7 +287,7 @@ package body Memoire is
         Put_Line("    Affichage de la liste d'entier ou boolean : ");
         afficher_liste_entier(Mem.Entiers, adresse);
         Put_Line("    Affichage de la liste de caractère ou chaine : ");
-        --afficher_liste_chaine(Mem, adresse, Liste_string);
+        afficher_liste_chaine(Mem.Chaines, adresse);
     end afficher_variables;
 
 end Memoire;
