@@ -1,21 +1,39 @@
--- Ce code intermédiaire calcule la factorielle F d’un entier n
--- avec numéros de ligne
+
+
+
+
+
+-- exemple de code intermédiaire utilisant des entiers, chaines de caractères ect
 Programme Facto est
     n, i, Fact, T1, T2, T3 : Entier
+    x, y, test : Chaine
 Début
-n <- 5
-i <- 1
-Fact <- 1
+    n <- 5
+   i <- 1
+  Fact <- 1
+ T1 <- i < n
+T2 <- i = n
+  T3 <- T1 OR T2
+    IF T3 GOTO 9
+ GOTO 15
+   Fact <- Fact * i
+ i <- i + 1
 T1 <- i < n
 T2 <- i = n
-T3 <- T1 OR T2
-IF T3 GOTO 9
-GOTO 15
-Fact <- Fact * i
-i <- i + 1
-T1 <- i < n
-T2 <- i = n
-T3 <- T1 OR T2
+ T3 <- T1 OR T2
 GOTO 7
-NULL
+    NULL
+-- test des chaines
+x <- "Bonjour"
+y <- "Hello"
+test <- "Hello"
+T1 <- test = y
+T2 <- test = x
+IF T2 GOTO 25
+GOTO 26
+Lire(x)
+IF T1 GOTO 27
+GOTO 28
+Ecrire(x)
+NULL 
 Fin
