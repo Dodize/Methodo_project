@@ -10,7 +10,7 @@ package Memoire is
    use P_Memoire_String;
 
    -- Enumerable du type de la variable
-   type T_Type is (CHAINE, ENTIER, TAB);
+   type T_Type is (CHAINE, ENTIER, TAB_ENTIER, TAB_CHAINE);
 
    type T_Memoire is
       record

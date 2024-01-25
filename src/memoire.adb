@@ -6,17 +6,108 @@ use  Ada.Integer_Text_IO;
 
 package body Memoire is
 
+    type T_TableauDeclare;
+    type T_Liste_TypesTableau is access T_TableauDeclare;
+    type T_TableauDeclare is
+        record
+            Nom: Unbounded_String;
+            BorneInf: Integer;
+            BorneSup : Integer;
+            TypeStocke : T_Type;
+            Suivant : T_Liste_TypesTableau;
+        end record;
+
+    -- TODO : spec + ajouter pre condition
+    procedure creer_nouveau_typetableau(ChaineDeclaration : in Unbounded_String; NouveauTableau : out T_Liste_TypesTableau) with
+            Pre => NouveauTableau /= null
+    is
+        Current_Line : Unbounded_String;
+        Splitted_Line : Unbounded_String;
+
+    begin
+         Current_Line := ChaineDeclaration;
+        -- recupere le mot "type"
+        slice_mot (Current_Line, Splitted_Line, " ");
+        -- recupere le nom du tableau
+        slice_mot (Current_Line, Splitted_Line, " ");
+        NouveauTableau.Nom := Splitted_Line;
+
+        -- parcoure jusqu'a la borne inf
+        slice_mot (Current_Line, Splitted_Line, "(");
+        slice_mot (Current_Line, Splitted_Line, ".");
+        NouveauTableau.BorneInf := Integer'Value(To_String(Splitted_Line));
+
+        -- parcoure jusqu'a la borne sup
+        slice_mot (Current_Line, Splitted_Line, ".");
+        slice_mot (Current_Line, Splitted_Line, ")");
+        NouveauTableau.BorneSup := Integer'Value(To_String(Splitted_Line));
+
+        if Index(Current_Line, "d'") /= 0 then
+            -- parcoure apres le d' pour obtenir le type
+            slice_mot (Current_Line, Splitted_Line, "'");
+        else
+            -- parcoure apres le "de" pour obtenir le type
+            slice_mot (Current_Line, Splitted_Line, " ");
+            slice_mot (Current_Line, Splitted_Line, " ");
+        end if;
+
+        --traduction du type
+        if Current_Line = "entiers" or else Current_Line = "booléens" then
+            NouveauTableau.TypeStocke := ENTIER;
+        elsif Current_Line = "chaines" or else Current_Line = "caractères" then
+            NouveauTableau.TypeStocke := CHAINE;
+        end if;
+
+        NouveauTableau.Suivant := null;
+    end;
+
+    function getDeclarationType(nomType : Unbounded_String; ListeTableaux : T_Liste_TypesTableau) return T_Liste_TypesTableau is
+        Current_Tableau : T_Liste_TypesTableau;
+    begin
+        Current_Tableau := ListeTableaux;
+        while Current_Tableau /= null and then Current_Tableau.Nom /= nomType loop
+            Current_Tableau := Current_Tableau.Suivant;
+        end loop;
+        return Current_Tableau;
+    end getDeclarationType;
+
+
+    procedure ajouterCaseMemoire(Current_Mem_Integer : in out P_Memoire_Entier.T_Case_Memoire; nomVariable : in Unbounded_String) is
+    begin
+        Current_Mem_Integer.Cle := nomVariable;
+        Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
+        Current_Mem_Integer.Suivant := new P_Memoire_Entier.T_Var;
+        -- Recuperation de l'element suivant
+        Current_Mem_Integer := Current_Mem_Integer.Suivant;
+    end ajouterCaseMemoire;
+
+    procedure ajouterCaseMemoire(Current_Mem_Chaine : in out P_Memoire_String.T_Case_Memoire; nomVariable : in Unbounded_String) is
+    begin
+        Current_Mem_Chaine.Cle := nomVariable;
+        Current_Mem_Chaine.TypeOfData := P_Memoire_String.CHAINE;
+        Current_Mem_Chaine.Suivant := new P_Memoire_String.T_Var;
+        -- Recuperation de l'element suivant
+        Current_Mem_Chaine := Current_Mem_Chaine.Suivant;
+    end ajouterCaseMemoire;
+
+
+
+
    -- Declare toutes les variables en memoire
    -- @param Mem : la memoire
    -- @param NomFichierCode : le nom du fichier du code ou sont declarees les variables
    procedure DeclarerVariables (Mem : out T_Memoire; NomFichierCode : in String) is
-      Current_Mem_Integer : P_Memoire_Entier.T_Case_Memoire;
-      Current_Mem_Chaine  : P_Memoire_String.T_Case_Memoire;
-      Current_Line        : Unbounded_String;
-      Splitted_Line       : Unbounded_String;
-      Fini                : Boolean;
-      Current_Type        : T_Type;
-      Code                : File_Type;
+        Current_Mem_Integer : P_Memoire_Entier.T_Case_Memoire;
+        Current_Mem_Chaine  : P_Memoire_String.T_Case_Memoire;
+        Current_Line        : Unbounded_String;
+        Splitted_Line       : Unbounded_String;
+        Fini                : Boolean;
+        Current_Type        : T_Type;
+        Code                : File_Type;
+        ListeTableaux : T_Liste_TypesTableau;
+        Current_Tableau : T_Liste_TypesTableau;
+        Current_NewTableau : T_Liste_TypesTableau;
+        NomTableau : Unbounded_String;
    begin
       Ouvrir_Fichier_Lecture(NomFichierCode, Code);
       Fini                := False;
@@ -33,17 +124,44 @@ package body Memoire is
             if Index(Current_Line, "Début") > 0 and Index(Current_Line, ":") = 0 then
                 Fini := True;
             else
+
                 -- Si pas commentaire ou declaration debut programme
                 if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
-                    -- Split au niveau de ':'
-                    slice_mot(Current_Line, Splitted_Line, ":");
-                    -- Recuperation du type
-                    -- les booleens sont traites comme des entiers
-                    if (Index(Current_Line, "Entier") > 0 or Index(Current_Line, "Booléen") > 0) then
-                        Current_Type := ENTIER;
-                    elsif (Index(Current_Line, "Chaine") > 0 or Index(Current_Line, "Caractère") > 0) then
-                        Current_Type := CHAINE;
+                    -- cas de la declaration d'un type (tableau)
+                    if (Index(Current_Line, "Type") > 0 and then Index(Current_Line, "taleau") > 0) then
+                        if ListeTableaux = null then
+                            ListeTableaux := new T_TableauDeclare;
+                            Current_NewTableau := ListeTableaux;
+                        else
+                            Current_NewTableau := new T_TableauDeclare;
+                        end if;
+                        creer_nouveau_typetableau(Current_Line, Current_NewTableau);
+                        Current_NewTableau := Current_NewTableau.Suivant;
+                    else
+                        -- Split au niveau de ':'
+                        slice_mot(Current_Line, Splitted_Line, ":");
+                        -- Recuperation du type
+                        -- les booleens sont traites comme des entiers
+                        if (Index(Current_Line, "Entier") > 0 or Index(Current_Line, "Booléen") > 0) then
+                            Current_Type := ENTIER;
+                        elsif (Index(Current_Line, "Chaine") > 0 or Index(Current_Line, "Caractère") > 0) then
+                            Current_Type := CHAINE;
+                        else
+                            -- on cherche si le type a ete declare avant
+                            if ListeTableaux /= null then
+                                NomTableau := To_Unbounded_String(Strip_Space(To_String(Current_Line)));
+                                Current_Tableau := getDeclarationType(NomTableau, ListeTableaux);
+                                if Current_Tableau.TypeStocke = ENTIER then
+                                    Current_Type := TAB_ENTIER;
+                                elsif Current_Tableau.TypeStocke = CHAINE then
+                                    Current_Type := TAB_CHAINE;
+                                end if;
+
+                            end if;
+
+                        end if;
                     end if;
+
 
                     Current_Line := Splitted_Line;
 
@@ -51,19 +169,22 @@ package body Memoire is
                     slice_mot (Current_Line, Splitted_Line, ",");
                     while Length (Splitted_Line) > 0 loop
                         Splitted_Line := Translate(Splitted_Line, Ada.Strings.Maps.Constants.Lower_Case_Map);
+                        Splitted_Line := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
                         -- Initialisation de la memoire en fonction de son type
                         if Current_Type = ENTIER then
-                            Current_Mem_Integer.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
-                            Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
-                            Current_Mem_Integer.Suivant := new P_Memoire_Entier.T_Var;
-                            -- Recuperation de l'element suivant
-                            Current_Mem_Integer := Current_Mem_Integer.Suivant;
+                            ajouterCaseMemoire(Current_Mem_Integer, Splitted_Line);
                         elsif Current_Type = CHAINE then
-                            Current_Mem_Chaine.Cle := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
-                            Current_Mem_Chaine.TypeOfData := P_Memoire_String.CHAINE;
-                            Current_Mem_Chaine.Suivant := new P_Memoire_String.T_Var;
-                            -- Recuperation de l'element suivant
-                            Current_Mem_Chaine := Current_Mem_Chaine.Suivant;
+                            ajouterCaseMemoire(Current_Mem_Chaine, Splitted_Line);
+                        elsif Current_Type = TAB_ENTIER then
+                            for i in Current_Tableau.BorneInf..Current_Tableau.BorneSup loop
+                                Splitted_Line := Splitted_Line & To_Unbounded_String("[" & Integer'Image(i) & "]");
+                                ajouterCaseMemoire(Current_Mem_Integer, Splitted_Line);
+                            end loop;
+                        elsif Current_Type = TAB_CHAINE then
+                            for i in Current_Tableau.BorneInf..Current_Tableau.BorneSup loop
+                                Splitted_Line := Splitted_Line & To_Unbounded_String("[" & Integer'Image(i) & "]");
+                                ajouterCaseMemoire(Current_Mem_Chaine, Splitted_Line);
+                            end loop;
                         end if;
                         -- Split au niveau de ','
                         slice_mot (Current_Line, Splitted_Line, ",");
