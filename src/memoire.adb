@@ -33,6 +33,7 @@ package body Memoire is
             if Index(Current_Line, "Début") > 0 and Index(Current_Line, ":") = 0 then
                 Fini := True;
             else
+                Put("test vcommit");
 
                 -- Si pas commentaire ou declaration debut programme
                 if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
