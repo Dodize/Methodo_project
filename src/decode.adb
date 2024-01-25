@@ -32,30 +32,32 @@ package body Decode is
     end increm_CP;
 
 
-    procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String) is
-      type_var : Unbounded_String;
+    procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
+        type_var : Unbounded_String;
     begin
-       type_var := RecupererType(mem, cle);
-       if type_var = "Entier" then
-          Put(RecupererValeur_entier(mem, cle));
-       elsif type_var = "Chaine" then
-          Put(To_String(RecupererValeur_chaine(mem, cle)));
-       end if;
+        type_var := RecupererType(mem, cle);
+        if type_var = "Entier" then
+            Put(RecupererValeur_entier(mem, cle));
+        elsif type_var = "Chaine" then
+            Put(To_String(RecupererValeur_chaine(mem, cle)));
+        end if;
+        increm_CP(CP);
     end ecrire;
 
-    procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String) is
-       type_var : Unbounded_String;
-       val_entier : Integer;
-       val_string : String (1..100); --on définit un max arbitrairement
+    procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
+        type_var : Unbounded_String;
+        val_entier : Integer;
+        val_string : String (1..100); --on définit un max arbitrairement
     begin
-       type_var := RecupererType(mem, cle);
-       if type_var = "Entier" then
-          Get(val_entier);
-          Modifier_Entier(mem, cle, val_entier);
-       elsif type_var = "Chaine" then
-          Get(val_string);
-          Modifier_Chaine(mem, cle, To_Unbounded_String(val_string));
-       end if;
+        type_var := RecupererType(mem, cle);
+        if type_var = "Entier" then
+            Get(val_entier);
+            Modifier_Entier(mem, cle, val_entier);
+        elsif type_var = "Chaine" then
+            Get(val_string);
+            Modifier_Chaine(mem, cle, To_Unbounded_String(val_string));
+        end if;
+        increm_CP(CP);
     end lire;
 
 
@@ -473,9 +475,9 @@ package body Decode is
         elsif InstruPart1 = "IF" then
             instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
         elsif InstruPart1 = "Lire" then
-            Lire(mem, InstruPart2);
+            lire(mem, InstruPart2, CP);
         elsif InstruPart1 = "Ecrire" then
-            Ecrire(mem, InstruPart2);
+            ecrire(mem, InstruPart2, CP);
         else
             -- affectation sinon operation
             if InstruPart3 = "affect" then
