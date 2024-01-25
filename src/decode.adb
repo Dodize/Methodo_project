@@ -243,21 +243,30 @@ package body Decode is
     end instru_op;
 
 
-
     -- Effectue l'instruction affectation
     -- @param CleVariable : le nom de la variable a modifier
     -- @param Valeur : la nouvelle valeur de la variable (recuperee en string dans le tableau d'instruction)
     -- @param Mem : la memoire
     procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire; CP : in out Integer) is
         Type_Var : Unbounded_String;
+        ValeurInt : Integer;
+        ValeurString : Unbounded_String;
     begin
         Type_Var := RecupererType(Mem, CleVariable);
         if Type_Var = "Entier" then
-            Modifier_Entier(Mem, CleVariable, Integer'Value(To_String(Valeur)));
+            if RecupererType(Mem, Valeur) = "null" then
+                ValeurInt := Integer'Value(To_String(Valeur));
+            else
+                ValeurInt := RecupererValeur_Entier(Mem, Valeur);
+            end if;
+            Modifier_Entier(Mem, CleVariable, ValeurInt);
         elsif Type_Var = "Chaine" then
-            Modifier_Chaine(Mem, CleVariable, Valeur);
-        else
-            null;
+            if RecupererType(Mem, Valeur) /= "null" then
+                ValeurString := RecupererValeur_Chaine(Mem, Valeur);
+            else
+                ValeurString := Valeur;
+            end if;
+            Modifier_Chaine(Mem, CleVariable, ValeurString);
         end if;
         increm_CP(CP);
     end instru_affectation;
