@@ -192,6 +192,18 @@ package body Decode is
             else
                 New_Bool := 0;
             end if;
+        elsif Operation = "<=" then
+            if Valeur1 <= Valeur2 then
+                New_Bool := 1;
+            else
+                New_Bool := 0;
+            end if;
+        elsif Operation = ">=" then
+            if Valeur1 >= Valeur2 then
+                New_Bool := 1;
+            else
+                New_Bool := 0;
+            end if;
         else
             -- exception
             Null;
