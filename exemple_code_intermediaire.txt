@@ -4,7 +4,7 @@
 
 
 -- exemple de code intermédiaire utilisant des entiers, chaines de caractères ect
-Programme Facto est
+Programme Principal est
     n, i, Fact, T1, T2, T3 : Entier
     x, y, test : Chaine
 Début
@@ -29,11 +29,23 @@ y <- "Hello"
 test <- "Hello"
 T1 <- test = y
 T2 <- test = x
-IF T2 GOTO 25
-GOTO 26
+IF T2 GOTO 24
+GOTO 25
 Lire(x)
-IF T1 GOTO 27
-GOTO 28
+IF T1 GOTO 28
+GOTO 27
+Lire(x)
+Ecrire(n)
 Ecrire(x)
+T1 <- test < y
+T2 <- test <= y
+IF T1 GOTO 34
+GOTO 35
+Lire(y)
+Ecrire(T1)
+IF T2 GOTO 38
+GOTO 39
+Ecrire(T2)
+GOTO 40
 NULL 
 Fin
