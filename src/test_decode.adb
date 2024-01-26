@@ -365,6 +365,94 @@ procedure test_decode is
         pragma Assert (CP = 3); -- CP a bien ete augmente
     end;
     
+    -- Test concernant l'affectation avec la valeur d'une case d'un tableau
+    procedure test_affectation_tableau_adroite is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        ElementTableau1 : Integer;
+        ElementTableau2 : Unbounded_String;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "Type T_Tab_Chaine est tableau (1..5) de chaines");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Entier");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Chaine");
+        Put_Line (Fichier_temp, "x : Entier");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- Tab1(1)");
+        Put_Line (Fichier_temp, "y <- Tab2(3)");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("Tab1(1)"), 2);
+        Modifier_Chaine(Memoire, To_Unbounded_String("Tab2(3)"), To_Unbounded_String("uneChaine"));
+        
+        -- test : operations d'affectation avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        ElementTableau1 := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        ElementTableau2 := RecupererValeur_Chaine(Memoire, To_Unbounded_String("y"));
+        pragma Assert (ElementTableau1 = 2);
+        Put(To_String(ElementTableau2));
+        pragma Assert (ElementTableau2 = To_Unbounded_String("uneChaine")); 
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'affectation avec un tableau ayant pour indice une variable
+    procedure test_affectation_tableau_indice_variable is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Tab_Value, X_Value : Integer;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "Tab : T_Tab_Entier");
+        Put_Line (Fichier_temp, "x, i : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab(i) <- 3");
+        Put_Line (Fichier_temp, "x <- Tab(i)");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("i"), 2);
+        
+        -- test : operations d'affectation avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Tab_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(2)"));
+        X_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
+        pragma Assert (Tab_Value = 3);
+        pragma Assert (X_Value = 3);
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
     
     -- Test concernant l'instruction OP : addition de deux constantes (entieres)
     procedure test_instruction_addition_entier_const is  
@@ -2613,6 +2701,8 @@ begin
     test_affectation_tableau_entierbooleen_var;
     --  test_affectation_tableau_chainecarac_cons;
     --  test_affectation_tableau_chainecarac_var;
+    --  test_affectation_tableau_adroite;
+    test_affectation_tableau_indice_variable;
 
         
     test_instruction_addition_entier_const;

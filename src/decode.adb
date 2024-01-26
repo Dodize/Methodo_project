@@ -50,10 +50,10 @@ package body Decode is
         val_string : String (1..100); --on définit un max arbitrairement
     begin
         type_var := RecupererType(mem, cle);
-        if type_var = "Entier" then
+        if type_var = "Entier" or else type_var = "TabEntier" then
             Get(val_entier);
             Modifier_Entier(mem, cle, val_entier);
-        elsif type_var = "Chaine" then
+        elsif type_var = "Chaine" or else type_var = "TabChaine" then
             Get(val_string);
             Modifier_Chaine(mem, cle, To_Unbounded_String(val_string));
         end if;
@@ -210,6 +210,22 @@ package body Decode is
         end if;
     end result_instru_chaine;
 
+        procedure traduire_indice_tableau(CleVariable : in out Unbounded_String; Mem : in out T_memoire) is
+        RecopieCle, ClePartie1 : Unbounded_String;
+        SplittedCle : Unbounded_String;
+        IndiceRecupere : Integer;
+    begin
+        RecopieCle := CleVariable;
+        slice_mot (RecopieCle, ClePartie1, "(");
+        slice_mot (RecopieCle, SplittedCle, ")");
+        -- test si l'indice ne contient pas que des chiffres (dans ce cas il s'agit d'une variable dont la valeur doit etre cherchee)
+        if not (for all Char of To_String(SplittedCle) => Char in '0' .. '9') then
+            IndiceRecupere := RecupererValeur_Entier(Mem, SplittedCle);
+            CleVariable := To_Unbounded_String(Strip_Space(To_String(ClePartie1) & "(" & Integer'Image(IndiceRecupere) & ")"));
+        end if;
+    end traduire_indice_tableau;
+
+
     -- Effectue l'instruction operation demande
     -- @param CleVariableAffectation : le nom de la variable affectee
     -- @param Valeur1 : le nom de la premiere variable de l'operation
@@ -221,23 +237,42 @@ package body Decode is
         New_Bool : Integer;
         New_Chaine : Unbounded_String;
         FirstOfValeur1 : Character; -- le premier caractere de valeur1
+        CleTraduite : Unbounded_String;
+        Valeur1Traduite : Unbounded_String;
+        Valeur2Traduite : Unbounded_String;
     begin
+        CleTraduite := CleVariableAffectation;
+        Valeur1Traduite := Valeur1;
+        Valeur2Traduite:= Valeur2;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(CleTraduite, "(") > 0 then
+            traduire_indice_tableau(CleTraduite, Memoire);
+        end if;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(Valeur1Traduite, "(") > 0 then
+            traduire_indice_tableau(Valeur1Traduite, Memoire);
+        end if;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(Valeur2Traduite, "(") > 0 then
+            traduire_indice_tableau(Valeur2Traduite, Memoire);
+        end if;
 
         New_Bool := -1;
-        Type_Var := RecupererType(Memoire, Valeur1);
-        FirstOfValeur1 := To_String(Valeur1)(To_String(Valeur1)'First);
+        Type_Var := RecupererType(Memoire, Valeur1Traduite);
+        FirstOfValeur1 := To_String(Valeur1Traduite)(To_String(Valeur1Traduite)'First);
         -- si Type_var vaut null => alors il s'agit d'une constante et on regarde le premier caractère pour connaitre son type
         if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''')) then
-            Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
+            Modifier_Entier(Memoire, CleTraduite, result_instru_entier(Valeur1Traduite, Operation, Valeur2Traduite, Memoire));
         elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''')) then
-            result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
+            result_instru_chaine(Valeur1Traduite, Operation, Valeur2Traduite, Memoire, New_Chaine, New_Bool);
             if New_Bool /= -1 then
-                Modifier_Entier(Memoire, CleVariableAffectation, New_Bool);
+                Modifier_Entier(Memoire, CleTraduite, New_Bool);
             else
-                Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
+                Modifier_Chaine(Memoire, CleTraduite, New_Chaine);
             end if;
-        else
-            Null; --TODO quand on aura les autres types
         end if;
         increm_CP(CP);
     end instru_op;
@@ -251,24 +286,39 @@ package body Decode is
         Type_Var : Unbounded_String;
         ValeurInt : Integer;
         ValeurString : Unbounded_String;
+        CleTraduite : Unbounded_String;
+        ValeurTraduite : Unbounded_String;
     begin
-        Type_Var := RecupererType(Mem, CleVariable);
+        CleTraduite := CleVariable;
+        ValeurTraduite := Valeur;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(CleTraduite, "(") > 0 then
+            traduire_indice_tableau(CleTraduite, Mem);
+        end if;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(ValeurTraduite, "(") > 0 then
+            traduire_indice_tableau(ValeurTraduite, Mem);
+        end if;
+
+        Type_Var := RecupererType(Mem, CleTraduite);
         if Type_Var = "Entier" or else Type_Var = "TabEntier" then
-            if RecupererType(Mem, Valeur) = "null" then
-                ValeurInt := Integer'Value(To_String(Valeur));
+            if RecupererType(Mem, ValeurTraduite) = "null" then
+                ValeurInt := Integer'Value(To_String(ValeurTraduite));
             else
-                ValeurInt := RecupererValeur_Entier(Mem, Valeur);
+                ValeurInt := RecupererValeur_Entier(Mem, ValeurTraduite);
             end if;
-            Modifier_Entier(Mem, CleVariable, ValeurInt);
+            Modifier_Entier(Mem, CleTraduite, ValeurInt);
         elsif Type_Var = "Chaine" or else Type_Var = "TabChaine" then
-            if RecupererType(Mem, Valeur) /= "null" then
-                ValeurString := RecupererValeur_Chaine(Mem, Valeur);
+            if RecupererType(Mem, ValeurTraduite) /= "null" then
+                ValeurString := RecupererValeur_Chaine(Mem, ValeurTraduite);
                 Delete(ValeurString, 1, 1);
                 ValeurString := Unbounded_Slice(ValeurString, 1, Length(ValeurString) - 1);
             else
-                ValeurString := Valeur;
+                ValeurString := ValeurTraduite;
             end if;
-            Modifier_Chaine(Mem, CleVariable, ValeurString);
+            Modifier_Chaine(Mem, CleTraduite, ValeurString);
         end if;
         increm_CP(CP);
     end instru_affectation;
