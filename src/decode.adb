@@ -237,9 +237,12 @@ package body Decode is
         New_Bool : Integer;
         New_Chaine : Unbounded_String;
         FirstOfValeur1 : Character; -- le premier caractere de valeur1
+        FirstOfValeur2 : Character;
         CleTraduite : Unbounded_String;
         Valeur1Traduite : Unbounded_String;
         Valeur2Traduite : Unbounded_String;
+        Valeur1_copy : Unbounded_String;
+        Valeur2_copy : Unbounded_String;
     begin
         CleTraduite := CleVariableAffectation;
         Valeur1Traduite := Valeur1;
@@ -263,16 +266,32 @@ package body Decode is
         New_Bool := -1;
         Type_Var := RecupererType(Memoire, Valeur1Traduite);
         FirstOfValeur1 := To_String(Valeur1Traduite)(To_String(Valeur1Traduite)'First);
+        FirstOfValeur2 := To_String(Valeur2Traduite)(To_String(Valeur2Traduite)'First);
+        Valeur1_copy := Valeur1Traduite;
+        Valeur2_copy := Valeur2Traduite;
+
         -- si Type_var vaut null => alors il s'agit d'une constante et on regarde le premier caractère pour connaitre son type
-        if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''')) then
+        if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''' and FirstOfValeur2 /= '"' and FirstOfValeur2 /= '"')) then
             Modifier_Entier(Memoire, CleTraduite, result_instru_entier(Valeur1Traduite, Operation, Valeur2Traduite, Memoire));
-        elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''')) then
-            result_instru_chaine(Valeur1Traduite, Operation, Valeur2Traduite, Memoire, New_Chaine, New_Bool);
-            if New_Bool /= -1 then
-                Modifier_Entier(Memoire, CleTraduite, New_Bool);
-            else
-                Modifier_Chaine(Memoire, CleTraduite, New_Chaine);
+        elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''' or FirstOfValeur2 /= '"' or FirstOfValeur2 /= '"')) then
+            if FirstOfValeur1 = '"' or FirstOfValeur1 = ''' then
+                Delete(Valeur1_copy, 1, 1);
+                Valeur1_copy := Unbounded_Slice(Valeur1_copy, 1, Length(Valeur1_copy) - 1);
             end if;
+
+            if FirstOfValeur2 = '"' or FirstOfValeur2 = '"' then
+                Delete(Valeur2_copy, 1, 1);
+                Valeur2_copy := Unbounded_Slice(Valeur2_copy, 1, Length(Valeur2_copy) - 1);
+            end if;
+
+            result_instru_chaine(Valeur1_copy, Operation, Valeur2_copy, Memoire, New_Chaine, New_Bool);
+            if New_Bool /= -1 then
+                Modifier_Entier(Memoire, CleVariableAffectation, New_Bool);
+            else
+                Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
+            end if;
+        else
+            Null; --TODO quand on aura les autres types
         end if;
         increm_CP(CP);
     end instru_op;
@@ -376,15 +395,55 @@ package body Decode is
     -- @param Mot : premier mot de la ligne
     procedure remplir_ligne_op(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
         inutile : Unbounded_String;
+        ligne_temp : Unbounded_String;
+        First_part : Unbounded_String;
+        Second_part : Unbounded_String;
+        Third_part : Unbounded_String;
+        is_chaine : Boolean;
     begin
+        is_chaine := False;
+
         Tab(Pos).pos1 := Mot;
         slice_mot(Ligne, inutile, " ");
-        slice_mot(Ligne, Tab(Pos).pos2, " ");
-        if index(Ligne, " ") = 0 then
-            Tab(Pos).pos3 := To_Unbounded_String("affect");
+
+        slice_string(To_String(Ligne), First_part, Second_part, Third_part, is_chaine);
+
+        if is_chaine then
+            if Second_part = "" then
+                slice_mot(Ligne, Tab(Pos).pos2, " ");
+                if index(Ligne, " ") = 0 then
+                    Tab(Pos).pos3 := To_Unbounded_String("affect");
+                else
+                    slice_mot(Ligne, Tab(Pos).pos3, " ");
+                    slice_mot(Ligne, Tab(Pos).pos4, " ");
+                end if;
+            elsif First_part = "" then
+                Tab(Pos).pos2 := Second_part;
+                slice_mot(Third_part, inutile, " ");
+                if Index(Third_part, " ") = 0 then
+                    Tab(Pos).pos3 := To_Unbounded_String("affect");
+                else
+                    ligne_temp := Third_part;
+                    slice_string(To_String(ligne_temp), First_part, Second_part, Third_part, is_chaine);
+                    if Second_part = "" then
+                        slice_mot(Third_part, Tab(Pos).pos3, " ");
+                        slice_mot(Third_part, Tab(Pos).pos4, " ");
+                    else
+                        slice_mot(First_part, Tab(Pos).pos3, " ");
+                        Tab(Pos).pos4 := Second_part;
+                    end if;
+                end if;
+            elsif Third_part /= "" then
+                null;
+            end if;
         else
-            slice_mot(Ligne, Tab(Pos).pos3, " ");
-            slice_mot(Ligne, Tab(Pos).pos4, " ");
+            slice_mot(Ligne, Tab(Pos).pos2, " ");
+                if index(Ligne, " ") = 0 then
+                    Tab(Pos).pos3 := To_Unbounded_String("affect");
+                else
+                    slice_mot(Ligne, Tab(Pos).pos3, " ");
+                    slice_mot(Ligne, Tab(Pos).pos4, " ");
+                end if;
         end if;
     end remplir_ligne_op;
 

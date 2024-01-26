@@ -27,39 +27,37 @@ package body utils is
     -- @param Ligne : ligne dont on extrait la chaine
     -- @param Ligne_restante : la partie de la ligne pas modifiée
     -- @param first_quote_found : indique si on a trouvé une chaine
-    -- @return la chaine
-    function slice_string(Ligne : in String; Ligne_restante : out Unbounded_String; first_quote_found : out Boolean) return Unbounded_String is
+    procedure slice_string(Ligne : in String; First_part : out Unbounded_String; Second_part : out Unbounded_String; Third_part : out Unbounded_String; first_quote_found : out Boolean) is
         first_quote : Character;
         last_quote_found : Boolean;
-        new_string : Unbounded_String;
     begin
         first_quote := '0';
         first_quote_found := false;
         last_quote_found := false;
-        Ligne_restante := To_Unbounded_String(Ligne);
+        First_part := To_Unbounded_String("");
+        Second_part := To_Unbounded_String("");
+        Third_part := To_Unbounded_String("");
+
         for i in Ligne'Range loop
+            -- Si on tombe sur le premier quote
             if (Ligne(i) = '"' or Ligne(i) = ''') and not first_quote_found then
                 first_quote := Ligne(i);
-                Delete(Ligne_restante, 1, 1);
                 first_quote_found := True;
+                Second_part := Second_part & Ligne(i);
             else
+                -- Si on tombe sur le dernier quote
                 if Ligne(i) = first_quote and first_quote_found and not last_quote_found then
                     last_quote_found := True;
-                    Put_Line("ici");
-                elsif first_quote_found then
-                    last_quote_found := False;
-                    new_string := new_string & Ligne(i);
-                    Delete(Ligne_restante, 1, 1);
+                    Second_part := Second_part & Ligne(i);
+                elsif first_quote_found and not last_quote_found then
+                    Second_part := Second_part & Ligne(i);
+                elsif not first_quote_found then
+                    First_part := First_part & Ligne(i);
+                elsif last_quote_found then
+                    Third_part := Third_part & Ligne(i);
                 end if;
             end if;
-
-            if i = Ligne'Length or (Ligne(i + 1) = ' ' and last_quote_found) then
-                Delete(Ligne_restante, 1, 1);
-                return new_string;
-            end if;
-
         end loop;
-        return new_string;
     end;
 
 

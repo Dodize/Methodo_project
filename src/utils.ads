@@ -16,7 +16,7 @@ package utils is
     -- @param Ligne_restante : la partie de la ligne pas modifiée
     -- @param first_quote_found : indique si on a trouvé une chaine
     -- @return la chaine
-    function slice_string(Ligne : in String; Ligne_restante : out Unbounded_String; first_quote_found : out Boolean) return Unbounded_String;
+    procedure slice_string(Ligne : in String; First_part : out Unbounded_String; Second_part : out Unbounded_String; Third_part : out Unbounded_String; first_quote_found : out Boolean);
     
     -- Ouvre le fichier en lecture pour pouvoir ensuite le parcourir
     -- @param NomFichier : le nom du fichier que l'on souhaite ouvrir en lecture

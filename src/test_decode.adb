@@ -1,7 +1,6 @@
 with Decode; 
 with Memoire;     use Memoire;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Utils; use Utils;
 
@@ -2119,7 +2118,7 @@ procedure test_decode is
         
         -- verifications
         X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = "hello world !");       
+        pragma Assert (X_value = "hello world !"); 
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -2709,7 +2708,7 @@ begin
     test_instruction_addition_entier_var;
     test_instruction_addition_entier_mix;
     test_instruction_addition_chaines_var;
-    -- test_instruction_addition_chaines_cons;
+    test_instruction_addition_chaines_cons;
     test_instruction_soustraction_const;
     test_instruction_soustraction_var;
     test_instruction_soustraction_mix;
