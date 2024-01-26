@@ -91,6 +91,33 @@ procedure test_memoire is
         pragma Assert (Y_value = "c");
     end;
     
+    -- Test concernant la declaration de variable tableaux (entiers chaines)
+    procedure test_DeclarerVariables_tableaux is
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Memoire : T_Memoire;
+        PremierElementEntier : Integer;
+        ElementChaine : Unbounded_String;
+    begin
+        --initialisation de la memoire avec une variable
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme_test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "Type T_Tab_Chaine est tableau (3..10) de chaines");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Entier");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Close(Fichier_temp);
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("Tab1(1)"), 2);
+        Modifier_Chaine(Memoire, To_Unbounded_String("Tab2(7)"), To_Unbounded_String("uneChaine"));
+        -- verifications
+        PremierElementEntier := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab1(1)"));
+        ElementChaine := RecupererValeur_Chaine(Memoire, To_Unbounded_String("Tab2(7)"));
+        pragma Assert (PremierElementEntier = 2);
+        pragma Assert (ElementChaine = "uneChaine");
+
+    end;
+    
     
     -- Test concernant la recuperation de valeur et type.
     procedure test_Recuperer_Entier is  
@@ -315,6 +342,7 @@ begin
     test_DeclarerVariables_entiers;
     test_DeclarerVariables_booleens;
     test_DeclarerVariables_carac;
+    test_DeclarerVariables_tableaux;
     test_Recuperer_Entier;
     test_Recuperer_Chaine;
     test_Recuperer_Chaine_Entier_Melange;

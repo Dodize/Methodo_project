@@ -1,6 +1,7 @@
 with Decode; 
 with Memoire;     use Memoire;
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Utils; use Utils;
 
@@ -47,8 +48,8 @@ procedure test_decode is
     end;
     
     
-    -- Test concernant l'instruction d'affectation
-    procedure test_instruction_affectation is
+    -- Test concernant l'instruction d'affectation d'un entier sous forme de constante
+    procedure test_affectation_entier_cons is
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -73,7 +74,7 @@ procedure test_decode is
         DeclarerVariables(Memoire, File_Name);
         Modifier_Entier(Memoire, To_Unbounded_String("x"), 0); --variable initialisee Ã  0
         
-        -- test : operation division variable + constante
+        -- test : operation d'affectation d'un entier sous forme de constante
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
@@ -83,8 +84,8 @@ procedure test_decode is
         
     end;
     
-    -- Test concernant l'instruction d'affectation
-    procedure test_instruction_affectation_variable is
+    -- Test concernant l'instruction d'affectation d'un entier sous forme de variable
+    procedure test_affectation_entier_variable is
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -110,7 +111,7 @@ procedure test_decode is
         Modifier_Entier(Memoire, To_Unbounded_String("x"), 0); --variable initialisee a  0
         Modifier_Entier(Memoire, To_Unbounded_String("y"), 2);
         
-        -- test : operation division variable + constante
+        -- test : operation d'affectation sous forme de variable
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
@@ -119,6 +120,251 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
         
     end;
+    
+    
+    -- Test concernant l'affectation sur des chaines de caracteres
+    procedure test_affectation_chaine_var is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Unbounded_String;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "y <- ""hi""");
+        Put_Line (Fichier_temp, "x <- y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        -- test : operation soustraction avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = "hi");       
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'affectation sur des chaines de caracteres
+    procedure test_affectation_chaine_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Unbounded_String;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- ""debut""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("""chaine"""));
+        
+        -- test : operation soustraction avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = """debut""");       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'affectation sur un tableau d'entiers et de booleens sous forme de constantes
+    procedure test_affectation_tableau_entierbooleen_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        ElementTableau1, ElementTableau2 : Integer;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "Type T_Tab_Booleen est tableau (5..10) de booléens");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Entier");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Booleen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab1(2) <- 3");
+        Put_Line (Fichier_temp, "Tab2(6) <- 0"); -- booleen faux
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("Tab1(2)"), 1);
+        Modifier_Entier(Memoire, To_Unbounded_String("Tab2(6)"), 1);
+        
+        -- test : operations d'affectation avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        ElementTableau1 := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab1(2)"));
+        ElementTableau2 := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab2(6)"));
+        pragma Assert (ElementTableau1 = 3);
+        pragma Assert (ElementTableau2 = 0); 
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'affectation sur un tableau d'entiers et de booleens sous forme de variables
+    procedure test_affectation_tableau_entierbooleen_var is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        ElementTableau1, ElementTableau2 : Integer;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "Type T_Tab_Booleen est tableau (5..10) de booléens");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Entier");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Booleen");
+        Put_Line (Fichier_temp, "x, y : Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab1(2) <- x");
+        Put_Line (Fichier_temp, "Tab2(6) <- y"); 
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("x"), 1);
+        Modifier_Entier(Memoire, To_Unbounded_String("y"), 0);-- booleen faux
+        
+        -- test : operations d'affectation avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        ElementTableau1 := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab1(2)"));
+        ElementTableau2 := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab2(6)"));
+        pragma Assert (ElementTableau1 = 1);
+        pragma Assert (ElementTableau2 = 0); 
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
+    
+      -- Test concernant l'affectation sur un tableau de chaines et de caracteres sous forme de constantes
+    procedure test_affectation_tableau_chainecarac_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        ElementTableau1, ElementTableau2 : Unbounded_String;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Chaine est tableau (1..5) de chaines");
+        Put_Line (Fichier_temp, "Type T_Tab_Carac est tableau (2..10) de caracteres");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Chaine");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Carac");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab1(2) <- ""unechaine""");
+        Put_Line (Fichier_temp, "Tab2(6) <- 'c'");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operations d'affectation avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        ElementTableau1 := RecupererValeur_Chaine(Memoire, To_Unbounded_String("Tab1(2)"));
+        ElementTableau2 := RecupererValeur_Chaine(Memoire, To_Unbounded_String("Tab2(6)"));
+        pragma Assert (ElementTableau1 = To_Unbounded_String("unechaine"));
+        pragma Assert (ElementTableau2 = To_Unbounded_String("c")); 
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant l'affectation sur un tableau de chaines et de caracteres sous forme de variables
+    procedure test_affectation_tableau_chainecarac_var is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        ElementTableau1, ElementTableau2 : Unbounded_String;
+        CP : Integer;
+        
+    begin
+
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Chaine est tableau (1..5) de chaines");
+        Put_Line (Fichier_temp, "Type T_Tab_Carac est tableau (2..10) de caracteres");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Chaine");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Carac");
+        Put_Line (Fichier_temp, "x, y : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab1(2) <- x");
+        Put_Line (Fichier_temp, "Tab2(6) <- y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("ici"));
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("la"));
+        
+        -- test : operations d'affectation avec constantes
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        ElementTableau1 := RecupererValeur_Chaine(Memoire, To_Unbounded_String("Tab1(2)"));
+        ElementTableau2 := RecupererValeur_Chaine(Memoire, To_Unbounded_String("Tab2(6)"));
+        pragma Assert (ElementTableau1 = To_Unbounded_String("ici"));
+        pragma Assert (ElementTableau2 = To_Unbounded_String("la")); 
+        pragma Assert (CP = 3); -- CP a bien ete augmente
+    end;
+    
     
     -- Test concernant l'instruction OP : addition de deux constantes (entieres)
     procedure test_instruction_addition_entier_const is  
@@ -191,7 +437,7 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
-    
+
     -- Test concernant l'instruction OP : addition d'une variable et d'une constante (entieres)
     procedure test_instruction_addition_entier_mix is  
         use Decode2;
@@ -1716,75 +1962,7 @@ procedure test_decode is
         
     end;
 
-    -- Test concernant l'affectation sur des chaines de caracteres
-    procedure test_affectation_chaine_var is  
-        use Decode2;
-        Fichier_temp : File_Type; -- le fichier d'instruction
-        Tab_Instruc : T_tab_instruc;
-        Memoire : T_Memoire;
-        X_value : Unbounded_String;
-        CP : Integer;
-        
-    begin
-
-        --initialisation du tableau d'instruction
-        createFileInstruct(Fichier_temp);
-        Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y : Chaine");
-        Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "y <- ""hi""");
-        Put_Line (Fichier_temp, "x <- y");
-        Put_Line (Fichier_temp, "Fin");
-        Close(Fichier_temp);
-        remplir_tab_instruc(Tab_Instruc, File_Name);
-        CP := 1;
-        
-        --initialisation de la memoire
-        DeclarerVariables(Memoire, File_Name);
-        effectuer_instru(Tab_Instruc, CP, Memoire);
-        -- test : operation soustraction avec constantes
-        effectuer_instru(Tab_Instruc, CP, Memoire);
-        
-        -- verifications
-        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = "hi");       
-        pragma Assert (CP = 3); -- CP a bien ete augmente
-    end;
-    
-    -- Test concernant l'affectation sur des chaines de caracteres
-    procedure test_affectation_chaine_cons is  
-        use Decode2;
-        Fichier_temp : File_Type; -- le fichier d'instruction
-        Tab_Instruc : T_tab_instruc;
-        Memoire : T_Memoire;
-        X_value : Unbounded_String;
-        CP : Integer;
-        
-    begin
-
-        --initialisation du tableau d'instruction
-        createFileInstruct(Fichier_temp);
-        Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x : Chaine");
-        Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "x <- ""debut""");
-        Put_Line (Fichier_temp, "Fin");
-        Close(Fichier_temp);
-        remplir_tab_instruc(Tab_Instruc, File_Name);
-        CP := 1;
-        
-        --initialisation de la memoire
-        DeclarerVariables(Memoire, File_Name);
-        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("""chaine"""));
-        
-        -- test : operation soustraction avec constantes
-        effectuer_instru(Tab_Instruc, CP, Memoire);
-        
-        -- verifications
-        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = """debut""");       
-        pragma Assert (CP = 2); -- CP a bien ete augmente
-    end;
+   
     
     -- Test concernant l'addition de chaines de caracteres
     procedure test_instruction_addition_chaines_var is  
@@ -2426,11 +2604,22 @@ procedure test_decode is
 
 begin
     test_instruction_NULL;
-    test_instruction_affectation;
-    test_instruction_affectation_variable;
+    
+    test_affectation_entier_cons;
+    test_affectation_entier_variable;
+    test_affectation_chaine_var;
+    test_affectation_chaine_cons;
+    test_affectation_tableau_entierbooleen_cons;
+    test_affectation_tableau_entierbooleen_var;
+    --  test_affectation_tableau_chainecarac_cons;
+    --  test_affectation_tableau_chainecarac_var;
+
+        
     test_instruction_addition_entier_const;
     test_instruction_addition_entier_var;
     test_instruction_addition_entier_mix;
+    test_instruction_addition_chaines_var;
+    -- test_instruction_addition_chaines_cons;
     test_instruction_soustraction_const;
     test_instruction_soustraction_var;
     test_instruction_soustraction_mix;
@@ -2441,6 +2630,9 @@ begin
     test_instruction_division_parzero;
     test_instruction_division_entier_var;
     test_instruction_division_entier_mix;
+    
+    test_instruction_egalite_chaines_vrai_var;
+    test_instruction_egalite_chaines_vrai_cons;
     test_instruction_egalite_booleen_var_true;
     test_instruction_egalite_booleen_var_false;
     test_instruction_egalite_booleen_const_true;
@@ -2472,12 +2664,7 @@ begin
     test_remplir_tab_instruc;
     test_remplir_lire_ecrire;
     test_suppr_indentation;
-    test_affectation_chaine_var;
-    test_affectation_chaine_cons;
-    test_instruction_addition_chaines_var;
-    -- test_instruction_addition_chaines_cons;
-    test_instruction_egalite_chaines_vrai_var;
-    test_instruction_egalite_chaines_vrai_cons;
+    
     test_instruction_egalite_chaines_faux;
     test_instruction_nonegalite_chaines_vrai;
     test_instruction_nonegalite_chaines_faux;

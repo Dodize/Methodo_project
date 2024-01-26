@@ -253,14 +253,14 @@ package body Decode is
         ValeurString : Unbounded_String;
     begin
         Type_Var := RecupererType(Mem, CleVariable);
-        if Type_Var = "Entier" then
+        if Type_Var = "Entier" or else Type_Var = "TabEntier" then
             if RecupererType(Mem, Valeur) = "null" then
                 ValeurInt := Integer'Value(To_String(Valeur));
             else
                 ValeurInt := RecupererValeur_Entier(Mem, Valeur);
             end if;
             Modifier_Entier(Mem, CleVariable, ValeurInt);
-        elsif Type_Var = "Chaine" then
+        elsif Type_Var = "Chaine" or else Type_Var = "TabChaine" then
             if RecupererType(Mem, Valeur) /= "null" then
                 ValeurString := RecupererValeur_Chaine(Mem, Valeur);
                 Delete(ValeurString, 1, 1);

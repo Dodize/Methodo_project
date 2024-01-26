@@ -292,7 +292,7 @@ package body Memoire is
    begin
       Type_Var := RecupererType(Memoire, Cle);
       -- on verifie s'il s'agit d'une variable (type=entier) ou d'une constante (type=null)
-      if Type_Var = "Entier" then
+      if Type_Var = "Entier" or else Type_Var = "TabEntier" then
          -- Recuperer la valeur en memoire
          return RecupererValeur_Entier_FromCase(Memoire.Entiers, Cle);
       elsif Type_Var = "null" then
@@ -313,7 +313,7 @@ package body Memoire is
     begin
         Type_Var := RecupererType(Memoire, Cle);
         -- on verifie s'il s'agit d'une variable (type=chaine) ou d'une constante (type=null)
-        if Type_Var = "Chaine" then
+        if Type_Var = "Chaine" or else Type_Var = "TabChaine" then
             -- Recuperer la valeur en memoire
             return RecupererValeur_Chaine_FromCase(Memoire.Chaines, Cle);
         elsif Type_Var = "null" then
