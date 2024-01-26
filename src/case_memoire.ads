@@ -9,7 +9,7 @@ generic
 package Case_Memoire is
 
     -- Enumerable du type de la variable
-    type T_Type is (CHAINE, ENTIER, TAB);
+    type T_Type is (CHAINE, ENTIER, TAB_ENTIER, TAB_CHAINE);
 
     type T_Var;
     type T_Case_Memoire is access T_Var;

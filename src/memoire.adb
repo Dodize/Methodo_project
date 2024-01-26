@@ -18,47 +18,53 @@ package body Memoire is
         end record;
 
     -- TODO : spec + ajouter pre condition
-    procedure creer_nouveau_typetableau(ChaineDeclaration : in Unbounded_String; NouveauTableau : out T_Liste_TypesTableau) with
-            Pre => NouveauTableau /= null
+    procedure creer_nouveau_typetableau(ChaineDeclaration : in Unbounded_String; ListeTableaux : in out T_Liste_TypesTableau)
     is
         Current_Line : Unbounded_String;
         Splitted_Line : Unbounded_String;
 
     begin
-         Current_Line := ChaineDeclaration;
-        -- recupere le mot "type"
-        slice_mot (Current_Line, Splitted_Line, " ");
-        -- recupere le nom du tableau
-        slice_mot (Current_Line, Splitted_Line, " ");
-        NouveauTableau.Nom := Splitted_Line;
-
-        -- parcoure jusqu'a la borne inf
-        slice_mot (Current_Line, Splitted_Line, "(");
-        slice_mot (Current_Line, Splitted_Line, ".");
-        NouveauTableau.BorneInf := Integer'Value(To_String(Splitted_Line));
-
-        -- parcoure jusqu'a la borne sup
-        slice_mot (Current_Line, Splitted_Line, ".");
-        slice_mot (Current_Line, Splitted_Line, ")");
-        NouveauTableau.BorneSup := Integer'Value(To_String(Splitted_Line));
-
-        if Index(Current_Line, "d'") /= 0 then
-            -- parcoure apres le d' pour obtenir le type
-            slice_mot (Current_Line, Splitted_Line, "'");
+        -- on parcoure la liste pour ajouter un nouveau type en fin de liste
+        if ListeTableaux /= null then
+            creer_nouveau_typetableau(ChaineDeclaration, ListeTableaux.Suivant);
         else
-            -- parcoure apres le "de" pour obtenir le type
+            ListeTableaux := new T_TableauDeclare;
+            Current_Line := ChaineDeclaration;
+            -- recupere le mot "type"
             slice_mot (Current_Line, Splitted_Line, " ");
+            -- recupere le nom du tableau
             slice_mot (Current_Line, Splitted_Line, " ");
+            ListeTableaux.Nom := Splitted_Line;
+
+            -- parcoure jusqu'a la borne inf
+            slice_mot (Current_Line, Splitted_Line, "(");
+            slice_mot (Current_Line, Splitted_Line, ".");
+            ListeTableaux.BorneInf := Integer'Value(To_String(Splitted_Line));
+
+            -- parcoure jusqu'a la borne sup
+            slice_mot (Current_Line, Splitted_Line, ".");
+            slice_mot (Current_Line, Splitted_Line, ")");
+            ListeTableaux.BorneSup := Integer'Value(To_String(Splitted_Line));
+
+            if Index(Current_Line, "d'") /= 0 then
+                -- parcoure apres le d' pour obtenir le type
+                slice_mot (Current_Line, Splitted_Line, "'");
+            else
+                -- parcoure apres le "de" pour obtenir le type
+                slice_mot (Current_Line, Splitted_Line, " ");
+                slice_mot (Current_Line, Splitted_Line, " ");
+            end if;
+
+            --traduction du type
+            if Current_Line = "entiers" or else Current_Line = "booléens" then
+                ListeTableaux.TypeStocke := ENTIER;
+            elsif Current_Line = "chaines" or else Current_Line = "caractères" then
+                ListeTableaux.TypeStocke := CHAINE;
+            end if;
+
+            ListeTableaux.Suivant := null;
         end if;
 
-        --traduction du type
-        if Current_Line = "entiers" or else Current_Line = "booléens" then
-            NouveauTableau.TypeStocke := ENTIER;
-        elsif Current_Line = "chaines" or else Current_Line = "caractères" then
-            NouveauTableau.TypeStocke := CHAINE;
-        end if;
-
-        NouveauTableau.Suivant := null;
     end;
 
     function getDeclarationType(nomType : Unbounded_String; ListeTableaux : T_Liste_TypesTableau) return T_Liste_TypesTableau is
@@ -72,19 +78,19 @@ package body Memoire is
     end getDeclarationType;
 
 
-    procedure ajouterCaseMemoire(Current_Mem_Integer : in out P_Memoire_Entier.T_Case_Memoire; nomVariable : in Unbounded_String) is
+    procedure ajouterCaseMemoire(Current_Mem_Integer : in out P_Memoire_Entier.T_Case_Memoire; NomVariable : in Unbounded_String; TypeData : in P_Memoire_Entier.T_Type) is
     begin
-        Current_Mem_Integer.Cle := nomVariable;
-        Current_Mem_Integer.TypeOfData := P_Memoire_Entier.ENTIER;
+        Current_Mem_Integer.Cle := NomVariable;
+        Current_Mem_Integer.TypeOfData := TypeData;
         Current_Mem_Integer.Suivant := new P_Memoire_Entier.T_Var;
         -- Recuperation de l'element suivant
         Current_Mem_Integer := Current_Mem_Integer.Suivant;
     end ajouterCaseMemoire;
 
-    procedure ajouterCaseMemoire(Current_Mem_Chaine : in out P_Memoire_String.T_Case_Memoire; nomVariable : in Unbounded_String) is
+    procedure ajouterCaseMemoire(Current_Mem_Chaine : in out P_Memoire_String.T_Case_Memoire; NomVariable : in Unbounded_String; TypeData : in P_Memoire_String.T_Type) is
     begin
-        Current_Mem_Chaine.Cle := nomVariable;
-        Current_Mem_Chaine.TypeOfData := P_Memoire_String.CHAINE;
+        Current_Mem_Chaine.Cle := NomVariable;
+        Current_Mem_Chaine.TypeOfData := TypeData;
         Current_Mem_Chaine.Suivant := new P_Memoire_String.T_Var;
         -- Recuperation de l'element suivant
         Current_Mem_Chaine := Current_Mem_Chaine.Suivant;
@@ -106,8 +112,8 @@ package body Memoire is
         Code                : File_Type;
         ListeTableaux : T_Liste_TypesTableau;
         Current_Tableau : T_Liste_TypesTableau;
-        Current_NewTableau : T_Liste_TypesTableau;
         NomTableau : Unbounded_String;
+        NomVariableTableau : Unbounded_String;
    begin
       Ouvrir_Fichier_Lecture(NomFichierCode, Code);
       Fini                := False;
@@ -125,26 +131,21 @@ package body Memoire is
                 Fini := True;
             else
 
-                -- Si pas commentaire ou declaration debut programme
-                if Index (Current_Line, "--") = 0 and Index (Current_Line, ":") > 0 then
+                -- Si pas commentaire ou declaration debut programme (a ameliorer ?)
+                if Index (Current_Line, "--") = 0 then
                     -- cas de la declaration d'un type (tableau)
-                    if (Index(Current_Line, "Type") > 0 and then Index(Current_Line, "taleau") > 0) then
-                        if ListeTableaux = null then
-                            ListeTableaux := new T_TableauDeclare;
-                            Current_NewTableau := ListeTableaux;
-                        else
-                            Current_NewTableau := new T_TableauDeclare;
-                        end if;
-                        creer_nouveau_typetableau(Current_Line, Current_NewTableau);
-                        Current_NewTableau := Current_NewTableau.Suivant;
-                    else
+                    if (Index(Current_Line, "Type") > 0 and Index(Current_Line, "tableau") > 0) then
+                        creer_nouveau_typetableau(Current_Line, ListeTableaux);
+
+                    -- on verifie la presence des deux point
+                    elsif Index (Current_Line, ":") > 0 then
                         -- Split au niveau de ':'
                         slice_mot(Current_Line, Splitted_Line, ":");
                         -- Recuperation du type
                         -- les booleens sont traites comme des entiers
-                        if (Index(Current_Line, "Entier") > 0 or Index(Current_Line, "Booléen") > 0) then
+                        if (Current_Line = " Entier" or Current_Line = " Booléen") then
                             Current_Type := ENTIER;
-                        elsif (Index(Current_Line, "Chaine") > 0 or Index(Current_Line, "Caractère") > 0) then
+                        elsif (Current_Line = " Chaine" or Current_Line = " Caractère") then
                             Current_Type := CHAINE;
                         else
                             -- on cherche si le type a ete declare avant
@@ -162,7 +163,6 @@ package body Memoire is
                         end if;
                     end if;
 
-
                     Current_Line := Splitted_Line;
 
                     -- Split au niveau de ','
@@ -172,18 +172,18 @@ package body Memoire is
                         Splitted_Line := To_Unbounded_String(Strip_Space(To_String(Splitted_Line)));
                         -- Initialisation de la memoire en fonction de son type
                         if Current_Type = ENTIER then
-                            ajouterCaseMemoire(Current_Mem_Integer, Splitted_Line);
+                            ajouterCaseMemoire(Current_Mem_Integer, Splitted_Line, P_Memoire_Entier.ENTIER);
                         elsif Current_Type = CHAINE then
-                            ajouterCaseMemoire(Current_Mem_Chaine, Splitted_Line);
+                            ajouterCaseMemoire(Current_Mem_Chaine, Splitted_Line, P_Memoire_String.CHAINE);
                         elsif Current_Type = TAB_ENTIER then
                             for i in Current_Tableau.BorneInf..Current_Tableau.BorneSup loop
-                                Splitted_Line := Splitted_Line & To_Unbounded_String("[" & Integer'Image(i) & "]");
-                                ajouterCaseMemoire(Current_Mem_Integer, Splitted_Line);
+                                NomVariableTableau := Splitted_Line & To_Unbounded_String(Strip_Space("(" & Integer'Image(i) & ")"));
+                                ajouterCaseMemoire(Current_Mem_Integer, NomVariableTableau, P_Memoire_Entier.TAB_ENTIER);
                             end loop;
                         elsif Current_Type = TAB_CHAINE then
                             for i in Current_Tableau.BorneInf..Current_Tableau.BorneSup loop
-                                Splitted_Line := Splitted_Line & To_Unbounded_String("[" & Integer'Image(i) & "]");
-                                ajouterCaseMemoire(Current_Mem_Chaine, Splitted_Line);
+                                NomVariableTableau := Splitted_Line & To_Unbounded_String(Strip_Space("(" & Integer'Image(i) & ")"));
+                                ajouterCaseMemoire(Current_Mem_Chaine, NomVariableTableau, P_Memoire_String.TAB_CHAINE);
                             end loop;
                         end if;
                         -- Split au niveau de ','
@@ -331,7 +331,11 @@ package body Memoire is
             search_type := search_type.Suivant;
         end loop;
         if search_type /= null then
-            return To_Unbounded_String("Chaine");
+            if search_type.TypeOfData = CHAINE then
+                return To_Unbounded_String("Chaine");
+            elsif search_type.TypeOfData = TAB_CHAINE then
+                return To_Unbounded_String("TabChaine");
+            end if;
         end if;
         return To_Unbounded_String("null");
     end donner_Type;
@@ -345,7 +349,12 @@ package body Memoire is
             search_type := search_type.Suivant;
         end loop;
         if search_type /= null then
-            return To_Unbounded_String("Entier");
+            if search_type.TypeOfData = ENTIER then
+                return To_Unbounded_String("Entier");
+            elsif search_type.TypeOfData = TAB_ENTIER then
+                return To_Unbounded_String("TabEntier");
+            end if;
+
         end if;
         return To_Unbounded_String("null");
     end donner_Type;
@@ -357,15 +366,18 @@ package body Memoire is
     function RecupererType (Mem : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String is
         Pos_entier : P_Memoire_Entier.T_Case_Memoire;
         Pos_string : P_Memoire_String.T_Case_Memoire;
+        TypeRenvoi : Unbounded_String;
     begin
         -- Recherche si la cle est un entier
-        if donner_Type(Mem, Cle, Pos_entier) /= To_Unbounded_String("null") then
-            return To_Unbounded_String("Entier");
+        TypeRenvoi := donner_Type(Mem, Cle, Pos_entier);
+        if TypeRenvoi /= To_Unbounded_String("null") then
+            return TypeRenvoi;
         end if;
         Pos_string := Mem.Chaines;
         --recherche si la cle est une chaine de caractère
-        if donner_Type(Mem, Cle, Pos_string) /= To_Unbounded_String("null") then
-            return To_Unbounded_String("Chaine");
+        TypeRenvoi := donner_Type(Mem, Cle, Pos_string);
+        if TypeRenvoi /= To_Unbounded_String("null") then
+            return TypeRenvoi;
         end if;
         return To_Unbounded_String("null");
     end RecupererType;

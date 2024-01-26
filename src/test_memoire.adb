@@ -274,6 +274,42 @@ procedure test_memoire is
         -- les caracteres sont consideres comme des chaines
         pragma Assert (RecupererType(Memoire, To_Unbounded_String("unCarac")) = To_Unbounded_String("Chaine"));
     end;
+    
+    -- Test concernant la modification de variable string.
+    procedure test_RecupererTypeTableaux is  
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Memoire : T_Memoire;
+    begin
+        --initialisation de la memoire avec une variable
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme_test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "Type T_Tab_Chaine est tableau (1..5) de chaines");
+        Put_Line (Fichier_temp, "Type T_Tab_Booleen est tableau (5..10) de booléens");
+        Put_Line (Fichier_temp, "Type T_Tab_Carac est tableau (2..5) de caractères");
+        Put_Line (Fichier_temp, "Tab1, Tab2 : T_Tab_Entier");
+        Put_Line (Fichier_temp, "Tab3, Tab4 : T_Tab_Chaine");
+        Put_Line (Fichier_temp, "Tab5, Tab6 : T_Tab_Booleen");
+        Put_Line (Fichier_temp, "Tab7, Tab8 : T_Tab_Carac");
+        Put_Line (Fichier_temp, "Début");
+        Close(Fichier_temp);  
+        DeclarerVariables(Memoire, File_Name);
+        --verifications
+        -- les tableaux d'entiers
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab1(1)")) = To_Unbounded_String("TabEntier"));
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab2(3)")) = To_Unbounded_String("TabEntier"));
+        -- les tableaux de chaines
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab3(1)")) = To_Unbounded_String("TabChaine"));
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab4(5)")) = To_Unbounded_String("TabChaine"));
+        -- les tableaux de booleens
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab5(6)")) = To_Unbounded_String("TabEntier"));
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab6(9)")) = To_Unbounded_String("TabEntier"));
+        -- les tableaux de caractères
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab7(2)")) = To_Unbounded_String("TabChaine"));
+        pragma Assert (RecupererType(Memoire, To_Unbounded_String("Tab8(4)")) = To_Unbounded_String("TabChaine"));
+        
+
+    end;
    
 begin
     test_DeclarerVariables_entiers;
@@ -285,5 +321,6 @@ begin
     test_ModifierVariables_Entier;
     test_ModifierVariables_Chaine;
     test_RecupererType;
+    test_RecupererTypeTableaux;
     deleteFileInstruct(File_Name);
 end test_memoire;
