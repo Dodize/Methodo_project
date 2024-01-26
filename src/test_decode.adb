@@ -1732,6 +1732,7 @@ procedure test_decode is
         Put_Line (Fichier_temp, "Programme Test est");
         Put_Line (Fichier_temp, "x, y : Chaine");
         Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "y <- ""hi""");
         Put_Line (Fichier_temp, "x <- y");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
@@ -1740,16 +1741,14 @@ procedure test_decode is
         
         --initialisation de la memoire
         DeclarerVariables(Memoire, File_Name);
-        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("hi"));
-        Put_Line(To_String(Memoire.Chaines.Data));
+        effectuer_instru(Tab_Instruc, CP, Memoire);
         -- test : operation soustraction avec constantes
         effectuer_instru(Tab_Instruc, CP, Memoire);
         
         -- verifications
         X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
-        Put_Line(To_String(X_value));
         pragma Assert (X_value = "hi");       
-        pragma Assert (CP = 2); -- CP a bien ete augmente
+        pragma Assert (CP = 3); -- CP a bien ete augmente
     end;
     
     -- Test concernant l'affectation sur des chaines de caracteres
@@ -1788,7 +1787,7 @@ procedure test_decode is
     end;
     
     -- Test concernant l'addition de chaines de caracteres
-    procedure test_instruction_addition_chaines is  
+    procedure test_instruction_addition_chaines_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -1824,8 +1823,42 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
+    -- Test concernant l'addition de chaines de caracteres
+    procedure test_instruction_addition_chaines_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Unbounded_String;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- ""hello "" + ""world !""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+                
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = "hello world !");       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
     -- Test concernant la comparaison de si deux chaines sont égales
-    procedure test_instruction_egalite_chaines_vrai_cons is  
+    procedure test_instruction_egalite_chaines_vrai_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -1863,7 +1896,7 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si deux chaines sont égales
-    procedure test_instruction_egalite_chaines_vrai_var is  
+    procedure test_instruction_egalite_chaines_vrai_cons is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -1876,10 +1909,9 @@ procedure test_decode is
         --initialisation du tableau d'instruction
         createFileInstruct(Fichier_temp);
         Put_Line (Fichier_temp, "Programme Test est");
-        Put_Line (Fichier_temp, "x, y : Chaine");
         Put_Line (Fichier_temp, "bool : Booléen");
         Put_Line (Fichier_temp, "Début");
-        Put_Line (Fichier_temp, "bool <- x = y");
+        Put_Line (Fichier_temp, "bool <- ""hello"" = ""hello""");
         Put_Line (Fichier_temp, "Fin");
         Close(Fichier_temp);
         remplir_tab_instruc(Tab_Instruc, File_Name);
@@ -1888,8 +1920,6 @@ procedure test_decode is
         
         --initialisation de la memoire
         DeclarerVariables(Memoire, File_Name);
-        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello"));
-        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("hello"));
         
         -- test : operation soustraction avec variables
         effectuer_instru(Tab_Instruc, CP, Memoire);
@@ -2444,7 +2474,9 @@ begin
     test_suppr_indentation;
     test_affectation_chaine_var;
     test_affectation_chaine_cons;
-    test_instruction_addition_chaines;
+    test_instruction_addition_chaines_var;
+    -- test_instruction_addition_chaines_cons;
+    test_instruction_egalite_chaines_vrai_var;
     test_instruction_egalite_chaines_vrai_cons;
     test_instruction_egalite_chaines_faux;
     test_instruction_nonegalite_chaines_vrai;

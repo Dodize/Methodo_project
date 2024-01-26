@@ -227,7 +227,7 @@ package body Decode is
         Type_Var := RecupererType(Memoire, Valeur1);
         FirstOfValeur1 := To_String(Valeur1)(To_String(Valeur1)'First);
         -- si Type_var vaut null => alors il s'agit d'une constante et on regarde le premier caractère pour connaitre son type
-        if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' or FirstOfValeur1 /= ''')) then
+        if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''')) then
             Modifier_Entier(Memoire, CleVariableAffectation, result_instru_entier(Valeur1, Operation, Valeur2, Memoire));
         elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''')) then
             result_instru_chaine(Valeur1, Operation, Valeur2, Memoire, New_Chaine, New_Bool);
@@ -263,6 +263,8 @@ package body Decode is
         elsif Type_Var = "Chaine" then
             if RecupererType(Mem, Valeur) /= "null" then
                 ValeurString := RecupererValeur_Chaine(Mem, Valeur);
+                Delete(ValeurString, 1, 1);
+                ValeurString := Unbounded_Slice(ValeurString, 1, Length(ValeurString) - 1);
             else
                 ValeurString := Valeur;
             end if;
@@ -317,23 +319,23 @@ package body Decode is
       slice_mot(Ligne, Tab(Pos).pos4, " ");
    end remplir_ligne;
 
-   -- Rempli une ligne du tableau en mettant en forme l'instru x y op z
-   -- @param Tab : tableau a remplir
-   -- @param Pos : ligne du tableau a remplir
-   -- @param Ligne : ligne dont on recupere les informations
-   -- @param Mot : premier mot de la ligne
-   procedure remplir_ligne_op(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
-      inutile : Unbounded_String;
-   begin
-      Tab(Pos).pos1 := Mot;
-      slice_mot(Ligne, inutile, " ");
-      slice_mot(Ligne, Tab(Pos).pos2, " ");
-      if index(Ligne, " ") = 0 then
-         Tab(Pos).pos3 := To_Unbounded_String("affect");
-      else
-        slice_mot(Ligne, Tab(Pos).pos3, " ");
-         slice_mot(Ligne, Tab(Pos).pos4, " ");
-      end if;
+    -- Rempli une ligne du tableau en mettant en forme l'instru x y op z
+    -- @param Tab : tableau a remplir
+    -- @param Pos : ligne du tableau a remplir
+    -- @param Ligne : ligne dont on recupere les informations
+    -- @param Mot : premier mot de la ligne
+    procedure remplir_ligne_op(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
+        inutile : Unbounded_String;
+    begin
+        Tab(Pos).pos1 := Mot;
+        slice_mot(Ligne, inutile, " ");
+        slice_mot(Ligne, Tab(Pos).pos2, " ");
+        if index(Ligne, " ") = 0 then
+            Tab(Pos).pos3 := To_Unbounded_String("affect");
+        else
+            slice_mot(Ligne, Tab(Pos).pos3, " ");
+            slice_mot(Ligne, Tab(Pos).pos4, " ");
+        end if;
     end remplir_ligne_op;
 
    -- Rempli une ligne du tableau en lire/ecrire dans la premiere case et la variable dans la deuxième
@@ -486,6 +488,11 @@ package body Decode is
         InstruPart2 := recuperer_instru_pos2(Tab, CP);
         InstruPart3 := recuperer_instru_pos3(Tab, CP);
         InstruPart4 := recuperer_instru_pos4(Tab, CP);
+
+        --  Put_Line(To_String(InstruPart1));
+        --  Put_Line(To_String(InstruPart2));
+        --  Put_Line(To_String(InstruPart3));
+        --  Put_Line(To_String(InstruPart4));
 
         -- Realiser l'instruction
         -- en fonction du premier mot de l'instruction, effectuer la bonne operation

@@ -11,6 +11,13 @@ package utils is
     -- @param Delimiteur: caractere signant la fin du mot
     procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in String);
    
+    -- Permet de récupérer les chaines de caractères d'une ligne
+    -- @param Ligne : ligne dont on extrait la chaine
+    -- @param Ligne_restante : la partie de la ligne pas modifiée
+    -- @param first_quote_found : indique si on a trouvé une chaine
+    -- @return la chaine
+    function slice_string(Ligne : in String; Ligne_restante : out Unbounded_String; first_quote_found : out Boolean) return Unbounded_String;
+    
     -- Ouvre le fichier en lecture pour pouvoir ensuite le parcourir
     -- @param NomFichier : le nom du fichier que l'on souhaite ouvrir en lecture
     -- @param FichierOuvert : l'object fichier apres ouverture

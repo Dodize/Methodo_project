@@ -302,25 +302,26 @@ package body Memoire is
       end if;
    end RecupererValeur_Entier;
 
-   -- Recupere la valeur d'une variable par son nom (a partir de l'objet memoire)
-   -- @param Mem : la memoire dans laquelle est stockee la variable
-   -- @param Cle : le nom de la variable recherchee
-   -- @return la valeur de la variable
-   -- Pre-condition : Mem.Chaines /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
-   function RecupererValeur_Chaine (Memoire : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String
-   is
-      Type_Var : Unbounded_String;
-   begin
-      -- on verifie s'il s'agit d'une variable (type=chaine) ou d'une constante (type=null)
-      if RecupererType(Memoire, Cle) = "Chaine" then
-         -- Recuperer la valeur en memoire
-         return RecupererValeur_Chaine_FromCase(Memoire.Chaines, Cle);
-      elsif Type_Var = "null" then
-         return Cle;
-      else
-         return To_Unbounded_String("");
-      end if;
-   end RecupererValeur_Chaine;
+    -- Recupere la valeur d'une variable par son nom (a partir de l'objet memoire)
+    -- @param Mem : la memoire dans laquelle est stockee la variable
+    -- @param Cle : le nom de la variable recherchee
+    -- @return la valeur de la variable
+    -- Pre-condition : Mem.Chaines /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
+    function RecupererValeur_Chaine (Memoire : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String
+    is
+        Type_Var : Unbounded_String;
+    begin
+        Type_Var := RecupererType(Memoire, Cle);
+        -- on verifie s'il s'agit d'une variable (type=chaine) ou d'une constante (type=null)
+        if Type_Var = "Chaine" then
+            -- Recuperer la valeur en memoire
+            return RecupererValeur_Chaine_FromCase(Memoire.Chaines, Cle);
+        elsif Type_Var = "null" then
+            return Cle;
+        else
+            return To_Unbounded_String("");
+        end if;
+    end RecupererValeur_Chaine;
 
     -- fonction disant si le type est une chaine de caractère
     -- surchargé
