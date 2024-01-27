@@ -187,7 +187,7 @@ procedure test_decode is
         
         -- verifications
         X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
-        pragma Assert (X_value = """debut""");       
+        pragma Assert (X_value = "debut");       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
@@ -406,7 +406,6 @@ procedure test_decode is
         ElementTableau1 := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
         ElementTableau2 := RecupererValeur_Chaine(Memoire, To_Unbounded_String("y"));
         pragma Assert (ElementTableau1 = 2);
-        Put(To_String(ElementTableau2));
         pragma Assert (ElementTableau2 = To_Unbounded_String("uneChaine")); 
         pragma Assert (CP = 3); -- CP a bien ete augmente
     end;
@@ -2122,6 +2121,42 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
+    -- Test concernant l'addition de chaines de caracteres
+    procedure test_instruction_addition_chaines_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_value : Unbounded_String;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Chaine");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "x <- y + ""hello""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("world !"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        X_value := RecupererValeur_Chaine(Memoire, To_Unbounded_String("x"));
+        pragma Assert (X_value = "world !hello");       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
     -- Test concernant la comparaison de si deux chaines sont égales
     procedure test_instruction_egalite_chaines_vrai_var is  
         use Decode2;
@@ -2698,17 +2733,18 @@ begin
     test_affectation_chaine_cons;
     test_affectation_tableau_entierbooleen_cons;
     test_affectation_tableau_entierbooleen_var;
-    --  test_affectation_tableau_chainecarac_cons;
-    --  test_affectation_tableau_chainecarac_var;
-    --  test_affectation_tableau_adroite;
+    test_affectation_tableau_chainecarac_cons;
+    test_affectation_tableau_chainecarac_var;
+    test_affectation_tableau_adroite;
     test_affectation_tableau_indice_variable;
-
-        
+    
+    
     test_instruction_addition_entier_const;
     test_instruction_addition_entier_var;
     test_instruction_addition_entier_mix;
     test_instruction_addition_chaines_var;
     test_instruction_addition_chaines_cons;
+    test_instruction_addition_chaines_mix;
     test_instruction_soustraction_const;
     test_instruction_soustraction_var;
     test_instruction_soustraction_mix;

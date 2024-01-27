@@ -166,6 +166,7 @@ package body Decode is
         New_Bool := -1;
         Valeur1 := RecupererValeur_Chaine(Memoire, CleVal1);
         Valeur2 := RecupererValeur_Chaine(Memoire, CleVal2);
+
         if Operation = "+" then
             New_Chaine := Valeur1 & Valeur2;
         elsif Operation = "=" then
@@ -205,8 +206,7 @@ package body Decode is
                 New_Bool := 0;
             end if;
         else
-            -- exception
-            Null;
+            raise OP_NON_RECONNUE_EXCEPTION;
         end if;
     end result_instru_chaine;
 
@@ -266,7 +266,9 @@ package body Decode is
         New_Bool := -1;
         Type_Var := RecupererType(Memoire, Valeur1Traduite);
         FirstOfValeur1 := To_String(Valeur1Traduite)(To_String(Valeur1Traduite)'First);
-        FirstOfValeur2 := To_String(Valeur2Traduite)(To_String(Valeur2Traduite)'First);
+        if Length(Valeur2Traduite) > 0 then
+            FirstOfValeur2 := To_String(Valeur2Traduite)(To_String(Valeur2Traduite)'First);
+        end if;
         Valeur1_copy := Valeur1Traduite;
         Valeur2_copy := Valeur2Traduite;
 
@@ -274,6 +276,7 @@ package body Decode is
         if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''' and FirstOfValeur2 /= '"' and FirstOfValeur2 /= '"')) then
             Modifier_Entier(Memoire, CleTraduite, result_instru_entier(Valeur1Traduite, Operation, Valeur2Traduite, Memoire));
         elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''' or FirstOfValeur2 /= '"' or FirstOfValeur2 /= '"')) then
+
             if FirstOfValeur1 = '"' or FirstOfValeur1 = ''' then
                 Delete(Valeur1_copy, 1, 1);
                 Valeur1_copy := Unbounded_Slice(Valeur1_copy, 1, Length(Valeur1_copy) - 1);
@@ -332,10 +335,10 @@ package body Decode is
         elsif Type_Var = "Chaine" or else Type_Var = "TabChaine" then
             if RecupererType(Mem, ValeurTraduite) /= "null" then
                 ValeurString := RecupererValeur_Chaine(Mem, ValeurTraduite);
-                Delete(ValeurString, 1, 1);
-                ValeurString := Unbounded_Slice(ValeurString, 1, Length(ValeurString) - 1);
             else
                 ValeurString := ValeurTraduite;
+                Delete(ValeurString, 1, 1);
+                ValeurString := Unbounded_Slice(ValeurString, 1, Length(ValeurString) - 1);
             end if;
             Modifier_Chaine(Mem, CleTraduite, ValeurString);
         end if;
@@ -420,30 +423,36 @@ package body Decode is
             elsif First_part = "" then
                 Tab(Pos).pos2 := Second_part;
                 slice_mot(Third_part, inutile, " ");
-                if Index(Third_part, " ") = 0 then
+                ligne_temp := Third_part;
+                slice_string(To_String(ligne_temp), First_part, Second_part, Third_part, is_chaine);
+                if index(Ligne, " ") = 0 then
                     Tab(Pos).pos3 := To_Unbounded_String("affect");
                 else
-                    ligne_temp := Third_part;
-                    slice_string(To_String(ligne_temp), First_part, Second_part, Third_part, is_chaine);
                     if Second_part = "" then
-                        slice_mot(Third_part, Tab(Pos).pos3, " ");
-                        slice_mot(Third_part, Tab(Pos).pos4, " ");
+                        slice_mot(First_part, Tab(Pos).pos3, " ");
+                        slice_mot(First_part, Tab(Pos).pos4, " ");
                     else
                         slice_mot(First_part, Tab(Pos).pos3, " ");
                         Tab(Pos).pos4 := Second_part;
                     end if;
                 end if;
-            elsif Third_part /= "" then
-                null;
-            end if;
-        else
-            slice_mot(Ligne, Tab(Pos).pos2, " ");
+            elsif Third_part = "" then
+                slice_mot(First_part, Tab(pos).pos2, " ");
                 if index(Ligne, " ") = 0 then
                     Tab(Pos).pos3 := To_Unbounded_String("affect");
                 else
-                    slice_mot(Ligne, Tab(Pos).pos3, " ");
-                    slice_mot(Ligne, Tab(Pos).pos4, " ");
+                    slice_mot(First_part, Tab(Pos).pos3, " ");
+                    Tab(Pos).pos4 := Second_part;
                 end if;
+            end if;
+        else
+            slice_mot(Ligne, Tab(Pos).pos2, " ");
+            if index(Ligne, " ") = 0 then
+                Tab(Pos).pos3 := To_Unbounded_String("affect");
+            else
+                slice_mot(Ligne, Tab(Pos).pos3, " ");
+                slice_mot(Ligne, Tab(Pos).pos4, " ");
+            end if;
         end if;
     end remplir_ligne_op;
 
