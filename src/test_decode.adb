@@ -3,7 +3,6 @@ with Memoire;     use Memoire;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Utils; use Utils;
-with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 procedure test_decode is
     
@@ -2402,10 +2401,47 @@ procedure test_decode is
         Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
         pragma Assert (Bool_value = 1);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
-    end; 
+    end;
+    
+    -- Test concernant la comparaison de si deux chaines sont égales
+    procedure test_instruction_egalite_chaines_vrai_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x = ""hello""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
 
     -- Test concernant la comparaison de si deux chaines sont égales
-    procedure test_instruction_egalite_chaines_faux is  
+    procedure test_instruction_egalite_chaines_faux_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2441,9 +2477,81 @@ procedure test_decode is
         pragma Assert (Bool_value = 0);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
+    
+    -- Test concernant la comparaison de si deux chaines sont égales
+    procedure test_instruction_egalite_chaines_faux_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""x"" = ""y""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation comparaison =
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
 
+    -- Test concernant la comparaison de si deux chaines sont égales
+    procedure test_instruction_egalite_chaines_faux_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x = ""world !""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello "));
+        
+        -- test : operation comparaison =
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
     -- Test concernant la comparaison de si deux chaines ne sont pas égales
-    procedure test_instruction_nonegalite_chaines_vrai is  
+    procedure test_instruction_nonegalite_chaines_vrai_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2481,7 +2589,79 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si deux chaines ne sont pas égales
-    procedure test_instruction_nonegalite_chaines_faux is  
+    procedure test_instruction_nonegalite_chaines_vrai_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""hi"" /= ""hey""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation comparaison =
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si deux chaines ne sont pas égales
+    procedure test_instruction_nonegalite_chaines_vrai_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x /= ""world !""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello "));
+        
+        -- test : operation comparaison =
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si deux chaines ne sont pas égales
+    procedure test_instruction_nonegalite_chaines_faux_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2517,9 +2697,81 @@ procedure test_decode is
         pragma Assert (Bool_value = 0);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
+    
+    -- Test concernant la comparaison de si deux chaines ne sont pas égales
+    procedure test_instruction_nonegalite_chaines_faux_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""bonjour"" /= ""bonjour""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation comparaison =
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si deux chaines ne sont pas égales
+    procedure test_instruction_nonegalite_chaines_faux_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x /= ""hello""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("hello"));
+        
+        -- test : operation comparaison =
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
 
     -- Test concernant la comparaison de si une chaine est supérieure à l'autre
-    procedure test_instruction_sup_chaines_vrai is  
+    procedure test_instruction_sup_chaines_vrai_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2557,7 +2809,79 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si une chaine est supérieure à l'autre
-    procedure test_instruction_sup_chaines_faux is  
+    procedure test_instruction_sup_chaines_vrai_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""vrai"" > ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure à l'autre
+    procedure test_instruction_sup_chaines_vrai_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x > ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("vrai"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure à l'autre
+    procedure test_instruction_sup_chaines_faux_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2595,7 +2919,79 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si une chaine est supérieure à l'autre
-    procedure test_instruction_inf_chaines_vrai is  
+    procedure test_instruction_sup_chaines_faux_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""est-ce vrai ?"" > ""non""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure à l'autre
+    procedure test_instruction_sup_chaines_faux_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x > ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("c'est vrai"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure à l'autre
+    procedure test_instruction_inf_chaines_vrai_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2632,8 +3028,81 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
+    -- Test concernant la comparaison de si une chaine est supérieure à l'autre
+    procedure test_instruction_inf_chaines_vrai_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" < ""oui""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure à l'autre
+    procedure test_instruction_inf_chaines_vrai_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- x < ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("c'est vrai"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
     -- Test concernant la comparaison de si une chaine est inférieure à l'autre
-    procedure test_instruction_inf_chaines_faux is  
+    procedure test_instruction_inf_chaines_faux_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2659,6 +3128,78 @@ procedure test_decode is
         --initialisation de la memoire
         DeclarerVariables(Memoire, File_Name);
         Modifier_Chaine(Memoire, To_Unbounded_String("x"), To_Unbounded_String("vrai"));
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("faux"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est inférieure à l'autre
+    procedure test_instruction_inf_chaines_faux_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""faux"" < ""ah""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est inférieure à l'autre
+    procedure test_instruction_inf_chaines_faux_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""vrai"" < y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
         Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("faux"));
         
         -- test : operation soustraction avec variables
@@ -2671,7 +3212,7 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si une chaine est inférieure ou égale à l'autre
-    procedure test_instruction_infeq_chaines_vrai_inf is  
+    procedure test_instruction_infeq_chaines_vrai_inf_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2707,9 +3248,81 @@ procedure test_decode is
         pragma Assert (Bool_value = 1);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
+
+    -- Test concernant la comparaison de si une chaine est inférieure ou égale à l'autre
+    procedure test_instruction_infeq_chaines_vrai_inf_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" <= ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est inférieure ou égale à l'autre
+    procedure test_instruction_infeq_chaines_vrai_inf_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" <= y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("faux"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
     
     -- Test concernant la comparaison de si une chaine est inférieuree ou égale à l'autre
-    procedure test_instruction_infeq_chaines_vrai_eq is  
+    procedure test_instruction_infeq_chaines_vrai_eq_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2746,8 +3359,80 @@ procedure test_decode is
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
     
+    -- Test concernant la comparaison de si une chaine est inférieuree ou égale à l'autre
+    procedure test_instruction_infeq_chaines_vrai_eq_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" <= ""c'est vrai""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est inférieuree ou égale à l'autre
+    procedure test_instruction_infeq_chaines_vrai_eq_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" <= y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("c'est vrai"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
     -- Test concernant la comparaison de si une chaine est inférieure à l'autre
-    procedure test_instruction_infeq_chaines_faux_sup is  
+    procedure test_instruction_infeq_chaines_faux_sup_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2783,9 +3468,81 @@ procedure test_decode is
         pragma Assert (Bool_value = 0);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
+
+    -- Test concernant la comparaison de si une chaine est inférieure à l'autre
+    procedure test_instruction_infeq_chaines_faux_sup_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""vrai"" <= ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est inférieure à l'autre
+    procedure test_instruction_infeq_chaines_faux_sup_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""vrai"" <= y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("faux"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
     
     -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
-    procedure test_instruction_supeq_chaines_vrai_sup is  
+    procedure test_instruction_supeq_chaines_vrai_sup_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2823,7 +3580,79 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
-    procedure test_instruction_supeq_chaines_vrai_eq is  
+    procedure test_instruction_supeq_chaines_vrai_sup_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""vrai"" >= ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
+    procedure test_instruction_supeq_chaines_vrai_sup_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""vrai"" >= y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("faux"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
+    procedure test_instruction_supeq_chaines_vrai_eq_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2861,7 +3690,79 @@ procedure test_decode is
     end;
     
     -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
-    procedure test_instruction_supeq_chaines_faux_inf is  
+    procedure test_instruction_supeq_chaines_vrai_eq_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""hey"" >= ""hey""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
+    procedure test_instruction_supeq_chaines_vrai_eq_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""hey"" >= y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("hey"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 1);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
+    procedure test_instruction_supeq_chaines_faux_inf_var is  
         use Decode2;
         Fichier_temp : File_Type; -- le fichier d'instruction
         Tab_Instruc : T_tab_instruc;
@@ -2897,6 +3798,79 @@ procedure test_decode is
         pragma Assert (Bool_value = 0);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
     end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
+    procedure test_instruction_supeq_chaines_faux_inf_cons is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "x, y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" >= ""faux""");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant la comparaison de si une chaine est supérieure ou égale à l'autre
+    procedure test_instruction_supeq_chaines_faux_inf_mix is  
+        use Decode2;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        Bool_Value : Integer;
+        CP : Integer;
+        
+    begin
+      
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "y : Chaine");
+        Put_Line (Fichier_temp, "bool : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "bool <- ""c'est vrai"" >= y");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Chaine(Memoire, To_Unbounded_String("y"), To_Unbounded_String("faux"));
+        
+        -- test : operation soustraction avec variables
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        
+        -- verifications
+        Bool_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("bool"));
+        pragma Assert (Bool_value = 0);       
+        pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
 
 begin
     test_instruction_NULL;
@@ -2910,8 +3884,7 @@ begin
     test_affectation_tableau_chainecarac_cons;
     test_affectation_tableau_chainecarac_var;
     test_affectation_tableau_adroite;
-    test_affectation_tableau_indice_variable;
-    
+    test_affectation_tableau_indice_variable;    
     
     test_instruction_addition_entier_const;
     test_instruction_addition_entier_var;
@@ -2969,19 +3942,46 @@ begin
     
     test_instruction_egalite_chaines_vrai_var;
     test_instruction_egalite_chaines_vrai_cons;
-    test_instruction_egalite_chaines_faux;
-    test_instruction_nonegalite_chaines_vrai;
-    test_instruction_nonegalite_chaines_faux;
-    test_instruction_sup_chaines_vrai;
-    test_instruction_sup_chaines_faux;
-    test_instruction_inf_chaines_vrai;
-    test_instruction_inf_chaines_faux;
-    test_instruction_infeq_chaines_vrai_inf;
-    test_instruction_infeq_chaines_vrai_eq;
-    test_instruction_infeq_chaines_faux_sup;
-    test_instruction_supeq_chaines_vrai_sup;
-    test_instruction_supeq_chaines_vrai_eq;
-    test_instruction_supeq_chaines_faux_inf;
+    test_instruction_egalite_chaines_vrai_mix;
+    test_instruction_egalite_chaines_faux_var;
+    test_instruction_egalite_chaines_faux_cons;
+    test_instruction_egalite_chaines_faux_mix;
+    test_instruction_nonegalite_chaines_vrai_var;
+    test_instruction_nonegalite_chaines_vrai_cons;
+    test_instruction_nonegalite_chaines_vrai_mix;
+    test_instruction_nonegalite_chaines_faux_var;
+    test_instruction_nonegalite_chaines_faux_cons;
+    test_instruction_nonegalite_chaines_faux_mix;
+    test_instruction_sup_chaines_vrai_var;
+    test_instruction_sup_chaines_vrai_cons;
+    test_instruction_sup_chaines_vrai_mix;
+    test_instruction_sup_chaines_faux_var;
+    test_instruction_sup_chaines_faux_cons;
+    test_instruction_sup_chaines_faux_mix;
+    test_instruction_inf_chaines_vrai_var;
+    test_instruction_inf_chaines_vrai_cons;
+    test_instruction_inf_chaines_vrai_mix;
+    test_instruction_inf_chaines_faux_var;
+    test_instruction_inf_chaines_faux_cons;
+    test_instruction_inf_chaines_faux_mix;
+    test_instruction_infeq_chaines_vrai_inf_var;
+    test_instruction_infeq_chaines_vrai_inf_cons;
+    test_instruction_infeq_chaines_vrai_inf_mix;
+    test_instruction_infeq_chaines_vrai_eq_var;
+    test_instruction_infeq_chaines_vrai_eq_cons;
+    test_instruction_infeq_chaines_vrai_eq_mix;
+    test_instruction_infeq_chaines_faux_sup_var;
+    test_instruction_infeq_chaines_faux_sup_cons;
+    test_instruction_infeq_chaines_faux_sup_mix;
+    test_instruction_supeq_chaines_vrai_sup_var;
+    test_instruction_supeq_chaines_vrai_sup_cons;
+    test_instruction_supeq_chaines_vrai_sup_mix;
+    test_instruction_supeq_chaines_vrai_eq_var;
+    test_instruction_supeq_chaines_vrai_eq_cons;
+    test_instruction_supeq_chaines_vrai_eq_mix;
+    test_instruction_supeq_chaines_faux_inf_var;
+    test_instruction_supeq_chaines_faux_inf_cons;
+    test_instruction_supeq_chaines_faux_inf_mix;
     
     deleteFileInstruct(File_Name);
    
