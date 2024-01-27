@@ -117,30 +117,30 @@ package body Decode is
 
     -- Effectue l'instruction goto en allant au label souhaite (sous forme de numero de ligne)
     -- @param CP : le compteur qui doit etre modifie
-    -- @param label : le numero de la ligne a laquelle on souhaite aller
+    -- @param Label : le numero de la ligne a laquelle on souhaite aller
+    -- @param TabInstruc : le tableau d'instructions permettant de verifier si le label est correct
     -- @exception GOTO_OUT_OF_RANGE_EXCEPTION : si le label ne correspond pas a une ligne valide
     -- (la ligne est < 1 ou > au nombre d'instructions)
-   procedure instru_goto (CP : out Integer; label : in Integer; Tab : in T_tab_instruc) is
+   procedure instru_goto (CP : out Integer; Label : in Integer; TabInstruc : in T_tab_instruc) is
     begin
-        if (label < 1) or else (label > Tab'Length) then
+        if (Label < 1) or else (Label > TabInstruc'Length) then
             raise GOTO_OUT_OF_RANGE_EXCEPTION;
         else
-            CP := label;
+            CP := Label;
         end if;
     end instru_goto;
 
 
     -- Calcule le resultat d'une operation composee de deux entiers
-    -- @param CleVal1 : le nom de la premiere variable de l'operation
+    -- @param CleVal1 : le nom de la premiere variable de l'operation ou la valeur de la constante
     -- @param Operation : l'operation a effectuer
-    -- @param CleVal2 : le nom de la deuxieme variable de l'operation
+    -- @param CleVal2 : le nom de la deuxieme variable de l'operation ou la valeur de la constante
     -- @param Memoire : la memoire
     -- @return : le resultat de l'operation
     -- @exception OP_NON_RECONNUE_EXCEPTION : si l'operation n'est pas reconnue
     function result_instru_entier(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire) return Integer is
         Result : Integer;
-        Valeur1 : Integer;
-        Valeur2 : Integer;
+        Valeur1, Valeur2 : Integer; --transformation des variables en leur veritable valeur
     begin
         Valeur1 := RecupererValeur_Entier(Memoire, CleVal1);
         Valeur2 := RecupererValeur_Entier(Memoire, CleVal2);
@@ -209,15 +209,15 @@ package body Decode is
     end result_instru_entier;
 
     -- Calcule le resultat d'une operation composee de deux chaines de caracteres
-    -- @param CleVal1 : le nom de la premiere variable de l'operation
+    -- @param CleVal1 : le nom de la premiere variable de l'operation ou la valeur de la constante
     -- @param Operation : l'operation a effectuer
-    -- @param CleVal2 : le nom de la deuxieme variable de l'operation
+    -- @param CleVal2 : le nom de la deuxieme variable de l'operation ou la valeur de la constante
     -- @param Memoire : la memoire
-    -- @return : le resultat de l'operation
+    -- @New_Chaine : le resultat si l'operation retourne une chaine
+    -- @New_Bool : le resultat si l'operation retourne un booleen
     -- @exception OP_NON_RECONNUE_EXCEPTION : si l'operation n'est pas reconnue
     procedure result_instru_chaine(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire; New_Chaine : out Unbounded_String ; New_Bool : out Integer) is
-        Valeur1 : Unbounded_String;
-        Valeur2 : Unbounded_String;
+        Valeur1, Valeur2 : Unbounded_String; -- transformation des variables en leur veritable valeur
     begin
         New_Bool := -1;
         Valeur1 := RecupererValeur_Chaine(Memoire, CleVal1);
@@ -266,78 +266,105 @@ package body Decode is
         end if;
     end result_instru_chaine;
 
+    -- indique si la modification se fait sur un entier ou non
+    -- @param Type_Var : le type de la variable1 de l'operation
+    -- @param FirstOfValeur1 : le premier caractere de la variable1
+    -- @param FirstOfValeur2 : le premier caractere de la variable2
+    -- return : true si la modification se fait sur un entier, false sinon
+    function estModificationEntier(Type_Var : in Unbounded_String; FirstOfValeur1 : in Character; FirstOfValeur2 : in Character) return Boolean is
+    begin
+        -- retourne true si : la variable est de type Entier ou Tableau d'entier
+        -- si la variable est une constante (directement sa valeur) elle ne doit pas contenir de guillemet en premier caractere
+        return Type_Var = "Entier" or else Type_Var = "TabEntier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''' and FirstOfValeur2 /= '"' and FirstOfValeur2 /= '"'));
+    end estModificationEntier;
+
+    -- indique si la modification se fait sur une chaine ou non
+    -- @param Type_Var : le type de la variable1 de l'operation
+    -- @param FirstOfValeur1 : le premier caractere de la variable1
+    -- @param FirstOfValeur2 : le premier caractere de la variable2
+    -- return : true si la modification se fait sur une chaine, false sinon
+    function estModificationChaine(Type_Var : in Unbounded_String; FirstOfValeur1 : in Character; FirstOfValeur2 : in Character) return Boolean is
+    begin
+        -- retourne true si : la variable est de type Chaine ou Tableau de chaines
+        -- si la variable est une constante (directement sa valeur) elle doit contenir des guillemets en premier caractere
+        return Type_Var = "Chaine" or else Type_Var = "TabChaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''' or FirstOfValeur2 /= '"' or FirstOfValeur2 /= '"'));
+    end estModificationChaine;
 
 
-    -- Effectue l'instruction operation demande
+
+    -- Effectue l'instruction operation demandee
     -- @param CleVariableAffectation : le nom de la variable affectee
     -- @param Valeur1 : le nom de la premiere variable de l'operation
     -- @param Operation : le type d'operation a realiser (en chaine)
     -- @param Valeur2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
+    -- @param CP : le compteur d'instructions
     -- @exception OP_NON_RECONNUE_EXCEPTION : si l'operation n'est pas reconnue
     procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire; CP: in out Integer) is
-        Type_Var : Unbounded_String;
-        New_Bool : Integer;
-        New_Chaine : Unbounded_String;
-        FirstOfValeur1 : Character; -- le premier caractere de valeur1
-        FirstOfValeur2 : Character;
-        CleTraduite : Unbounded_String;
-        Valeur1Traduite : Unbounded_String;
-        Valeur2Traduite : Unbounded_String;
-        Valeur1_copy : Unbounded_String;
-        Valeur2_copy : Unbounded_String;
+        Type_Var : Unbounded_String;                  -- permet de stocker le type d'une variable
+        New_Bool : Integer;                           -- resultat d'une operation retournant un booleen
+        New_Chaine : Unbounded_String;                -- resultat d'une operation retournant une chaine
+        FirstOfValeur1, FirstOfValeur2 : Character;   -- le premier caractere de valeur1/valeur2
+        CleTraduite : Unbounded_String;               -- traduction de la variable affectee s'il s'agit d'un tableau
+                                                      -- afin de remplacer l'indice par sa valeur
+        Valeur1Traduite, Valeur2Traduite : Unbounded_String;
+
     begin
         CleTraduite := CleVariableAffectation;
         Valeur1Traduite := Valeur1;
         Valeur2Traduite:= Valeur2;
 
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(CleTraduite, "(") > 0 then
             traduire_indice_tableau(CleTraduite, Memoire);
         end if;
 
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(Valeur1Traduite, "(") > 0 then
             traduire_indice_tableau(Valeur1Traduite, Memoire);
         end if;
 
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(Valeur2Traduite, "(") > 0 then
             traduire_indice_tableau(Valeur2Traduite, Memoire);
         end if;
 
         New_Bool := -1;
         Type_Var := RecupererType(Memoire, Valeur1Traduite);
+
+        -- on recupere le premier caractere de Valeur1 et Valeur2 (si Valeur2 existe)
         FirstOfValeur1 := To_String(Valeur1Traduite)(To_String(Valeur1Traduite)'First);
         if Length(Valeur2Traduite) > 0 then
             FirstOfValeur2 := To_String(Valeur2Traduite)(To_String(Valeur2Traduite)'First);
         end if;
-        Valeur1_copy := Valeur1Traduite;
-        Valeur2_copy := Valeur2Traduite;
 
         -- si Type_var vaut null => alors il s'agit d'une constante et on regarde le premier caractère pour connaitre son type
-        if Type_Var = "Entier" or else Type_Var = "TabEntier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''' and FirstOfValeur2 /= '"' and FirstOfValeur2 /= '"')) then
+        if estModificationEntier(Type_Var, FirstOfValeur1, FirstOfValeur2) then
             Modifier_Entier(Memoire, CleTraduite, result_instru_entier(Valeur1Traduite, Operation, Valeur2Traduite, Memoire));
-        elsif Type_Var = "Chaine" or else Type_Var = "TabChaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''' or FirstOfValeur2 /= '"' or FirstOfValeur2 /= '"')) then
-
+        elsif estModificationChaine(Type_Var, FirstOfValeur1, FirstOfValeur2)  then
+            -- s'il s'agit de constantes, on enleve les guillemets
             if FirstOfValeur1 = '"' or FirstOfValeur1 = ''' then
-                Delete(Valeur1_copy, 1, 1);
-                Valeur1_copy := Unbounded_Slice(Valeur1_copy, 1, Length(Valeur1_copy) - 1);
+                Delete(Valeur1Traduite, 1, 1);
+                Valeur1Traduite := Unbounded_Slice(Valeur1Traduite, 1, Length(Valeur1Traduite) - 1);
             end if;
 
             if FirstOfValeur2 = '"' or FirstOfValeur2 = ''' then
-                Delete(Valeur2_copy, 1, 1);
-                Valeur2_copy := Unbounded_Slice(Valeur2_copy, 1, Length(Valeur2_copy) - 1);
+                Delete(Valeur2Traduite, 1, 1);
+                Valeur2Traduite := Unbounded_Slice(Valeur2Traduite, 1, Length(Valeur2Traduite) - 1);
             end if;
 
-            result_instru_chaine(Valeur1_copy, Operation, Valeur2_copy, Memoire, New_Chaine, New_Bool);
+            result_instru_chaine(Valeur1Traduite, Operation, Valeur2Traduite, Memoire, New_Chaine, New_Bool);
+
+            -- on test s'il le resultat est un booleen ou une chaine
             if New_Bool /= -1 then
                 Modifier_Entier(Memoire, CleVariableAffectation, New_Bool);
             else
                 Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
             end if;
-        else
-            Null; --TODO quand on aura les autres types
+
         end if;
         increm_CP(CP);
     end instru_op;
@@ -345,37 +372,44 @@ package body Decode is
 
     -- Effectue l'instruction affectation
     -- @param CleVariable : le nom de la variable a modifier
-    -- @param Valeur : la nouvelle valeur de la variable (recuperee en string dans le tableau d'instruction)
+    -- @param Valeur : la nouvelle valeur de la variable (nom de variable ou valeur reelle)
     -- @param Mem : la memoire
+    -- @param CP : le compteur d'instructions
     procedure instru_affectation (CleVariable : in Unbounded_String; Valeur : in Unbounded_String; Mem : in out T_memoire; CP : in out Integer) is
-        Type_Var : Unbounded_String;
-        ValeurInt : Integer;
-        ValeurString : Unbounded_String;
-        CleTraduite : Unbounded_String;
-        ValeurTraduite : Unbounded_String;
+        Type_Var : Unbounded_String;       -- permet de stocker le type de la variable a effecter
+        ValeurInt : Integer;               -- valeur reelle de la variable si c'est un integer
+        ValeurString : Unbounded_String;   -- valeur reelle de la variable si c'est une chaine
+        CleTraduite, ValeurTraduite : Unbounded_String; -- permet de traduire les noms des variables s'il s'agit de tableaux indices par une variable
     begin
+        -- recopie de la cle pour la modifier
         CleTraduite := CleVariable;
+        -- recopie de la valeur a effecter pour la modifier
         ValeurTraduite := Valeur;
 
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(CleTraduite, "(") > 0 then
             traduire_indice_tableau(CleTraduite, Mem);
         end if;
 
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(ValeurTraduite, "(") > 0 then
             traduire_indice_tableau(ValeurTraduite, Mem);
         end if;
 
         Type_Var := RecupererType(Mem, CleTraduite);
         if Type_Var = "Entier" or else Type_Var = "TabEntier" then
+            -- on test s'il s'agit d'une constante ou d'un nom de variable et on recupere la valeur
             if RecupererType(Mem, ValeurTraduite) = "null" then
                 ValeurInt := Integer'Value(To_String(ValeurTraduite));
             else
                 ValeurInt := RecupererValeur_Entier(Mem, ValeurTraduite);
             end if;
             Modifier_Entier(Mem, CleTraduite, ValeurInt);
+
         elsif Type_Var = "Chaine" or else Type_Var = "TabChaine" then
+            -- on test s'il s'agit d'une constante ou d'un nom de variable et on recupere la valeur
             if RecupererType(Mem, ValeurTraduite) /= "null" then
                 ValeurString := RecupererValeur_Chaine(Mem, ValeurTraduite);
             else
@@ -385,6 +419,7 @@ package body Decode is
             end if;
             Modifier_Chaine(Mem, CleTraduite, ValeurString);
         end if;
+
         increm_CP(CP);
     end instru_affectation;
 
@@ -393,46 +428,48 @@ package body Decode is
      --  @param VariableBool : le nom de la variable booleenne
      --  @param Label : la valeur que doit prendre CP si le booleen vaut True
      --  @param CP : le compteur de la ligne courante
-     --  @param mem : la memoire
-    procedure instru_if (VariableBool : in Unbounded_String; Label : in Integer; CP : in out Integer; mem : in T_memoire) is
+     --  @param Memoire : la memoire
+     --  @param TabInstruc : le tableau d'instructions permettant de verifier que le label est correct
+    procedure instru_if (VariableBool : in Unbounded_String; Label : in Integer; CP : in out Integer; Memoire : in T_memoire; TabInstruc : in T_tab_instruc) is
         valeur : Integer; -- valeur de "VariableBool"
     begin
         -- Recuperer la valeur du booleen
-        valeur := RecupererValeur_Entier(mem, VariableBool);
+        valeur := RecupererValeur_Entier(Memoire, VariableBool);
         if valeur = 0 then -- cas ou la valeur vaut false : on ne fait rien
             increm_CP(CP);
         else -- cas ou la valeur vaut true : on change la valeur de CP
-            CP := Label;
+            instru_goto(CP, Label, TabInstruc);
         end if;
    end instru_if;
 
 
-   -- Effectue l'instruction null, soit ne fait rien
-   procedure instru_null(CP : in out Integer) is
-   begin
-      increm_CP(CP);
-   end instru_null;
+    -- Effectue l'instruction null, soit ne fait rien et augmente le compteur d'instructions
+    -- @param CP : le compteur d'instructions
+    procedure instru_null(CP : in out Integer) is
+    begin
+        increm_CP(CP);
+    end instru_null;
 
-   -- Rempli une ligne du tableau en mettant en forme l'instruction null ou un commentaire
-   -- @param Tab : tableau a remplir
-   -- @param Index : ligne du tableau a remplir
-   procedure remplir_ligne_null(Tab: out T_tab_instruc; Pos : in Integer) is
-   begin
-      Tab(Pos).pos1 := To_Unbounded_String("NULL");
-   end remplir_ligne_null;
+    -- Rempli une ligne du tableau en mettant en forme l'instruction null ou un commentaire
+    -- @param Tab : tableau a remplir
+    -- @param Index : ligne du tableau a remplir
+    procedure remplir_ligne_null(Tab: out T_tab_instruc; Pos : in Integer) is
+    begin
+        Tab(Pos).pos1 := To_Unbounded_String("NULL");
+    end remplir_ligne_null;
 
-   -- Rempli une ligne du tableau en mettant en forme l'instruction
-   -- @param Tab : tableau a remplir
-   -- @param Index : ligne du tableau a remplir
-   -- @param Ligne : ligne dont on recupere les informations
-   -- @param Mot : premier mot de la ligne
-   procedure remplir_ligne(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
-   begin
-      Tab(Pos).pos1 := Mot;
-      slice_mot(Ligne, Tab(Pos).pos2, " ");
-      slice_mot(Ligne, Tab(Pos).pos3, " ");
-      slice_mot(Ligne, Tab(Pos).pos4, " ");
-   end remplir_ligne;
+    -- Rempli une ligne du tableau en mettant en forme l'instruction
+    -- @param Tab : tableau a remplir
+    -- @param Pos : ligne du tableau a remplir
+    -- @param Ligne : ligne dont on recupere les informations
+    -- @param Mot : premier mot de la ligne
+    procedure remplir_ligne(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
+    begin
+        Tab(Pos).pos1 := Mot;
+        slice_mot(Ligne, Tab(Pos).pos2, " ");
+        slice_mot(Ligne, Tab(Pos).pos3, " ");
+        slice_mot(Ligne, Tab(Pos).pos4, " ");
+    end remplir_ligne;
 
     -- Rempli une ligne du tableau en mettant en forme l'instru x y op z
     -- @param Tab : tableau a remplir
@@ -440,7 +477,7 @@ package body Decode is
     -- @param Ligne : ligne dont on recupere les informations
     -- @param Mot : premier mot de la ligne
     procedure remplir_ligne_op(Tab: out T_tab_instruc; Pos : in Integer; Ligne: in out Unbounded_String; Mot : in Unbounded_String) is
-        inutile : Unbounded_String;
+        inutile : Unbounded_String;     -- partie inutile de l'instruction a chaque decoupage
         ligne_temp : Unbounded_String;
         First_part : Unbounded_String;
         Second_part : Unbounded_String;
@@ -511,8 +548,6 @@ package body Decode is
         slice_mot(Mot, Tab(Pos).pos1, "(");
         Mot_tempo := Mot & " " & Ligne;
         slice_mot(Mot_tempo, Tab(Pos).pos2, ")");
-        --LastCharac := To_String(Mot_tempo)'Last;
-        --Tab(Pos).pos2 := To_Unbounded_String(To_String(Mot_tempo)(1..LastCharac-1));
     end remplir_ligne_lire_ecrire;
 
     -- function intermédiaire pour simplifier la lecture
@@ -525,6 +560,7 @@ package body Decode is
 
     -- procédure permettant de retirer des espaces avant le premier mot de la ligne
     -- pour supprimer l'indentation du code intermédiaire
+    -- @param Ligne : la ligne d'instruction dont on souhaite retirer les espaces
     procedure enlever_indentation (Ligne : in out Unbounded_String) is
         inutile : Unbounded_String;
     begin
@@ -540,7 +576,7 @@ package body Decode is
    -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
    -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
     procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
-        Ligne : Unbounded_String;
+        Ligne : Unbounded_String;   -- ligne lue dans le fichier d'instructions
         Mot : Unbounded_String;
         Pos : Integer;
         Fichier : File_Type;
@@ -606,7 +642,7 @@ package body Decode is
     end recuperer_instru_pos4;
 
 
-    --affiche le numéro de ligne où l'on ira à la prochaine instruction
+    -- Affiche le numéro de ligne où l'on ira à la prochaine instruction
     -- @param Tab : tableau comptenant les instructions
     -- @param CP : compteur
     -- @param mem : liste chainee comptenant les variables et leurs valeurs
@@ -645,8 +681,8 @@ package body Decode is
    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
    -- Et modifie le CP en consequence
    -- @param Tab : tableau comptenant les instructions
-   -- @param CP : compteur
-   -- @param mem : liste chainee contenant les variables et leurs valeurs
+   -- @param CP : compteur des instructions
+   -- @param mem : liste chainee contenant les variables et leurs valeurs (represente la memoire)
     -- @exception OP_NON_RECONNUE_EXCEPTION : si l'instruction a effectuer n'est pas reconnue
     procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
         InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
@@ -657,11 +693,6 @@ package body Decode is
         InstruPart3 := recuperer_instru_pos3(Tab, CP);
         InstruPart4 := recuperer_instru_pos4(Tab, CP);
 
-        --  Put_Line(To_String(InstruPart1));
-        --  Put_Line(To_String(InstruPart2));
-        --  Put_Line(To_String(InstruPart3));
-        --  Put_Line(To_String(InstruPart4));
-
         -- Realiser l'instruction
         -- en fonction du premier mot de l'instruction, effectuer la bonne operation
         if InstruPart1 = "NULL" then
@@ -669,7 +700,7 @@ package body Decode is
         elsif InstruPart1 = "GOTO" then
             instru_goto(CP, Integer'Value(To_String(InstruPart2)), Tab);
         elsif InstruPart1 = "IF" then
-            instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem);
+            instru_if(InstruPart2, Integer'Value(To_String(InstruPart4)), CP, mem, Tab);
         elsif InstruPart1 = "Lire" then
             lire(mem, InstruPart2, CP);
         elsif InstruPart1 = "Ecrire" then
