@@ -31,21 +31,30 @@ package body Decode is
       CP := CP+1;
     end increm_CP;
 
-    procedure traduire_indice_tableau(CleVariable : in out Unbounded_String; Mem : in T_memoire) is
-        RecopieCle, ClePartie1 : Unbounded_String;
-        SplittedCle : Unbounded_String;
+    -- Permet de traduire l'indice d'un tableau en remplacant la variable par sa valeur
+    -- Par exemple si CleVariable = "Tab(i)" et i=5 alors CleVariable vaudra "Tab(5)"
+    -- @param CleVariable : le nom de la variable de type tableau
+    -- @param Mem : la memoire permettant d'acceder a la valeur de la variable
+    procedure traduire_indice_tableau(CleVariable : in out Unbounded_String; Memoire : in T_memoire) is
+        RecopieCle, ClePartie1, SplittedCle : Unbounded_String; -- parties de la cle permettant de modifier la valeur de l'indice
         IndiceRecupere : Integer;
     begin
         RecopieCle := CleVariable;
+        -- on recupere la partie avant la parenthese et a l'interieur de celle ci
         slice_mot (RecopieCle, ClePartie1, "(");
         slice_mot (RecopieCle, SplittedCle, ")");
         -- test si l'indice ne contient pas que des chiffres (dans ce cas il s'agit d'une variable dont la valeur doit etre cherchee)
         if not (for all Char of To_String(SplittedCle) => Char in '0' .. '9') then
-            IndiceRecupere := RecupererValeur_Entier(Mem, SplittedCle);
+            IndiceRecupere := RecupererValeur_Entier(Memoire, SplittedCle);
+            -- reassemble les parties de la cle
             CleVariable := To_Unbounded_String(Strip_Space(To_String(ClePartie1) & "(" & Integer'Image(IndiceRecupere) & ")"));
         end if;
     end traduire_indice_tableau;
 
+    -- effectue l'instruction ecrire dans le terminal
+    -- @param Mem : la memoire
+    -- @param Cle : la variable a ecrire (constante ou nom de variable)
+    -- @param CP : le compteur d'instruction
     procedure ecrire(Mem : in T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
         type_var : Unbounded_String;
         CleTraduite : Unbounded_String;
@@ -53,9 +62,11 @@ package body Decode is
     begin
         CleTraduite := Cle;
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(CleTraduite, "(") > 0 then
             traduire_indice_tableau(CleTraduite, Mem);
         end if;
+
         type_var := RecupererType(mem, CleTraduite);
         if type_var = "Entier" or else type_var = "TabEntier" then
             Put(RecupererValeur_entier(mem, CleTraduite));
@@ -74,7 +85,10 @@ package body Decode is
         increm_CP(CP);
     end ecrire;
 
-
+    -- effectue l'instruction lire (ce que l'utilisateur tappe dans le terminal)
+    -- @param mem : la memoire
+    -- @param Cle : le nom de la variable qui est modifiee
+    -- @param CP : le compteur d'instruction
     procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
         type_var : Unbounded_String;
         val_entier : Integer;
@@ -84,6 +98,7 @@ package body Decode is
         CleTraduite := Cle;
 
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        -- on traduit eventuellement l'indice s'il s'agit d'une variable
         if Index(CleTraduite, "(") > 0 then
             traduire_indice_tableau(CleTraduite, Mem);
         end if;
@@ -121,6 +136,7 @@ package body Decode is
     -- @param CleVal2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
     -- @return : le resultat de l'operation
+    -- @exception OP_NON_RECONNUE_EXCEPTION : si l'operation n'est pas reconnue
     function result_instru_entier(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire) return Integer is
         Result : Integer;
         Valeur1 : Integer;
@@ -198,6 +214,7 @@ package body Decode is
     -- @param CleVal2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
     -- @return : le resultat de l'operation
+    -- @exception OP_NON_RECONNUE_EXCEPTION : si l'operation n'est pas reconnue
     procedure result_instru_chaine(CleVal1 : in Unbounded_String; Operation : in Unbounded_String; CleVal2 : in Unbounded_String; Memoire : in out T_memoire; New_Chaine : out Unbounded_String ; New_Bool : out Integer) is
         Valeur1 : Unbounded_String;
         Valeur2 : Unbounded_String;
@@ -257,6 +274,7 @@ package body Decode is
     -- @param Operation : le type d'operation a realiser (en chaine)
     -- @param Valeur2 : le nom de la deuxieme variable de l'operation
     -- @param Memoire : la memoire
+    -- @exception OP_NON_RECONNUE_EXCEPTION : si l'operation n'est pas reconnue
     procedure instru_op (CleVariableAffectation : in Unbounded_String; Valeur1 : in Unbounded_String; Operation : in Unbounded_String; Valeur2 : in Unbounded_String; Memoire : in out T_memoire; CP: in out Integer) is
         Type_Var : Unbounded_String;
         New_Bool : Integer;
@@ -307,7 +325,7 @@ package body Decode is
                 Valeur1_copy := Unbounded_Slice(Valeur1_copy, 1, Length(Valeur1_copy) - 1);
             end if;
 
-            if FirstOfValeur2 = '"' or FirstOfValeur2 = '"' then
+            if FirstOfValeur2 = '"' or FirstOfValeur2 = ''' then
                 Delete(Valeur2_copy, 1, 1);
                 Valeur2_copy := Unbounded_Slice(Valeur2_copy, 1, Length(Valeur2_copy) - 1);
             end if;
@@ -520,6 +538,7 @@ package body Decode is
    -- Si la ligne est un coommentaire : devient un null dans le tableau
    -- @param Tab : tableau a remplir
    -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
+   -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
     procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
         Ligne : Unbounded_String;
         Mot : Unbounded_String;
@@ -611,7 +630,7 @@ package body Decode is
     end afficher_label;
 
 
-    -- Pour debugger : Affihe memoire CP et la memoire regroupant les valeurs des differentes variables
+    -- Pour debugger : Affiche le CP et la memoire regroupant les valeurs des differentes variables
     -- @param Tab : tableau comptenant les instructions
     -- @param CP : compteur
     -- @param mem : liste chainee comptenant les variables et leurs valeurs
@@ -628,6 +647,7 @@ package body Decode is
    -- @param Tab : tableau comptenant les instructions
    -- @param CP : compteur
    -- @param mem : liste chainee contenant les variables et leurs valeurs
+    -- @exception OP_NON_RECONNUE_EXCEPTION : si l'instruction a effectuer n'est pas reconnue
     procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
         InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
     begin

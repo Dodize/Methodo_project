@@ -3,6 +3,7 @@ with Memoire;     use Memoire;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 with Utils; use Utils;
+with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 
 procedure test_decode is
     
@@ -921,6 +922,179 @@ procedure test_decode is
         X_value := RecupererValeur_Entier(Memoire, To_Unbounded_String("x"));
         pragma Assert (X_value = 2);       
         pragma Assert (CP = 2); -- CP a bien ete augmente
+    end;
+    
+    -- Test concernant les operations de tableau d'entiers
+    procedure test_operations_tableau_entier is  
+        package Decode5 is new Decode(Capacite => 5);
+        use Decode5;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        TabValue : Integer;
+        CP : Integer;
+        
+    begin 
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Entier est tableau (1..5) d'entiers");
+        Put_Line (Fichier_temp, "TabEntier : T_Tab_Entier");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "TabEntier(1) <- 1");
+        Put_Line (Fichier_temp, "TabEntier(1) <- 2 + TabEntier(1)");
+        Put_Line (Fichier_temp, "TabEntier(1) <- TabEntier(1) - 2");
+        Put_Line (Fichier_temp, "TabEntier(1) <- 3 * 2");
+        Put_Line (Fichier_temp, "TabEntier(1) <- 6 / 3");
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- tests  + verifications
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        effectuer_instru(Tab_Instruc, CP, Memoire); -- addition
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("TabEntier(1)"));
+        pragma Assert (TabValue = 3);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire); -- soustraction
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("TabEntier(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire); -- multiplication
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("TabEntier(1)"));
+        pragma Assert (TabValue = 6);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire); -- division
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("TabEntier(1)"));
+        pragma Assert (TabValue = 2);
+    end;
+    
+    -- Test concernant les operations de tableau de booleens
+    procedure test_operations_tableau_booleen is  
+        package Decode8 is new Decode(Capacite => 8);
+        use Decode8;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        TabValue : Integer;
+        CP : Integer;
+        
+    begin 
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Bool est tableau (1..6) de booléens");
+        Put_Line (Fichier_temp, "Tab : T_Tab_Bool");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab(1) <- 6 = 6"); -- renvoie true
+        Put_Line (Fichier_temp, "Tab(1) <- 6 /= 6"); -- renvoie false
+        Put_Line (Fichier_temp, "Tab(1) <- 6 < 7"); -- renvoie true
+        Put_Line (Fichier_temp, "Tab(1) <- 6 <= 7"); -- renvoie true
+        Put_Line (Fichier_temp, "Tab(1) <- 7 > 6"); -- renvoie true
+        Put_Line (Fichier_temp, "Tab(1) <- 6 >= 6"); -- renvoie true
+        Put_Line (Fichier_temp, "Tab(1) <- Tab(2) OR Tab(3)"); -- renvoie true
+        Put_Line (Fichier_temp, "Tab(1) <- Tab(2) AND Tab(3)"); -- renvoie false
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        Modifier_Entier(Memoire, To_Unbounded_String("Tab(2)"), 0); -- false
+        Modifier_Entier(Memoire, To_Unbounded_String("Tab(3)"), 1); -- true
+        
+        -- tests  + verifications
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 0);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        TabValue := RecupererValeur_Entier(Memoire, To_Unbounded_String("Tab(1)"));
+        pragma Assert (TabValue = 0);
+    end;
+    
+    -- Test concernant les operations de tableau de chaines et de caracteres
+    procedure test_operations_tableau_chaine_carac is  
+        package Decode8 is new Decode(Capacite => 8);
+        use Decode8;
+        Fichier_temp : File_Type; -- le fichier d'instruction
+        Tab_Instruc : T_tab_instruc;
+        Memoire : T_Memoire;
+        X_Value : Integer;
+        CP : Integer;
+        
+    begin 
+        --initialisation du tableau d'instruction
+        createFileInstruct(Fichier_temp);
+        Put_Line (Fichier_temp, "Programme Test est");
+        Put_Line (Fichier_temp, "Type T_Tab_Chaine est tableau (1..6) de chaines");
+        Put_Line (Fichier_temp, "Type T_Tab_Carac est tableau (1..6) de caractères");
+        Put_Line (Fichier_temp, "Tab1 : T_Tab_Chaine");
+        Put_Line (Fichier_temp, "Tab2 : T_Tab_Carac");
+        Put_Line (Fichier_temp, "X : Booléen");
+        Put_Line (Fichier_temp, "Début");
+        Put_Line (Fichier_temp, "Tab1(1) <- ""unechaine"""); 
+        Put_Line (Fichier_temp, "Tab2(1) <- 'c'"); 
+        Put_Line (Fichier_temp, "X <- Tab1(1) = ""unechaine"""); -- renvoie true
+        Put_Line (Fichier_temp, "X <- Tab1(1) /= ""unechaine"""); -- renvoie false
+        Put_Line (Fichier_temp, "X <- Tab2(1) = 'c'"); -- renvoie true
+        Put_Line (Fichier_temp, "X <- Tab2(1) /= 'c'"); -- renvoie false
+        Put_Line (Fichier_temp, "Fin");
+        Close(Fichier_temp);
+        remplir_tab_instruc(Tab_Instruc, File_Name);
+        CP := 1;
+        
+        --initialisation de la memoire
+        DeclarerVariables(Memoire, File_Name);
+        
+        -- tests  + verifications
+        effectuer_instru(Tab_Instruc, CP, Memoire); -- initialisation
+        effectuer_instru(Tab_Instruc, CP, Memoire); -- initialisation
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        X_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("X"));
+        pragma Assert (X_Value = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        X_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("X"));
+        pragma Assert (X_Value = 0);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        X_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("X"));
+        pragma Assert (X_Value = 1);
+        
+        effectuer_instru(Tab_Instruc, CP, Memoire);
+        X_Value := RecupererValeur_Entier(Memoire, To_Unbounded_String("X"));
+        pragma Assert (X_Value = 0);
     end;
     
     -- Test concernant l'instruction OP : test de l'egalite avec deux variables (resultat = true)
@@ -2755,9 +2929,10 @@ begin
     test_instruction_division_parzero;
     test_instruction_division_entier_var;
     test_instruction_division_entier_mix;
+    test_operations_tableau_entier;
+    test_operations_tableau_booleen;
+    test_operations_tableau_chaine_carac;
     
-    test_instruction_egalite_chaines_vrai_var;
-    test_instruction_egalite_chaines_vrai_cons;
     test_instruction_egalite_booleen_var_true;
     test_instruction_egalite_booleen_var_false;
     test_instruction_egalite_booleen_const_true;
@@ -2778,6 +2953,7 @@ begin
     test_instruction_or_booleen_true1;
     test_instruction_or_booleen_true2;
     test_instruction_or_booleen_false;
+    
     test_instruction_op_exception;
     test_instruction_goto_ligne_ante;
     test_instruction_goto_ligne_post;
@@ -2785,11 +2961,14 @@ begin
     test_instruction_goto_invalide_sup;
     test_instruction_if_true;
     test_instruction_if_false;
+    
     test_initialisation_cp;
     test_remplir_tab_instruc;
     test_remplir_lire_ecrire;
     test_suppr_indentation;
     
+    test_instruction_egalite_chaines_vrai_var;
+    test_instruction_egalite_chaines_vrai_cons;
     test_instruction_egalite_chaines_faux;
     test_instruction_nonegalite_chaines_vrai;
     test_instruction_nonegalite_chaines_faux;
@@ -2803,6 +2982,7 @@ begin
     test_instruction_supeq_chaines_vrai_sup;
     test_instruction_supeq_chaines_vrai_eq;
     test_instruction_supeq_chaines_faux_inf;
+    
     deleteFileInstruct(File_Name);
    
 end test_decode;
