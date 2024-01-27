@@ -478,12 +478,15 @@ package body Decode is
    -- @param Pos : ligne du tableau a remplir
    -- @param Ligne : ligne dont on recupere les informations
    -- @param Mot : premier mot de la ligne
-    procedure remplir_ligne_lire_ecrire(Tab: out T_tab_instruc; Pos : in Integer; Mot : in out Unbounded_String) is
-        LastCharac : Integer;
+    procedure remplir_ligne_lire_ecrire(Tab: out T_tab_instruc; Pos : in Integer; Mot : in out Unbounded_String; Ligne : in out Unbounded_String) is
+        --LastCharac : Integer;
+        Mot_tempo : Unbounded_String;
     begin
         slice_mot(Mot, Tab(Pos).pos1, "(");
-        LastCharac := To_String(Mot)'Last;
-        Tab(Pos).pos2 := To_Unbounded_String(To_String(Mot)(1..LastCharac-1));
+        Mot_tempo := Mot & " " & Ligne;
+        slice_mot(Mot_tempo, Tab(Pos).pos2, ")");
+        --LastCharac := To_String(Mot_tempo)'Last;
+        --Tab(Pos).pos2 := To_Unbounded_String(To_String(Mot_tempo)(1..LastCharac-1));
     end remplir_ligne_lire_ecrire;
 
     -- function intermédiaire pour simplifier la lecture
@@ -530,7 +533,7 @@ package body Decode is
             elsif Mot = "GOTO" or Mot = "IF" then
                 remplir_ligne(Tab, Pos, Ligne, Mot);
             else -- dans le cas de lire ou ecrire car mise en forme speciale
-                remplir_ligne_lire_ecrire(Tab, Pos, Mot);
+                remplir_ligne_lire_ecrire(Tab, Pos, Mot, Ligne);
             end if;
             Pos := Pos + 1;
             Ligne := To_Unbounded_String(Get_Line(Fichier));
