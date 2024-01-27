@@ -49,6 +49,7 @@ package body Decode is
     procedure ecrire(Mem : in T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
         type_var : Unbounded_String;
         CleTraduite : Unbounded_String;
+        DebutCleTraduite : Character;
     begin
         CleTraduite := Cle;
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
@@ -61,6 +62,13 @@ package body Decode is
         elsif type_var = "Chaine" or else type_var = "TabChaine" then
             Put(To_String(RecupererValeur_chaine(mem, CleTraduite)));
         else
+            -- dans le cas d'une constante, on selectionne le premier caractere
+            DebutCleTraduite := To_String(CleTraduite)(To_String(CleTraduite)'First);
+            -- s'il s'agit de guillemets, alors on les supprime
+            if DebutCleTraduite = '"' or DebutCleTraduite = ''' then
+                Delete(CleTraduite, 1, 1);
+                CleTraduite := Unbounded_Slice(CleTraduite, 1, Length(CleTraduite) - 1);
+            end if;
             Put(To_String(CleTraduite));
         end if;
         increm_CP(CP);
