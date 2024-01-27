@@ -1,0 +1,37 @@
+Programme Tri_Tableau est
+    Type T_Tab_Entier est tableau (1..8) d'entiers
+    Tab : T_Tab_Entier
+    i, j, recopie : Entier
+    estFiniExterne, estFiniInterne, estSup : Booléen
+Début
+    i <- 1
+    estFiniExterne <- i > 8
+    IF estFiniExterne GOTO 8
+    Lire(Tab(i))
+    i <- i + 1
+    GOTO 2
+    -- tri du tableau
+    i <- 1
+    estFiniExterne <- i > 7
+    IF estFiniExterne GOTO 24
+    j <- i + 1
+    estFiniInterne <- j > 8
+    IF estFiniInterne GOTO 21
+    estSup <- Tab(j) > Tab(i)
+    IF estSup GOTO 19
+    recopie <- Tab(i)
+    Tab(i) <- Tab(j)
+    Tab(j) <- recopie
+    j <- j + 1
+    GOTO 12
+    i <- i + 1
+    GOTO 9
+    -- lecture du tableau
+    i <- 1
+    estFiniExterne <- i > 8
+    IF estFiniExterne GOTO 30
+    Ecrire(Tab(i))
+    i <- i + 1
+    GOTO 25
+    Null
+Fin
