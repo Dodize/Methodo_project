@@ -31,31 +31,61 @@ package body Decode is
       CP := CP+1;
     end increm_CP;
 
-
-    procedure ecrire(mem : in T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
-        type_var : Unbounded_String;
+    procedure traduire_indice_tableau(CleVariable : in out Unbounded_String; Mem : in T_memoire) is
+        RecopieCle, ClePartie1 : Unbounded_String;
+        SplittedCle : Unbounded_String;
+        IndiceRecupere : Integer;
     begin
-        type_var := RecupererType(mem, cle);
-        if type_var = "Entier" then
-            Put(RecupererValeur_entier(mem, cle));
-        elsif type_var = "Chaine" then
-            Put(To_String(RecupererValeur_chaine(mem, cle)));
+        RecopieCle := CleVariable;
+        slice_mot (RecopieCle, ClePartie1, "(");
+        slice_mot (RecopieCle, SplittedCle, ")");
+        -- test si l'indice ne contient pas que des chiffres (dans ce cas il s'agit d'une variable dont la valeur doit etre cherchee)
+        if not (for all Char of To_String(SplittedCle) => Char in '0' .. '9') then
+            IndiceRecupere := RecupererValeur_Entier(Mem, SplittedCle);
+            CleVariable := To_Unbounded_String(Strip_Space(To_String(ClePartie1) & "(" & Integer'Image(IndiceRecupere) & ")"));
+        end if;
+    end traduire_indice_tableau;
+
+    procedure ecrire(Mem : in T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
+        type_var : Unbounded_String;
+        CleTraduite : Unbounded_String;
+    begin
+        CleTraduite := Cle;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(CleTraduite, "(") > 0 then
+            traduire_indice_tableau(CleTraduite, Mem);
+        end if;
+        type_var := RecupererType(mem, CleTraduite);
+        if type_var = "Entier" or else type_var = "TabEntier" then
+            Put(RecupererValeur_entier(mem, CleTraduite));
+        elsif type_var = "Chaine" or else type_var = "TabChaine" then
+            Put(To_String(RecupererValeur_chaine(mem, CleTraduite)));
         end if;
         increm_CP(CP);
     end ecrire;
+
 
     procedure lire(mem : in out T_Memoire; Cle : in Unbounded_String; CP: in out Integer) is
         type_var : Unbounded_String;
         val_entier : Integer;
         val_string : String (1..100); --on définit un max arbitrairement
+        CleTraduite : Unbounded_String;
     begin
-        type_var := RecupererType(mem, cle);
+        CleTraduite := Cle;
+
+        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+        if Index(CleTraduite, "(") > 0 then
+            traduire_indice_tableau(CleTraduite, Mem);
+        end if;
+
+        type_var := RecupererType(mem, CleTraduite);
         if type_var = "Entier" or else type_var = "TabEntier" then
             Get(val_entier);
-            Modifier_Entier(mem, cle, val_entier);
+            Modifier_Entier(mem, CleTraduite, val_entier);
         elsif type_var = "Chaine" or else type_var = "TabChaine" then
             Get(val_string);
-            Modifier_Chaine(mem, cle, To_Unbounded_String(val_string));
+            Modifier_Chaine(mem, CleTraduite, To_Unbounded_String(val_string));
         end if;
         increm_CP(CP);
     end lire;
@@ -210,20 +240,6 @@ package body Decode is
         end if;
     end result_instru_chaine;
 
-        procedure traduire_indice_tableau(CleVariable : in out Unbounded_String; Mem : in out T_memoire) is
-        RecopieCle, ClePartie1 : Unbounded_String;
-        SplittedCle : Unbounded_String;
-        IndiceRecupere : Integer;
-    begin
-        RecopieCle := CleVariable;
-        slice_mot (RecopieCle, ClePartie1, "(");
-        slice_mot (RecopieCle, SplittedCle, ")");
-        -- test si l'indice ne contient pas que des chiffres (dans ce cas il s'agit d'une variable dont la valeur doit etre cherchee)
-        if not (for all Char of To_String(SplittedCle) => Char in '0' .. '9') then
-            IndiceRecupere := RecupererValeur_Entier(Mem, SplittedCle);
-            CleVariable := To_Unbounded_String(Strip_Space(To_String(ClePartie1) & "(" & Integer'Image(IndiceRecupere) & ")"));
-        end if;
-    end traduire_indice_tableau;
 
 
     -- Effectue l'instruction operation demande
@@ -273,9 +289,9 @@ package body Decode is
         Valeur2_copy := Valeur2Traduite;
 
         -- si Type_var vaut null => alors il s'agit d'une constante et on regarde le premier caractère pour connaitre son type
-        if Type_Var = "Entier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''' and FirstOfValeur2 /= '"' and FirstOfValeur2 /= '"')) then
+        if Type_Var = "Entier" or else Type_Var = "TabEntier" or else (Type_Var = "null" and (FirstOfValeur1 /= '"' and FirstOfValeur1 /= ''' and FirstOfValeur2 /= '"' and FirstOfValeur2 /= '"')) then
             Modifier_Entier(Memoire, CleTraduite, result_instru_entier(Valeur1Traduite, Operation, Valeur2Traduite, Memoire));
-        elsif Type_Var = "Chaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''' or FirstOfValeur2 /= '"' or FirstOfValeur2 /= '"')) then
+        elsif Type_Var = "Chaine" or else Type_Var = "TabChaine" or else (Type_Var = "null" and (FirstOfValeur1 = '"' or FirstOfValeur1 /= ''' or FirstOfValeur2 /= '"' or FirstOfValeur2 /= '"')) then
 
             if FirstOfValeur1 = '"' or FirstOfValeur1 = ''' then
                 Delete(Valeur1_copy, 1, 1);
@@ -462,9 +478,11 @@ package body Decode is
    -- @param Ligne : ligne dont on recupere les informations
    -- @param Mot : premier mot de la ligne
     procedure remplir_ligne_lire_ecrire(Tab: out T_tab_instruc; Pos : in Integer; Mot : in out Unbounded_String) is
+        LastCharac : Integer;
     begin
         slice_mot(Mot, Tab(Pos).pos1, "(");
-        slice_mot(Mot, Tab(Pos).pos2, ")");
+        LastCharac := To_String(Mot)'Last;
+        Tab(Pos).pos2 := To_Unbounded_String(To_String(Mot)(1..LastCharac-1));
     end remplir_ligne_lire_ecrire;
 
     -- function intermédiaire pour simplifier la lecture

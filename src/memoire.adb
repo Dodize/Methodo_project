@@ -31,6 +31,7 @@ package body Memoire is
             ListeTableaux := new T_TableauDeclare;
             Current_Line := ChaineDeclaration;
             -- recupere le mot "type"
+            slice_mot (Current_Line, Splitted_Line, "T");
             slice_mot (Current_Line, Splitted_Line, " ");
             -- recupere le nom du tableau
             slice_mot (Current_Line, Splitted_Line, " ");
