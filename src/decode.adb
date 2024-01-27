@@ -51,7 +51,6 @@ package body Decode is
         CleTraduite : Unbounded_String;
     begin
         CleTraduite := Cle;
-
         -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
         if Index(CleTraduite, "(") > 0 then
             traduire_indice_tableau(CleTraduite, Mem);
@@ -61,6 +60,8 @@ package body Decode is
             Put(RecupererValeur_entier(mem, CleTraduite));
         elsif type_var = "Chaine" or else type_var = "TabChaine" then
             Put(To_String(RecupererValeur_chaine(mem, CleTraduite)));
+        else
+            Put(To_String(CleTraduite));
         end if;
         increm_CP(CP);
     end ecrire;
