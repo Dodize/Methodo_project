@@ -32,7 +32,7 @@ package Memoire is
     -- @param Mem : la memoire contenant la variable a modifier
     -- @param Cle : le nom de la variable a modifier
     -- @param Data : la nouvelle valeur de la variable
-    -- Precondition : la liste des cases memoires contient une case memoire ayant pour Cle la Cle donnee en parametre
+    -- Precondition : la cle existe dans la liste des cases mémoire
     procedure Modifier_Entier(Mem : in out T_Memoire ; Cle : in Unbounded_String ; Data : in Integer) with
             Post => RecupererValeur_Entier(Mem, Cle) = Data;
 
@@ -40,6 +40,7 @@ package Memoire is
     -- @param Mem : la memoire contenant la variable a modifier
     -- @param Cle : le nom de la variable a modifier
     -- @param Data : la nouvelle valeur de la variable
+    -- Precondition : la cle existe dans la liste des cases mémoire
     procedure Modifier_Chaine(Mem : in out T_Memoire ; Cle : in Unbounded_String ; Data : in Unbounded_String) with
             Post => RecupererValeur_Chaine(Mem, Cle) = Data;
 
