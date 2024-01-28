@@ -234,13 +234,15 @@ package body Memoire is
     -- @param CaseMem : la premiere case memoire
     -- @param Cle : le nom de la variable
     -- @return : la case memoire contenant la variable
+    -- Precondition : la cle existe dans la liste des cases mémoire
+    -- Postcondition : Result.Cle = Cle
     function trouver_case_entier (CaseMem : in P_Memoire_Entier.T_Case_Memoire; Cle : in Unbounded_String) return P_Memoire_Entier.T_Case_Memoire is
         Pos_entier : P_Memoire_Entier.T_Case_Memoire;
     begin
         -- Recuperer la liste chainee
         Pos_entier := CaseMem;
         -- a chaque iteration on transforme la cle en minuscule pour que ce ne soit pas case sensitive
-        while Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) /= Pos_entier.Cle loop -- on n'est pas oblige de commencer par Pos_entier /= null or else car on sait que la variable existe en memoire
+        while Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) /= Pos_entier.Cle loop
             Pos_entier := Pos_entier.Suivant;
         end loop;
         return Pos_entier;
@@ -250,17 +252,20 @@ package body Memoire is
     -- @param CaseMem : la premiere case memoire
     -- @param Cle : le nom de la variable
     -- @return : la case memoire contenant la variable
+    -- Precondition : la cle existe dans la liste des cases mémoire
+    -- Postcondition : Result.Cle = Cle
     function trouver_case_chaine (CaseMem : in P_Memoire_String.T_Case_Memoire; Cle : in Unbounded_String) return P_Memoire_String.T_Case_Memoire is
         Pos_chaine : P_Memoire_String.T_Case_Memoire;
     begin
         -- Recuperer la liste chainee
         Pos_chaine := CaseMem;
         -- a chaque iteration on transforme la cle en minuscule pour que ce ne soit pas case sensitive
-        while Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) /= Pos_chaine.Cle loop -- on n'est pas oblige de commencer par Pos_entier /= null or else car on sait que la variable existe en memoire
+        while Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) /= Pos_chaine.Cle loop
             Pos_chaine := Pos_chaine.Suivant;
         end loop;
         return Pos_chaine;
     end trouver_case_chaine;
+
 
     -- Modifie la donnee d'une variable existante (mais pas forcement initialisee) de type entier/booleen
     -- @param Mem : la memoire contenant la variable a modifier
@@ -278,7 +283,7 @@ package body Memoire is
     -- @param Mem : la memoire contenant la variable a modifier
     -- @param Cle : le nom de la variable a modifier
     -- @param Data : la nouvelle valeur de la variable
-    -- Precondition : la cle existe dans la liste des cases mémoire
+    -- Precondition : la cle existe dans la liste des cases memoire (
     procedure Modifier_Chaine (Mem : in out T_Memoire; Cle : in Unbounded_String; Data : in Unbounded_String) is
         Pos_chaine : P_Memoire_String.T_Case_Memoire;
     begin
@@ -286,10 +291,12 @@ package body Memoire is
         Pos_chaine.Data := Data;
     end Modifier_Chaine;
 
+
     -- Recupere la valeur d'une variable par son nom a partir d'une case memoire (est appelee par RecupererValeur_Entier)
     -- @param CaseMem : la case memoire dans laquelle on verifie si la cle correspond
     -- @param Cle : la cle de la variable dont on cherche la valeur
     -- @return : la valeur associee au nom de la variable
+    -- Pre-condition : La cle existe dans la memoire
     function RecupererValeur_Entier_FromCase(CaseMem : in P_Memoire_Entier.T_Case_Memoire; Cle : in Unbounded_String) return Integer
     is
     begin
@@ -297,15 +304,16 @@ package body Memoire is
         if Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) = CaseMem.Cle then
             return CaseMem.All.Data;
         else
-            return RecupererValeur_Entier_FromCase(CaseMem.Suivant, Cle); -- on sait que la cle existe donc si elle n'a pas encore ete trouvee
-            -- alors elle est dans la case suivante (pas la peine de tester si Suivant /= Null)
+            return RecupererValeur_Entier_FromCase(CaseMem.Suivant, Cle);
         end if;
     end RecupererValeur_Entier_FromCase;
+
 
     -- Recupere la valeur d'une variable par son nom a partir d'une case memoire (est appelee par RecupererValeur_Chaine)
     -- @param CaseMem : la case memoire dans laquelle on verifie si la cle correspond
     -- @param Cle : la cle de la variable dont on cherche la valeur
     -- @return : la valeur associee au nom de la variable
+    -- Pre-condition : La cle existe dans la memoire
     function RecupererValeur_Chaine_FromCase(CaseMem : in P_Memoire_String.T_Case_Memoire; Cle : in Unbounded_String) return Unbounded_String
     is
     begin
@@ -313,16 +321,17 @@ package body Memoire is
         if Translate(Cle, Ada.Strings.Maps.Constants.Lower_Case_Map) = CaseMem.Cle then
             return CaseMem.All.Data;
         else
-            return RecupererValeur_Chaine_FromCase(CaseMem.Suivant, Cle); -- on sait que la cle existe donc si elle n'a pas encore ete trouvee
-            -- alors elle est dans la case suivante (pas la peine de tester si Suivant /= Null)
+            return RecupererValeur_Chaine_FromCase(CaseMem.Suivant, Cle);
         end if;
     end RecupererValeur_Chaine_FromCase;
 
-    -- Recupere la valeur d'une variable (de type entier ou booleen) par son nom
+
+    -- Recupere la valeur d'une variable (de type entier ou booleen)
+    -- S'il s'agit d'une variable declaree, cherche sa valeur dans la memoire
+    -- S'il s'agit d'une constante declaree sans variable, cast en Integer
     -- @param Memoire : la memoire dans laquelle est stockee la variable
     -- @param Cle : le nom de la variable recherchee
     -- @return : la valeur de la variable
-    -- Pre-condition : Mem.Entiers /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
     function RecupererValeur_Entier (Memoire : in T_Memoire; Cle : in Unbounded_String) return Integer
     is
         Type_Var : Unbounded_String;
@@ -339,11 +348,12 @@ package body Memoire is
         end if;
     end RecupererValeur_Entier;
 
-    -- Recupere la valeur d'une variable (de type chaine ou caractere) par son nom
-    -- @param Mem : la memoire dans laquelle est stockee la variable
+    -- Recupere la valeur d'une variable (de type chaine ou caractere)
+    -- S'il s'agit d'une variable declaree, cherche sa valeur dans la memoire
+    -- S'il s'agit d'une constante declaree sans variable, cast en Integer
+    -- @param Memoire : la memoire dans laquelle est stockee la variable
     -- @param Cle : le nom de la variable recherchee
     -- @return : la valeur de la variable
-    -- Pre-condition : Mem.Chaines /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
     function RecupererValeur_Chaine (Memoire : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String
     is
         Type_Var : Unbounded_String;
@@ -360,8 +370,11 @@ package body Memoire is
         end if;
     end RecupererValeur_Chaine;
 
-    -- fonction disant si le type est une chaine de caractère
-    -- surchargé
+    -- Retourne le type de la variable si elle est trouvee dans la partie memoire des chaines/caracteres
+    -- @param Mem : la memoire
+    -- @param Cle : le nom de la variable
+    -- @param search_type : prend la valeur de chaque case parcourue pour chercher la variable
+    -- @return : le type de la variable, ou null si elle n'est pas trouvee
     function donner_Type(Mem : in T_Memoire; Cle : in Unbounded_String; search_type : in out P_Memoire_String.T_Case_Memoire) return Unbounded_String is
     begin
         search_type := Mem.Chaines;
@@ -378,8 +391,12 @@ package body Memoire is
         return To_Unbounded_String("null");
     end donner_Type;
 
-    -- fonction disant si le type est un entier
-    -- surchargé
+
+    -- Retourne le type de la variable si elle est trouvee dans la partie memoire des entiers/booleens
+    -- @param Mem : la memoire
+    -- @param Cle : le nom de la variable
+    -- @param search_type : prend la valeur de chaque case parcourue pour chercher la variable
+    -- @return : le type de la variable, ou null si elle n'est pas trouvee
     function donner_Type(Mem : in T_Memoire; Cle : in Unbounded_String; search_type : in out P_Memoire_Entier.T_Case_Memoire) return Unbounded_String is
     begin
         search_type := Mem.Entiers;
@@ -392,10 +409,10 @@ package body Memoire is
             elsif search_type.TypeOfData = TAB_ENTIER then
                 return To_Unbounded_String("TabEntier");
             end if;
-
         end if;
         return To_Unbounded_String("null");
     end donner_Type;
+
 
     -- Recupere le type d'une variable par son nom ou renvoie null si la variable n'est pas stockee en memoire (constante)
     -- @param Mem : la memoire dans laquelle est stockee la variable
@@ -420,31 +437,36 @@ package body Memoire is
         return To_Unbounded_String("null");
     end RecupererType;
 
-    -- affiche le contenue de la liste de chaine de caractère
-    procedure afficher_liste_chaine(Mem : in P_Memoire_String.T_Case_Memoire; adresse : in out Integer) is
+
+    -- affiche le contenu de la liste de chaine de caractère
+    -- @param Mem : la case memoire a afficher
+    -- @param Adresse : l'adresse de la case memoire
+    procedure afficher_liste_chaine(Mem : in P_Memoire_String.T_Case_Memoire; Adresse : in out Integer) is
     begin
         if Mem.Suivant = null then
             null;
         else
-            Put("        Adresse en mémoire : "); Put(adresse, 1); Put_Line("");
+            Put("        Adresse en mémoire : "); Put(Adresse, 1); Put_Line("");
             Put("        Nom de la variable : "); Put(To_String(Mem.Cle)); Put_Line("");
             Put("        Valeur de la variable : "); Put_Line(To_String(Mem.Data)); Put_Line("");
-            adresse := adresse +1;
-            afficher_liste_chaine(Mem.Suivant, adresse);
+            Adresse := Adresse +1;
+            afficher_liste_chaine(Mem.Suivant, Adresse);
         end if;
     end afficher_liste_chaine;
 
-    -- affiche le contenue de la liste d'entier
-    procedure afficher_liste_entier(Mem : in P_Memoire_Entier.T_Case_Memoire; adresse : in out Integer) is
+    -- affiche le contenu de la liste d'entier
+    -- @param Mem : la case memoire a afficher
+    -- @param Adresse : l'adresse de la case memoire
+    procedure afficher_liste_entier(Mem : in P_Memoire_Entier.T_Case_Memoire; Adresse : in out Integer) is
     begin
         if Mem.Suivant = null then
             null;
         else
-            Put("        Adresse en mémoire : "); Put(adresse, 1); Put_Line("");
+            Put("        Adresse en mémoire : "); Put(Adresse, 1); Put_Line("");
             Put("        Nom de la variable : "); Put(To_String(Mem.Cle)); Put_Line("");
             Put("        Valeur de la variable : "); Put(Mem.Data, 1); Put_Line(""); Put_Line("");
-            adresse := adresse +1;
-            afficher_liste_entier(Mem.Suivant, adresse);
+            Adresse := Adresse +1;
+            afficher_liste_entier(Mem.Suivant, Adresse);
         end if;
     end afficher_liste_entier;
 
@@ -454,10 +476,15 @@ package body Memoire is
         adresse : Integer;
     begin
         adresse := 1;
-        Put_Line("    Affichage de la liste d'entier ou boolean : ");
-        afficher_liste_entier(Mem.Entiers, adresse);
-        Put_Line("    Affichage de la liste de caractère ou chaine : ");
-        afficher_liste_chaine(Mem.Chaines, adresse);
+        if Mem.Entiers.Suivant /= null then
+            Put_Line("    Affichage de la liste d'entier ou boolean : ");
+            afficher_liste_entier(Mem.Entiers, adresse);
+        end if;
+
+        if Mem.Chaines.Suivant /= null then
+            Put_Line("    Affichage de la liste de caractère ou chaine : ");
+            afficher_liste_chaine(Mem.Chaines, adresse);
+        end if;
     end afficher_variables;
 
 end Memoire;
