@@ -228,21 +228,21 @@ package body Memoire is
       return Pos_chaine;
    end trouver_case_chaine;
 
-   -- Modifie la donnee d'une variable existante en memoire
-   -- @param Mem : la memoire modifiee
-   -- @param Cle : le nom de la variable a modifier
-   -- @param Data : la nouvelle valeur de la variable
-   procedure Modifier_Entier (Mem : in out T_Memoire; Cle : in Unbounded_String; Data : in Integer) is
+    -- Modifie la donnee d'une variable existante (mais pas forcement initialisee) de type entier/booleen
+    -- @param Mem : la memoire contenant la variable a modifier
+    -- @param Cle : le nom de la variable a modifier
+    -- @param Data : la nouvelle valeur de la variable
+    procedure Modifier_Entier(Mem : in out T_Memoire ; Cle : in Unbounded_String ; Data : in Integer) is
       Pos_entier : P_Memoire_Entier.T_Case_Memoire;
     begin
       Pos_entier := trouver_case_entier(Mem.Entiers, Cle);
       Pos_entier.Data := Data;
    end Modifier_Entier;
 
-   -- Modifie la donnee d'une variable existante en memoire
-   -- @param Mem : la memoire modifiee
-   -- @param Cle : le nom de la variable a modifier
-   -- @param Data : la nouvelle valeur de la variable
+    -- Modifie la donnee d'une variable existante en memoire (mais pas forcement initialisee) de type chaine/caractere
+    -- @param Mem : la memoire contenant la variable a modifier
+    -- @param Cle : le nom de la variable a modifier
+    -- @param Data : la nouvelle valeur de la variable
    procedure Modifier_Chaine (Mem : in out T_Memoire; Cle : in Unbounded_String; Data : in Unbounded_String) is
       Pos_chaine : P_Memoire_String.T_Case_Memoire;
    begin
@@ -282,11 +282,11 @@ package body Memoire is
        end if;
    end RecupererValeur_Chaine_FromCase;
 
-   -- Recupere la valeur d'une variable par son nom (a partir de l'objet memoire)
-   -- @param Mem : la memoire dans laquelle est stockee la variable
-   -- @param Cle : le nom de la variable recherchee
-   -- @return la valeur de la variable
-   -- Pre-condition : Mem.Entiers /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
+    -- Recupere la valeur d'une variable (de type entier ou booleen) par son nom
+    -- @param Memoire : la memoire dans laquelle est stockee la variable
+    -- @param Cle : le nom de la variable recherchee
+    -- @return : la valeur de la variable
+    -- Pre-condition : Mem.Entiers /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
    function RecupererValeur_Entier (Memoire : in T_Memoire; Cle : in Unbounded_String) return Integer
    is
       Type_Var : Unbounded_String;
@@ -303,10 +303,10 @@ package body Memoire is
       end if;
    end RecupererValeur_Entier;
 
-    -- Recupere la valeur d'une variable par son nom (a partir de l'objet memoire)
+    -- Recupere la valeur d'une variable (de type chaine ou caractere) par son nom
     -- @param Mem : la memoire dans laquelle est stockee la variable
     -- @param Cle : le nom de la variable recherchee
-    -- @return la valeur de la variable
+    -- @return : la valeur de la variable
     -- Pre-condition : Mem.Chaines /= Null et la cle existe dans la memoire (car le programme intermediaire est bien forme)
     function RecupererValeur_Chaine (Memoire : in T_Memoire; Cle : in Unbounded_String) return Unbounded_String
     is
@@ -361,7 +361,7 @@ package body Memoire is
         return To_Unbounded_String("null");
     end donner_Type;
 
-   -- Recupere le type d'une variable par son nom
+   -- Recupere le type d'une variable par son nom ou renvoie null si la variable n'est pas stockee en memoire (constante)
    -- @param Mem : la memoire dans laquelle est stockee la variable
    -- @param Cle : le nom de la variable recherchee
    -- @return le type de la variable
