@@ -23,9 +23,11 @@ package body utils is
     end slice_mot;
 
 
-    -- Permet de récupérer les chaines de caractères d'une ligne
+    -- Permet de récupérer une chaine de caractères d'une ligne
     -- @param Ligne : ligne dont on extrait la chaine
-    -- @param Ligne_restante : la partie de la ligne pas modifiée
+    -- @param First_part : la partie de la ligne située avant la première chaine
+    -- @param Second_part : la partie de la ligne avec la première chaine trouvée
+    -- @param Third_part : la partie de la ligne située après la première chaine
     -- @param first_quote_found : indique si on a trouvé une chaine
     procedure slice_string(Ligne : in String; First_part : out Unbounded_String; Second_part : out Unbounded_String; Third_part : out Unbounded_String; first_quote_found : out Boolean) is
         first_quote : Character;
@@ -43,17 +45,25 @@ package body utils is
             if (Ligne(i) = '"' or Ligne(i) = ''') and not first_quote_found then
                 first_quote := Ligne(i);
                 first_quote_found := True;
+                -- Ajout du caractere dans la partie chaine
                 Second_part := Second_part & Ligne(i);
             else
                 -- Si on tombe sur le dernier quote
                 if Ligne(i) = first_quote and first_quote_found and not last_quote_found then
                     last_quote_found := True;
+                    -- Ajout du caractere dans la partie chaine
                     Second_part := Second_part & Ligne(i);
+                -- Si on a le quote de début mais pas celui de fin
                 elsif first_quote_found and not last_quote_found then
+                    -- Ajout du caractere dans la partie chaine
                     Second_part := Second_part & Ligne(i);
+                -- Si on a pas encore le premier quote
                 elsif not first_quote_found then
+                    -- Ajout du caractere dans la partie pré chaine
                     First_part := First_part & Ligne(i);
+                -- Si on a trouvé le dernier quote et donc la fin de la chaine
                 elsif last_quote_found then
+                    -- Ajout du caractere dans la partie post chaine
                     Third_part := Third_part & Ligne(i);
                 end if;
             end if;
