@@ -1,8 +1,8 @@
 package body utils is
 
-    -- permet de récupérer dans mot les caractères d'une ligne présent avant délimiteur
+    -- permet de recuperer dans la variable "mot" les caracteres d'une ligne presents avant le delimiteur
     -- @param Ligne : ligne dont on extrait le mot
-    -- @param Mot : a placer le mot extrait
+    -- @param Mot : les caracteres avant le delimiteur
     -- @param Delimiteur: caractere signant la fin du mot
     procedure slice_mot(Ligne : in out Unbounded_String; Mot : out Unbounded_String; Delimiteur : in String) is
         Pos : Natural;
@@ -74,6 +74,7 @@ package body utils is
     -- Ouvre le fichier en lecture pour pouvoir ensuite le parcourir
     -- @param NomFichier : le nom du fichier que l'on souhaite ouvrir en lecture
     -- @param FichierOuvert : l'object fichier apres ouverture
+    -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
     procedure Ouvrir_Fichier_Lecture(NomFichier : in String; FichierOuvert : out File_Type) is
     begin
         Open(FichierOuvert, In_File, NomFichier);
