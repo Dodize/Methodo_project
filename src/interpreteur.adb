@@ -8,6 +8,7 @@ package body Interpreteur is
 
     -- Permet de choisir le mode d'utilisation : 0 pour normal et 1 pour debug
     -- @return : 0 pour mode d'execution normal, 1 pour le mode debug
+    -- @exception si l'utilisateur ne rentre pas 0 ou 1
     function Menu return Integer is
         type_menu : Integer;
     begin
