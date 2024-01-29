@@ -64,12 +64,12 @@ package body Interpreteur is
         -- Declaration des variables en memoire, récuperation des instructions
         DeclarerVariables(Mem, NomFichier);
         remplir_tab_instruc(Instructions, NomFichier);
-        Capacite_tab := get_nombre_instruc(Instructions);
         -- Initialisation du CP
         init_CP(CP);
         -- Demande le Mode : normal ou debugg
         mode := menu;
         -- parcour le tableau tant que l'on n'a pas termine le programme
+        Capacite_tab := get_nombre_instruc(Instructions);
         while (CP <= Capacite_tab) loop
             if Mode = 1 then
                 afficher(Instructions, CP, Mem);

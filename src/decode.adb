@@ -559,7 +559,7 @@ package body Decode is
     -- @param Tab : tableau a remplir
     -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
     -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
-    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
+    procedure remplir_tab_instruc (Tab : out T_tab_instruc; NomFichier : in String) is
         Ligne : Unbounded_String;   -- ligne lue dans le fichier d'instructions
         Mot : Unbounded_String;
         Pos : Integer;

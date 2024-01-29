@@ -29,7 +29,7 @@ package Decode is
    -- @param Tab : tableau a remplir
    -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
    -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
-    procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String);
+    procedure remplir_tab_instruc (Tab : out T_tab_instruc; NomFichier : in String);
 
    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
    -- @param Tab : tableau comptenant les instructions
