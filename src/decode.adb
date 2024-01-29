@@ -380,17 +380,8 @@ package body Decode is
         -- recopie de la valeur a effecter pour la modifier
         ValeurTraduite := Valeur;
 
-        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
-        -- on traduit eventuellement l'indice s'il s'agit d'une variable
-        if Index(CleTraduite, "(") > 0 then
-            traduire_indice_tableau(CleTraduite, Mem);
-        end if;
-
-        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
-        -- on traduit eventuellement l'indice s'il s'agit d'une variable
-        if Index(ValeurTraduite, "(") > 0 then
-            traduire_indice_tableau(ValeurTraduite, Mem);
-        end if;
+        trad_clef(CleTraduite, Mem);
+        trad_clef(ValeurTraduite, Mem);
 
         Type_Var := RecupererType(Mem, CleTraduite);
         if Type_Var = "Entier" or else Type_Var = "TabEntier" then
