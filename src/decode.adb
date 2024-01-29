@@ -6,29 +6,29 @@ with Ada.Integer_Text_IO ;        use Ada.Integer_Text_IO ;
 
 package body Decode is
 
--- Importer le module de memoire dans .adb
+    -- Importer le module de memoire dans .adb
 
-   -- Initialise le compteur
-   -- @param CP : compteur a initialiser
-   procedure init_CP (CP: out Integer) is
-   begin
-      CP := 1;
-   end init_CP;
+    -- Initialise le compteur
+    -- @param CP : compteur a initialiser
+    procedure init_CP (CP: out Integer) is
+    begin
+        CP := 1;
+    end init_CP;
 
-   -- Retourne le nombre d'instructions du tableau d'instructions (le nombre de ligne)
-   -- @param Tab : le tableau d'instructions
-   -- @return : le nombre d'instructions
+    -- Retourne le nombre d'instructions du tableau d'instructions (le nombre de ligne)
+    -- @param Tab : le tableau d'instructions
+    -- @return : le nombre d'instructions
     function get_nombre_instruc(Tab : in T_tab_instruc) return Integer is
     begin
         return Tab'Length;
     end get_nombre_instruc;
 
 
-   -- Incremente le compteur
-   -- @param CP : compteur a incrementer
-   procedure increm_CP (CP : in out Integer) is
-   begin
-      CP := CP+1;
+    -- Incremente le compteur
+    -- @param CP : compteur a incrementer
+    procedure increm_CP (CP : in out Integer) is
+    begin
+        CP := CP+1;
     end increm_CP;
 
     -- Permet de traduire l'indice d'un tableau en remplacant la variable par sa valeur
@@ -121,7 +121,7 @@ package body Decode is
     -- @param TabInstruc : le tableau d'instructions permettant de verifier si le label est correct
     -- @exception GOTO_OUT_OF_RANGE_EXCEPTION : si le label ne correspond pas a une ligne valide
     -- (la ligne est < 1 ou > au nombre d'instructions)
-   procedure instru_goto (CP : out Integer; Label : in Integer; TabInstruc : in T_tab_instruc) is
+    procedure instru_goto (CP : out Integer; Label : in Integer; TabInstruc : in T_tab_instruc) is
     begin
         if (Label < 1) or else (Label > TabInstruc'Length) then
             raise GOTO_OUT_OF_RANGE_EXCEPTION;
@@ -291,6 +291,15 @@ package body Decode is
     end estModificationChaine;
 
 
+    -- Fonction intermédiaire
+    -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
+    -- on traduit eventuellement l'indice s'il s'agit d'une variable
+    procedure trad_clef(cle : in out Unbounded_String; Mem : in out T_Memoire) is
+    begin
+        if Index(cle, "(") > 0 then
+            traduire_indice_tableau(cle, Mem);
+        end if;
+    end trad_clef;
 
     -- Effectue l'instruction operation demandee
     -- @param CleVariableAffectation : le nom de la variable affectee
@@ -306,7 +315,7 @@ package body Decode is
         New_Chaine : Unbounded_String;                -- resultat d'une operation retournant une chaine
         FirstOfValeur1, FirstOfValeur2 : Character;   -- le premier caractere de valeur1/valeur2
         CleTraduite : Unbounded_String;               -- traduction de la variable affectee s'il s'agit d'un tableau
-                                                      -- afin de remplacer l'indice par sa valeur
+        -- afin de remplacer l'indice par sa valeur
         Valeur1Traduite, Valeur2Traduite : Unbounded_String;
 
     begin
@@ -314,23 +323,9 @@ package body Decode is
         Valeur1Traduite := Valeur1;
         Valeur2Traduite:= Valeur2;
 
-        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
-        -- on traduit eventuellement l'indice s'il s'agit d'une variable
-        if Index(CleTraduite, "(") > 0 then
-            traduire_indice_tableau(CleTraduite, Memoire);
-        end if;
-
-        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
-        -- on traduit eventuellement l'indice s'il s'agit d'une variable
-        if Index(Valeur1Traduite, "(") > 0 then
-            traduire_indice_tableau(Valeur1Traduite, Memoire);
-        end if;
-
-        -- si le nom de la variable contient des parentheses alors il s'agit d'un tableau
-        -- on traduit eventuellement l'indice s'il s'agit d'une variable
-        if Index(Valeur2Traduite, "(") > 0 then
-            traduire_indice_tableau(Valeur2Traduite, Memoire);
-        end if;
+        trad_clef(CleTraduite, Memoire);
+        trad_clef(Valeur1Traduite, Memoire);
+        trad_clef(Valeur2Traduite, Memoire);
 
         New_Bool := -1;
         Type_Var := RecupererType(Memoire, Valeur1Traduite);
@@ -364,7 +359,6 @@ package body Decode is
             else
                 Modifier_Chaine(Memoire, CleVariableAffectation, New_Chaine);
             end if;
-
         end if;
         increm_CP(CP);
     end instru_op;
@@ -424,12 +418,12 @@ package body Decode is
     end instru_affectation;
 
 
-     --  Effectue l'instruction if en fonction de la variable VariableBool
-     --  @param VariableBool : le nom de la variable booleenne
-     --  @param Label : la valeur que doit prendre CP si le booleen vaut True
-     --  @param CP : le compteur de la ligne courante
-     --  @param Memoire : la memoire
-     --  @param TabInstruc : le tableau d'instructions permettant de verifier que le label est correct
+    --  Effectue l'instruction if en fonction de la variable VariableBool
+    --  @param VariableBool : le nom de la variable booleenne
+    --  @param Label : la valeur que doit prendre CP si le booleen vaut True
+    --  @param CP : le compteur de la ligne courante
+    --  @param Memoire : la memoire
+    --  @param TabInstruc : le tableau d'instructions permettant de verifier que le label est correct
     procedure instru_if (VariableBool : in Unbounded_String; Label : in Integer; CP : in out Integer; Memoire : in T_memoire; TabInstruc : in T_tab_instruc) is
         valeur : Integer; -- valeur de "VariableBool"
     begin
@@ -440,7 +434,7 @@ package body Decode is
         else -- cas ou la valeur vaut true : on change la valeur de CP
             instru_goto(CP, Label, TabInstruc);
         end if;
-   end instru_if;
+    end instru_if;
 
 
     -- Effectue l'instruction null, soit ne fait rien et augmente le compteur d'instructions
@@ -487,16 +481,15 @@ package body Decode is
         is_chaine := False;
 
         Tab(Pos).pos1 := Mot;
-        slice_mot(Ligne, inutile, " ");
-
+        slice_mot(Ligne, inutile, " "); -- on enlève "<-" présent dans le code intermédiaire
         slice_string(To_String(Ligne), First_part, Second_part, Third_part, is_chaine);
 
-        if is_chaine then
+        if is_chaine then --si une chaine de caractère est trouvée
             if Second_part = "" then
                 slice_mot(Ligne, Tab(Pos).pos2, " ");
-                if index(Ligne, " ") = 0 then
+                if index(Ligne, " ") = 0 then -- on est dans le cas d'une affectation
                     Tab(Pos).pos3 := To_Unbounded_String("affect");
-                else
+                else -- on est dans le cas d'une opération
                     slice_mot(Ligne, Tab(Pos).pos3, " ");
                     slice_mot(Ligne, Tab(Pos).pos4, " ");
                 end if;
@@ -505,9 +498,9 @@ package body Decode is
                 slice_mot(Third_part, inutile, " ");
                 ligne_temp := Third_part;
                 slice_string(To_String(ligne_temp), First_part, Second_part, Third_part, is_chaine);
-                if index(Ligne, " ") = 0 then
+                if index(Ligne, " ") = 0 then -- on est dans le cas d'une affectation
                     Tab(Pos).pos3 := To_Unbounded_String("affect");
-                else
+                else -- on est dans le cas d'une opération
                     if Second_part = "" then
                         slice_mot(First_part, Tab(Pos).pos3, " ");
                         slice_mot(First_part, Tab(Pos).pos4, " ");
@@ -518,29 +511,29 @@ package body Decode is
                 end if;
             elsif Third_part = "" then
                 slice_mot(First_part, Tab(pos).pos2, " ");
-                if index(Ligne, " ") = 0 then
+                if index(Ligne, " ") = 0 then -- on est dans le cas d'une affectation
                     Tab(Pos).pos3 := To_Unbounded_String("affect");
-                else
+                else -- on est dans le cas d'une opération
                     slice_mot(First_part, Tab(Pos).pos3, " ");
                     Tab(Pos).pos4 := Second_part;
                 end if;
             end if;
         else
             slice_mot(Ligne, Tab(Pos).pos2, " ");
-            if index(Ligne, " ") = 0 then
+            if index(Ligne, " ") = 0 then -- on est dans le cas d'une affectation
                 Tab(Pos).pos3 := To_Unbounded_String("affect");
-            else
+            else -- on est dans le cas d'une opération
                 slice_mot(Ligne, Tab(Pos).pos3, " ");
                 slice_mot(Ligne, Tab(Pos).pos4, " ");
             end if;
         end if;
     end remplir_ligne_op;
 
-   -- Rempli une ligne du tableau en lire/ecrire dans la premiere case et la variable dans la deuxième
-   -- @param Tab : tableau a remplir
-   -- @param Pos : ligne du tableau a remplir
-   -- @param Ligne : ligne dont on recupere les informations
-   -- @param Mot : premier mot de la ligne
+    -- Rempli une ligne du tableau en lire/ecrire dans la premiere case et la variable dans la deuxième
+    -- @param Tab : tableau a remplir
+    -- @param Pos : ligne du tableau a remplir
+    -- @param Ligne : ligne dont on recupere les informations
+    -- @param Mot : premier mot de la ligne
     procedure remplir_ligne_lire_ecrire(Tab: out T_tab_instruc; Pos : in Integer; Mot : in out Unbounded_String; Ligne : in out Unbounded_String) is
         --LastCharac : Integer;
         Mot_tempo : Unbounded_String;
@@ -569,12 +562,12 @@ package body Decode is
         end loop;
     end;
 
-   -- Rempli le tableau avec les instructions du fichier
-   -- en mettant sous la forme voulue
-   -- Si la ligne est un coommentaire : devient un null dans le tableau
-   -- @param Tab : tableau a remplir
-   -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
-   -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
+    -- Rempli le tableau avec les instructions du fichier
+    -- en mettant sous la forme voulue
+    -- Si la ligne est un coommentaire : devient un null dans le tableau
+    -- @param Tab : tableau a remplir
+    -- @param NomFichier : le nom du fichier contenant code source a utiliser pour remplir le tableau
+    -- @exception ADA.IO_EXCEPTIONS.NAME_ERROR : si le fichier ayant pour nom "NomFichier" n'existe pas ou n'est pas accessible par le programme
     procedure remplir_tab_instruc (Tab : in out T_tab_instruc; NomFichier : in String) is
         Ligne : Unbounded_String;   -- ligne lue dans le fichier d'instructions
         Mot : Unbounded_String;
@@ -605,40 +598,40 @@ package body Decode is
     end remplir_tab_instruc;
 
 
-   -- Retourne une partie d'une instruction a la ligne du CP
-   -- @param Tab : tableau contenant les instructions
-   -- @param CP : la ligne de la partie a recuperer
-   -- @return : la partie 1 de l'instruction
-   function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
-   begin
-      return Tab(CP).pos1;
-   end recuperer_instru_pos1;
+    -- Retourne une partie d'une instruction a la ligne du CP
+    -- @param Tab : tableau contenant les instructions
+    -- @param CP : la ligne de la partie a recuperer
+    -- @return : la partie 1 de l'instruction
+    function recuperer_instru_pos1 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
+    begin
+        return Tab(CP).pos1;
+    end recuperer_instru_pos1;
 
-   -- Retourne une partie d'une instruction a la ligne du CP
-   -- @param Tab : tableau contenant les instructions
-   -- @param CP : la ligne de la partie a recuperer
-   -- @return : la partie 2 de l'instruction
-   function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
-   begin
-      return Tab(CP).pos2;
-   end recuperer_instru_pos2;
+    -- Retourne une partie d'une instruction a la ligne du CP
+    -- @param Tab : tableau contenant les instructions
+    -- @param CP : la ligne de la partie a recuperer
+    -- @return : la partie 2 de l'instruction
+    function recuperer_instru_pos2 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
+    begin
+        return Tab(CP).pos2;
+    end recuperer_instru_pos2;
 
-   -- Retourne une partie d'une instruction a la ligne du CP
-   -- @param Tab : tableau contenant les instructions
-   -- @param CP : la ligne de la partie a recuperer
-   -- @return : la partie 3 de l'instruction
-   function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
-   begin
-      return Tab(CP).pos3;
-   end recuperer_instru_pos3;
+    -- Retourne une partie d'une instruction a la ligne du CP
+    -- @param Tab : tableau contenant les instructions
+    -- @param CP : la ligne de la partie a recuperer
+    -- @return : la partie 3 de l'instruction
+    function recuperer_instru_pos3 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
+    begin
+        return Tab(CP).pos3;
+    end recuperer_instru_pos3;
 
-   -- Retourne une partie d'une instruction a la ligne du CP
-   -- @param Tab : tableau contenant les instructions
-   -- @param CP : la ligne de la partie a recuperer
-   -- @return : la partie 4 de l'instruction
-   function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
-   begin
-      return Tab(CP).pos4;
+    -- Retourne une partie d'une instruction a la ligne du CP
+    -- @param Tab : tableau contenant les instructions
+    -- @param CP : la ligne de la partie a recuperer
+    -- @return : la partie 4 de l'instruction
+    function recuperer_instru_pos4 (Tab : in T_tab_instruc; CP : in Integer) return Unbounded_String is
+    begin
+        return Tab(CP).pos4;
     end recuperer_instru_pos4;
 
 
@@ -678,11 +671,11 @@ package body Decode is
     end afficher;
 
 
-   -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
-   -- Et modifie le CP en consequence
-   -- @param Tab : tableau comptenant les instructions
-   -- @param CP : compteur des instructions
-   -- @param mem : liste chainee contenant les variables et leurs valeurs (represente la memoire)
+    -- Effectue une instruction passee en parametre en fonction de son type (GOTO, null, if, op)
+    -- Et modifie le CP en consequence
+    -- @param Tab : tableau comptenant les instructions
+    -- @param CP : compteur des instructions
+    -- @param mem : liste chainee contenant les variables et leurs valeurs (represente la memoire)
     -- @exception OP_NON_RECONNUE_EXCEPTION : si l'instruction a effectuer n'est pas reconnue
     procedure effectuer_instru (Tab : in T_tab_instruc; CP : in out Integer; mem : in out T_memoire) is
         InstruPart1, InstruPart2, InstruPart3, InstruPart4 : Unbounded_String; -- differentes parties de l'instruction
